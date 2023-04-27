@@ -10,7 +10,6 @@ export class TzktService {
   constructor(private http: HttpClient) {}
 
   getBlocks(): Observable<Block[]> {
-    console.log("yes!!");
     return this.http
       .get<Block[]>('https://api.tzkt.io/v1/blocks');
   }

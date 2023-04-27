@@ -8,7 +8,7 @@ import { Injectable } from '@angular/core';
 export class TZKTEffects {
   fetchBlocks$ = createEffect(() =>
     this.actions$.pipe(
-      ofType('[tzkt] fetch blocks'),
+      ofType(TZKTActions.fetchBlocks().type),
       switchMap(() => this.service.getBlocks()),
       map((blocks) => TZKTActions.storeBlocks({ blocks }))
     )
