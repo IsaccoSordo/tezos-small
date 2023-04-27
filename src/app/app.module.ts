@@ -8,6 +8,8 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
 import { TzktService } from './services/tzkt.service';
+import { tzktReducer } from './state/tzkt.reducer';
+import { TZKTEffects } from './effects/tzkt.effects';
 
 @NgModule({
   declarations: [AppComponent, BlocksOverviewComponent],
@@ -16,8 +18,8 @@ import { TzktService } from './services/tzkt.service';
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
-    StoreModule.forRoot({}, {}),
-    EffectsModule.forRoot([]),
+    StoreModule.forRoot({tzkt: tzktReducer}),
+    EffectsModule.forRoot([TZKTEffects]),
   ],
   providers: [TzktService],
   bootstrap: [AppComponent],

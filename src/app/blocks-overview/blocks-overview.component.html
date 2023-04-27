@@ -1,1 +1,3 @@
-<p>blocks-overview works!</p>
+<table *ngIf="blocks$ | async as blocks">
+    <tr *ngFor="let block of blocks">{{block.timestamp}}</tr>
+</table>
