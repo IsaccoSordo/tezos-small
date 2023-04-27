@@ -8,6 +8,7 @@ transactions -->
 		<tr>
 			<th scope="col">Hash</th>
 			<th scope="col">Level</th>
+			<th scope="col">Transactions</th>
 			<th scope="col">Proposer</th>
 			<th scope="col">Timestamp</th>
 		</tr>
@@ -16,7 +17,8 @@ transactions -->
 		<tr *ngFor="let block of blocks$ | async">
 			<th scope="row">{{ block.hash }}</th>
 			<td>{{ block.level }}</td>
-			<!-- todo proposer -->
+			<td>{{ block.transactions }}</td>
+			<td>{{block.proposer ? block.proposer.alias : ''}}</td>
 			<td>{{ block.timestamp }}</td>
 		</tr>
 	</tbody>
