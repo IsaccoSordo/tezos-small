@@ -1,4 +1,4 @@
-import { Block } from "../generic";
+import { Block } from "../common";
 
 export interface TZKTState {
     blocks: Block[];

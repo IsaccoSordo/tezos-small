@@ -1,3 +1,23 @@
-<table *ngIf="blocks$ | async as blocks">
+<!-- <table *ngIf="blocks$ | async as blocks">
     <tr *ngFor="let block of blocks">{{block.timestamp}}</tr>
+</table> -->
+<!-- the block level, proposer, timestamp and the number of
+transactions -->
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th scope="col">Hash</th>
+			<th scope="col">Level</th>
+			<th scope="col">Proposer</th>
+			<th scope="col">Timestamp</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let block of blocks$ | async">
+			<th scope="row">{{ block.hash }}</th>
+			<td>{{ block.level }}</td>
+			<!-- todo proposer -->
+			<td>{{ block.timestamp }}</td>
+		</tr>
+	</tbody>
 </table>

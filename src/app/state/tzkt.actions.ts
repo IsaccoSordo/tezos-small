@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { Block } from '../generic';
+import { Block } from '../common';
 
 export const TZKTActions = createActionGroup({
   source: 'tzkt',
