@@ -10,9 +10,9 @@ export class TzktService {
   constructor(private http: HttpClient) {}
 
   getBlocks(): Observable<Block[]> {
-    return this.http.get<Block[]>('https://api.tzkt.io/v1/blocks').pipe(
-      switchMap((blocks, i) => {
-        const newBlocks: Observable<Block>[] = blocks.slice(0,25).map((block) => { // todo ui limit
+    return this.http.get<Block[]>('https://api.tzkt.io/v1/blocks?limit=25&offset.pg=0').pipe( // todo ui limit
+      switchMap((blocks) => {
+        const newBlocks: Observable<Block>[] = blocks.map((block) => { 
           const params = new HttpParams().append('level', block.level);
           return this.http
             .get<number>(
