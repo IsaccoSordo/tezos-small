@@ -9,10 +9,11 @@ import { Block } from '../common';
 export class TzktService {
   constructor(private http: HttpClient) {}
 
-  getBlocks(): Observable<Block[]> {
-    return this.http.get<Block[]>(
-      'https://api.tzkt.io/v1/blocks?limit=25&offset.pg=0'
-    );
+  getBlocks(limit: number, offset: number): Observable<Block[]> {
+    const params = new HttpParams()
+      .append('limit', limit)
+      .append('offset.pg', offset);
+    return this.http.get<Block[]>('https://api.tzkt.io/v1/blocks', { params });
   }
 
   getTransactions(level: number): Observable<number> {

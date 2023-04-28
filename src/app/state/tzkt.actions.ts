@@ -4,7 +4,7 @@ import { Block } from '../common';
 export const TZKTActions = createActionGroup({
   source: 'tzkt',
   events: {
-    'fetch blocks': emptyProps(),
+    'fetch blocks': props<{ limit: number; offset: number }>(),
     'store blocks': props<{ blocks: Block[] }>(),
   },
 });

@@ -9,8 +9,8 @@ import { Block } from '../common';
 export class TZKTEffects {
   fetchBlocks$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(TZKTActions.fetchBlocks().type),
-      switchMap(() => this.service.getBlocks()),
+      ofType(TZKTActions.fetchBlocks),
+      switchMap(({limit, offset}) => this.service.getBlocks(limit, offset)),
       switchMap((blocks) =>
         forkJoin(
           blocks.map((block) =>
