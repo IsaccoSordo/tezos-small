@@ -12,7 +12,7 @@ import { TZKTActions } from '../state/tzkt.actions';
 })
 export class BlocksOverviewComponent implements OnInit {
   blocks$: Observable<Block[]> = this.store.select(selectBlocks);
-  page = 0;
+  page = 1; // base value for paginator is 1 (not 0)
   pageSize = 10;
 
   constructor(private store: Store) {}
@@ -23,7 +23,7 @@ export class BlocksOverviewComponent implements OnInit {
 
   refreshView() {
     this.store.dispatch(
-      TZKTActions.fetchBlocks({ limit: this.pageSize, offset: this.page })
+      TZKTActions.fetchBlocks({ limit: this.pageSize, offset: this.page - 1 }) // the API offset param starts from 0
     );
   }
 }
