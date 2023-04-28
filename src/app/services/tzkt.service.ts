@@ -10,25 +10,16 @@ export class TzktService {
   constructor(private http: HttpClient) {}
 
   getBlocks(): Observable<Block[]> {
-    return this.http.get<Block[]>('https://api.tzkt.io/v1/blocks?limit=25&offset.pg=0').pipe( // todo ui limit
-      switchMap((blocks) => {
-        const newBlocks: Observable<Block>[] = blocks.map((block) => { 
-          const params = new HttpParams().append('level', block.level);
-          return this.http
-            .get<number>(
-              `https://api.tzkt.io/v1/operations/transactions/count`,
-              { params }
-            )
-            .pipe(
-              map((num) => ({
-                ...block,
-                transactions: num,
-              }))
-            );
-        });
+    return this.http.get<Block[]>(
+      'https://api.tzkt.io/v1/blocks?limit=25&offset.pg=0'
+    );
+  }
 
-        return forkJoin(newBlocks);
-      })
+  getTransactions(level: number): Observable<number> {
+    const params = new HttpParams().append('level', level);
+    return this.http.get<number>(
+      `https://api.tzkt.io/v1/operations/transactions/count`,
+      { params }
     );
   }
 }

@@ -1,8 +1,9 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { map, switchMap } from 'rxjs';
+import { forkJoin, map, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { TZKTActions } from '../state/tzkt.actions';
 import { Injectable } from '@angular/core';
+import { Block } from '../common';
 
 @Injectable()
 export class TZKTEffects {
@@ -10,7 +11,16 @@ export class TZKTEffects {
     this.actions$.pipe(
       ofType(TZKTActions.fetchBlocks().type),
       switchMap(() => this.service.getBlocks()),
-      map((blocks) => TZKTActions.storeBlocks({ blocks }))
+      switchMap((blocks) =>
+        forkJoin(
+          blocks.map((block) =>
+            this.service
+              .getTransactions(block.level)
+              .pipe(map((transactions) => ({ ...block, transactions })))
+          )
+        )
+      ),
+      map((blocks: Block[]) => TZKTActions.storeBlocks({ blocks }))
     )
   );
 
