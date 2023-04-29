@@ -1,6 +1,3 @@
-<nav class="navbar navbar-light bg-light">
-    <a class="nav-item nav-link" routerLink="">Home</a>
-  </nav>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -10,12 +7,17 @@
       <th scope="col">Status</th>
     </tr>
   </thead>
-  <tbody>
-    <tr *ngFor="let transaction of transactions$ | async">
-      <td>{{ transaction.sender.alias }}</td>
-      <td>{{ transaction.target.alias }}</td>
-      <td>{{ transaction.amount }}</td>
-      <td>{{ transaction.status }}</td>
-    </tr>
-  </tbody>
+  <ng-container *ngIf="transactions$ | async as transactions">
+    <tbody *ngIf="transactions.length > 0; else default">
+      <tr *ngFor="let transaction of transactions">
+        <td>{{ transaction.sender.address }}</td>
+        <td>{{ transaction.target.address }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.status }}</td>
+      </tr>
+    </tbody>
+  </ng-container>
 </table>
+<ng-template #default>
+  <p>No data found.</p>
+</ng-template>
