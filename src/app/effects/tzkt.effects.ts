@@ -10,7 +10,7 @@ export class TZKTEffects {
   fetchBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TZKTActions.fetchBlocks),
-      switchMap(({limit, offset}) => this.service.getBlocks(limit, offset)),
+      switchMap(({ limit, offset }) => this.service.getBlocks(limit, offset)),
       switchMap((blocks) =>
         forkJoin(
           blocks.map((block) =>
@@ -21,6 +21,14 @@ export class TZKTEffects {
         )
       ),
       map((blocks: Block[]) => TZKTActions.storeBlocks({ blocks }))
+    )
+  );
+
+  fetchBlocksCount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TZKTActions.fetchBlocksCount),
+      switchMap(() => this.service.getBlocksCount()),
+      map((count) => TZKTActions.storeBlocksCount({ count }))
     )
   );
 

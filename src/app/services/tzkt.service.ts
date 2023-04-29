@@ -9,10 +9,15 @@ import { Block } from '../common';
 export class TzktService {
   constructor(private http: HttpClient) {}
 
+  getBlocksCount(): Observable<number> {
+    return this.http.get<number>('https://api.tzkt.io/v1/blocks/count');
+  }
+
   getBlocks(limit: number, offset: number): Observable<Block[]> {
     const params = new HttpParams()
       .append('limit', limit)
-      .append('offset.pg', offset);
+      .append('offset.pg', offset)
+      .append('sort.desc', 'level');
     return this.http.get<Block[]>('https://api.tzkt.io/v1/blocks', { params });
   }
 

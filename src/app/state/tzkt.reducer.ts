@@ -1,8 +1,9 @@
-import { createReducer, on } from "@ngrx/store";
-import { initialState } from "./tzkt.state";
-import { TZKTActions } from "./tzkt.actions";
+import { createReducer, on } from '@ngrx/store';
+import { initialState } from './tzkt.state';
+import { TZKTActions } from './tzkt.actions';
 
 export const tzktReducer = createReducer(
-    initialState,
-    on(TZKTActions.storeBlocks, (state, {blocks}) => ({...state, blocks}))
-)
+  initialState,
+  on(TZKTActions.storeBlocks, (state, { blocks }) => ({ ...state, blocks })),
+  on(TZKTActions.storeBlocksCount, (state, { count }) => ({ ...state, count }))
+);

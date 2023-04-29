@@ -7,3 +7,8 @@ export const selectBlocks = createSelector(
     tzktFeatureSelector,
     (state) => state.blocks
 )
+
+export const selectBlocksCount = createSelector(
+    tzktFeatureSelector,
+    (state) => state.count
+)

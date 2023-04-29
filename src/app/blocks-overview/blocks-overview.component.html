@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let block of blocks$ | async">
-      <th scope="row">{{ block.hash }}</th>
+      <td><a href="#">{{ block.hash }}</a></td>
       <td>{{ block.level }}</td>
       <td>{{ block.transactions }}</td>
       <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
@@ -20,7 +20,7 @@
 </table>
 <div class="d-flex justify-content-between p-2">
   <ngb-pagination
-    [collectionSize]="1000"
+    [collectionSize]="(count$ | async) || 100"
     [(page)]="page"
     [pageSize]="pageSize"
     (pageChange)="refreshView()"

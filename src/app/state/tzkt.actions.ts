@@ -6,5 +6,7 @@ export const TZKTActions = createActionGroup({
   events: {
     'fetch blocks': props<{ limit: number; offset: number }>(),
     'store blocks': props<{ blocks: Block[] }>(),
+    'fetch blocks count': emptyProps(),
+    'store blocks count': props<{ count: number }>(),
   },
 });
