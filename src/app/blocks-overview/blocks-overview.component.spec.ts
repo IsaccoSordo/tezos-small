@@ -23,7 +23,7 @@ describe('BlocksOverviewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NgbModule, RouterTestingModule.withRoutes([])],
       declarations: [BlocksOverviewComponent],
-      providers: [provideMockStore({ selectors: selectors })],
+      providers: [provideMockStore({ selectors })],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BlocksOverviewComponent);
