@@ -3,7 +3,6 @@ import { MockSelector, provideMockStore } from '@ngrx/store/testing';
 import { DetailsComponent } from './details.component';
 import { ActivatedRoute } from '@angular/router';
 import { selectTransactions } from '../store/tzkt.selectors';
-import { of } from 'rxjs';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
