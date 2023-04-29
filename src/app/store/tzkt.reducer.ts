@@ -6,5 +6,9 @@ export const tzktReducer = createReducer(
   initialState,
   on(TZKTActions.storeBlocks, (state, { blocks }) => ({ ...state, blocks })),
   on(TZKTActions.storeBlocksCount, (state, { count }) => ({ ...state, count })),
-  on(TZKTActions.storeError, (state, { error }) => ({ ...state, error }))
+  on(TZKTActions.storeError, (state, { error }) => ({ ...state, error })),
+  on(TZKTActions.storeTransactions, (state, { transactions }) => ({
+    ...state,
+    transactions,
+  }))
 );

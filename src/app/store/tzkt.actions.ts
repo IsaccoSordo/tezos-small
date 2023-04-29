@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { Block } from '../common';
+import { Block, Transaction } from '../common';
 
 export const TZKTActions = createActionGroup({
   source: 'tzkt',
@@ -8,6 +8,8 @@ export const TZKTActions = createActionGroup({
     'store blocks': props<{ blocks: Block[] }>(),
     'fetch blocks count': emptyProps(),
     'store blocks count': props<{ count: number }>(),
-    'store error': props<{error: string}>()
+    'fetch transactions': props<{ level: number }>(),
+    'store transactions': props<{transactions: Transaction[]}>(),
+    'store error': props<{ error: string }>(),
   },
 });

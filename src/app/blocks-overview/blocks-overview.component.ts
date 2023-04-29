@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { selectBlocks, selectBlocksCount } from '../state/tzkt.selectors';
+import { selectBlocks, selectBlocksCount } from '../store/tzkt.selectors';
 import { Block } from '../common';
-import { TZKTActions } from '../state/tzkt.actions';
+import { TZKTActions } from '../store/tzkt.actions';
 
 @Component({
   selector: 'app-blocks-overview',

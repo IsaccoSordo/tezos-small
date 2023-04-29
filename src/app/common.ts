@@ -1,12 +1,19 @@
 export interface Block {
-    hash: string;
-    level: number;
-    proposer?: Proposer;
-    timestamp: string;
-    transactions: number;
+  hash: string;
+  level: number;
+  proposer?: Account;
+  timestamp: string;
+  transactions: number;
 }
 
-export interface Proposer {
-    alias: string;
-    address: string;
+export interface Transaction {
+  sender: Account;
+  target: Account;
+  amount: number;
+  status: string;
+}
+
+export interface Account {
+  alias: string;
+  address: string;
 }

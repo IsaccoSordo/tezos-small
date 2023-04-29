@@ -1,7 +1,7 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
-import { TZKTActions } from '../state/tzkt.actions';
+import { TZKTActions } from '../store/tzkt.actions';
 import { Injectable } from '@angular/core';
 import { Block } from '../common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -28,7 +28,7 @@ export class TZKTEffects {
         forkJoin(
           blocks.map((block) =>
             this.service
-              .getTransactions(block.level)
+              .getTransactionsCount(block.level)
               .pipe(map((transactions) => ({ ...block, transactions })))
           )
         )
@@ -43,6 +43,15 @@ export class TZKTEffects {
       ofType(TZKTActions.fetchBlocksCount),
       switchMap(() => this.service.getBlocksCount()),
       map((count) => TZKTActions.storeBlocksCount({ count })),
+      catchError(this.handleError)
+    )
+  );
+
+  fetchTransactions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(TZKTActions.fetchTransactions),
+      switchMap(({ level }) => this.service.getTransactions(level)),
+      map((transactions) => TZKTActions.storeTransactions({ transactions })),
       catchError(this.handleError)
     )
   );
