@@ -11,8 +11,8 @@ import { TzktService } from './services/tzkt.service';
 import { tzktReducer } from './store/tzkt.reducer';
 import { TZKTEffects } from './effects/tzkt.effects';
 import { DetailsComponent } from './details/details.component';
-import { SpinnerComponent } from './spinner/spinner.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import { SpinnerComponent } from './ui/spinner/spinner.component';
+import { NavbarComponent } from './ui/navbar/navbar.component';
 
 @NgModule({
   declarations: [AppComponent, BlocksOverviewComponent, DetailsComponent, SpinnerComponent, NavbarComponent],

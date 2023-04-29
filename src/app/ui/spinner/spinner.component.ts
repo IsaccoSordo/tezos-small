@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectLoadingCounter } from '../store/tzkt.selectors';
+import { selectLoadingCounter } from '../../store/tzkt.selectors';
 
 @Component({
   selector: 'app-spinner',
