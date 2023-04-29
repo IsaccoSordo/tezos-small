@@ -1,14 +1,19 @@
-import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { TZKTState } from "./tzkt.state";
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { TZKTState } from './tzkt.state';
 
 export const tzktFeatureSelector = createFeatureSelector<TZKTState>('tzkt');
 
 export const selectBlocks = createSelector(
-    tzktFeatureSelector,
-    (state) => state.blocks
-)
+  tzktFeatureSelector,
+  (state) => state.blocks
+);
 
 export const selectBlocksCount = createSelector(
-    tzktFeatureSelector,
-    (state) => state.count
-)
+  tzktFeatureSelector,
+  (state) => state.count
+);
+
+export const selectError = createSelector(
+  tzktFeatureSelector,
+  (state) => state.error
+);

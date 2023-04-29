@@ -8,5 +8,6 @@ export const TZKTActions = createActionGroup({
     'store blocks': props<{ blocks: Block[] }>(),
     'fetch blocks count': emptyProps(),
     'store blocks count': props<{ count: number }>(),
+    'store error': props<{error: string}>()
   },
 });

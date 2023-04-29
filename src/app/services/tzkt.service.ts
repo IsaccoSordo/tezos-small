@@ -1,6 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin, map, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Block } from '../common';
 
 @Injectable({
