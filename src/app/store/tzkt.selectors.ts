@@ -13,6 +13,11 @@ export const selectBlocksCount = createSelector(
   (state) => state.count
 );
 
+export const selectTransactions = createSelector(
+  tzktFeatureSelector,
+  (state) => state.transactions
+);
+
 export const selectError = createSelector(
   tzktFeatureSelector,
   (state) => state.error
