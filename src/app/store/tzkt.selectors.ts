@@ -22,3 +22,8 @@ export const selectError = createSelector(
   tzktFeatureSelector,
   (state) => state.error
 );
+
+export const selectLoadingCounter = createSelector(
+  tzktFeatureSelector,
+  (state) => state.loadingCounter
+);

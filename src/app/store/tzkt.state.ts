@@ -5,11 +5,13 @@ export interface TZKTState {
     count: number;
     transactions: Transaction[],
     error: string;
+    loadingCounter: number;
 }
 
 export const initialState: TZKTState = {
     blocks: [],
     count: 0,
     transactions: [],
-    error: ''
+    error: '',
+    loadingCounter: 0
 }
