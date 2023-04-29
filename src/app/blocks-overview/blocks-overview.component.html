@@ -10,11 +10,13 @@
   </thead>
   <tbody>
     <tr *ngFor="let block of blocks$ | async">
-      <td><a href="#">{{ block.hash }}</a></td>
+      <td>
+        <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
+      </td>
       <td>{{ block.level }}</td>
       <td>{{ block.transactions }}</td>
       <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
-      <td>{{ block.timestamp | date:'dd.MM.yyyy HH:mm'}}</td>
+      <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
     </tr>
   </tbody>
 </table>
@@ -24,7 +26,7 @@
     [(page)]="page"
     [pageSize]="pageSize"
     (pageChange)="refreshView()"
-	[maxSize]="10"
+    [maxSize]="10"
   >
   </ngb-pagination>
 </div>
