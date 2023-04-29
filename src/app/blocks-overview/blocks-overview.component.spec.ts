@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideMockStore } from '@ngrx/store/testing';
 import { BlocksOverviewComponent } from './blocks-overview.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
@@ -8,7 +9,9 @@ describe('BlocksOverviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BlocksOverviewComponent ]
+      imports: [NgbModule],
+      declarations: [ BlocksOverviewComponent ],
+      providers: [provideMockStore({})]
     })
     .compileComponents();
 
