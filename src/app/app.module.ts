@@ -8,11 +8,12 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
 import { TzktService } from './services/tzkt.service';
-import { tzktReducer } from './state/tzkt.reducer';
+import { tzktReducer } from './store/tzkt.reducer';
 import { TZKTEffects } from './effects/tzkt.effects';
+import { DetailsComponent } from './details/details.component';
 
 @NgModule({
-  declarations: [AppComponent, BlocksOverviewComponent],
+  declarations: [AppComponent, BlocksOverviewComponent, DetailsComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
