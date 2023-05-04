@@ -6,6 +6,7 @@ import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.compo
 import { DetailsComponent } from './details/details.component';
 import { NavbarComponent } from './ui/navbar/navbar.component';
 import { SpinnerComponent } from './ui/spinner/spinner.component';
+import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -17,6 +18,7 @@ describe('AppComponent', () => {
         DetailsComponent,
         SpinnerComponent,
         NavbarComponent,
+        ErrorNotificationComponent,
       ],
       providers: [provideMockStore({})],
     }).compileComponents();

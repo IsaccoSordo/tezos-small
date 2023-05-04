@@ -8,17 +8,19 @@
       <th scope="col">Timestamp</th>
     </tr>
   </thead>
-  <tbody>
-    <tr *ngFor="let block of blocks$ | async">
-      <td>
-        <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
-      </td>
-      <td>{{ block.level }}</td>
-      <td>{{ block.transactions }}</td>
-      <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
-      <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
-    </tr>
-  </tbody>
+  <ng-container *ngIf="blocks$ | async as blocks">
+    <tbody *ngIf="blocks.length > 0; else default">
+      <tr *ngFor="let block of blocks$ | async">
+        <td>
+          <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
+        </td>
+        <td>{{ block.level }}</td>
+        <td>{{ block.transactions }}</td>
+        <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
+        <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
+      </tr>
+    </tbody>
+  </ng-container>
 </table>
 <div class="d-flex justify-content-between p-2">
   <ngb-pagination
@@ -30,3 +32,6 @@
   >
   </ngb-pagination>
 </div>
+<ng-template #default>
+  <p>No data found.</p>
+</ng-template>

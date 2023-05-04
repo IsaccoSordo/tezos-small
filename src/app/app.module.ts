@@ -13,15 +13,23 @@ import { TZKTEffects } from './effects/tzkt.effects';
 import { DetailsComponent } from './details/details.component';
 import { SpinnerComponent } from './ui/spinner/spinner.component';
 import { NavbarComponent } from './ui/navbar/navbar.component';
+import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
 
 @NgModule({
-  declarations: [AppComponent, BlocksOverviewComponent, DetailsComponent, SpinnerComponent, NavbarComponent],
+  declarations: [
+    AppComponent,
+    BlocksOverviewComponent,
+    DetailsComponent,
+    SpinnerComponent,
+    NavbarComponent,
+    ErrorNotificationComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
     HttpClientModule,
-    StoreModule.forRoot({tzkt: tzktReducer}),
+    StoreModule.forRoot({ tzkt: tzktReducer }),
     EffectsModule.forRoot([TZKTEffects]),
   ],
   providers: [TzktService],
