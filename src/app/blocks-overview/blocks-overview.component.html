@@ -6,7 +6,7 @@
     [paginator]="true"
     (refresh)="refreshView($event)"
   >
-    <tr *ngFor="let block of blocks$ | async">
+    <tr *ngFor="let block of blocks">
       <td>
         <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
       </td>

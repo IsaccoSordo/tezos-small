@@ -14,16 +14,17 @@ export class TableComponent {
   @Input() page = 1; // base value for paginator is 1 (not 0)
   @Input() pageSize = 10;
   @Input() paginator: boolean = false;
+  @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(this.getSnapshot());
 
-  private readonly state: TableData = {
-    count: this.count,
-    page: this.page,
-    pageSize: this.pageSize,
-  };
-
-  @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(this.state);
+  private getSnapshot() {
+    return {
+      count: this.count,
+      page: this.page,
+      pageSize: this.pageSize,
+    };
+  }
 
   refreshView() {
-    this.refresh.next(this.state);
+    this.refresh.next(this.getSnapshot());
   }
 }
