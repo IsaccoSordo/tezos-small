@@ -22,7 +22,7 @@ export class DetailsComponent implements OnInit {
     !isNaN(level) &&
       this.store.dispatch(
         TZKTActions.fetchTransactions({
-          level: level,
+          level,
         })
       );
   }
