@@ -4,7 +4,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { AppComponent } from './app.component';
 import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
 import { DetailsComponent } from './details/details.component';
-import { NavbarComponent } from './ui/navbar/navbar.component';
+import { NavbarComponent } from './navbar/navbar.component';
 import { SpinnerComponent } from './ui/spinner/spinner.component';
 import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
 

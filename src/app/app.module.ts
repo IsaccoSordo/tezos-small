@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
@@ -11,26 +10,21 @@ import { TzktService } from './services/tzkt.service';
 import { tzktReducer } from './store/tzkt.reducer';
 import { TZKTEffects } from './effects/tzkt.effects';
 import { DetailsComponent } from './details/details.component';
-import { SpinnerComponent } from './ui/spinner/spinner.component';
-import { NavbarComponent } from './ui/navbar/navbar.component';
-import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
-import { TableComponent } from './ui/table/table.component';
+import { UiModule } from './ui/ui.module';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BlocksOverviewComponent,
     DetailsComponent,
-    SpinnerComponent,
     NavbarComponent,
-    ErrorNotificationComponent,
-    TableComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgbModule,
     HttpClientModule,
+    UiModule,
     StoreModule.forRoot({ tzkt: tzktReducer }),
     EffectsModule.forRoot([TZKTEffects]),
   ],
