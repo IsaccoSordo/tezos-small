@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { TableData } from 'src/app/common';
 
@@ -14,9 +14,11 @@ export class TableComponent {
   @Input() page = 1; // base value for paginator is 1 (not 0)
   @Input() pageSize = 10;
   @Input() paginator: boolean = false;
-  @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(this.getSnapshot());
+  @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
+    this.getSnapshot()
+  );
 
-  private getSnapshot() {
+  private getSnapshot(): TableData {
     return {
       count: this.count,
       page: this.page,
