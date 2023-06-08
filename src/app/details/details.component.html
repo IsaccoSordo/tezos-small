@@ -1,23 +1,13 @@
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Sender</th>
-      <th scope="col">Target</th>
-      <th scope="col">Amount</th>
-      <th scope="col">Status</th>
+<ng-container *ngIf="transactions$ | async as transactions">
+  <app-table
+    [headers]="['Sender', 'Target', 'Amount', 'Status']"
+    [list]="transactions"
+  >
+    <tr *ngFor="let transaction of transactions">
+      <td>{{ transaction.sender.address }}</td>
+      <td>{{ transaction.target.address }}</td>
+      <td>{{ transaction.amount }}</td>
+      <td>{{ transaction.status }}</td>
     </tr>
-  </thead>
-  <ng-container *ngIf="transactions$ | async as transactions">
-    <tbody *ngIf="transactions.length > 0; else default">
-      <tr *ngFor="let transaction of transactions">
-        <td>{{ transaction.sender.address }}</td>
-        <td>{{ transaction.target.address }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.status }}</td>
-      </tr>
-    </tbody>
-  </ng-container>
-</table>
-<ng-template #default>
-  <p>No data found.</p>
-</ng-template>
+  </app-table>
+</ng-container>

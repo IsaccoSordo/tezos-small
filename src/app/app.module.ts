@@ -14,6 +14,7 @@ import { DetailsComponent } from './details/details.component';
 import { SpinnerComponent } from './ui/spinner/spinner.component';
 import { NavbarComponent } from './ui/navbar/navbar.component';
 import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
+import { TableComponent } from './ui/table/table.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ErrorNotificationComponent } from './ui/error-notification/error-notifi
     SpinnerComponent,
     NavbarComponent,
     ErrorNotificationComponent,
+    TableComponent,
   ],
   imports: [
     BrowserModule,

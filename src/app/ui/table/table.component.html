@@ -1,0 +1,13 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col" *ngFor="let header of headers">Sender</th>
+    </tr>
+  </thead>
+  <tbody *ngIf="list.length > 0; else default">
+    <ng-content></ng-content>
+  </tbody>
+</table>
+<ng-template #default>
+  <p>No data found.</p>
+</ng-template>
