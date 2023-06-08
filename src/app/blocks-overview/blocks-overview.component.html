@@ -1,37 +1,19 @@
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Hash</th>
-      <th scope="col">Level</th>
-      <th scope="col">Transactions</th>
-      <th scope="col">Proposer</th>
-      <th scope="col">Timestamp</th>
-    </tr>
-  </thead>
-  <ng-container *ngIf="blocks$ | async as blocks">
-    <tbody *ngIf="blocks.length > 0; else default">
-      <tr *ngFor="let block of blocks$ | async">
-        <td>
-          <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
-        </td>
-        <td>{{ block.level }}</td>
-        <td>{{ block.transactions }}</td>
-        <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
-        <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
-      </tr>
-    </tbody>
-  </ng-container>
-</table>
-<div class="d-flex justify-content-between p-2">
-  <ngb-pagination
-    [collectionSize]="(count$ | async) || 100"
-    [(page)]="page"
-    [pageSize]="pageSize"
-    (pageChange)="refreshView()"
-    [maxSize]="10"
+<ng-container *ngIf="blocks$ | async as blocks">
+  <app-table
+    [headers]="['Hash', 'Level', 'Transactions', 'Proposer', 'Timestamp']"
+    [list]="blocks"
+    [count]="(count$ | async) || 100"
+    [paginator]="true"
+    (refresh)="refreshView($event)"
   >
-  </ngb-pagination>
-</div>
-<ng-template #default>
-  <p>No data found.</p>
-</ng-template>
+    <tr *ngFor="let block of blocks$ | async">
+      <td>
+        <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
+      </td>
+      <td>{{ block.level }}</td>
+      <td>{{ block.transactions }}</td>
+      <td>{{ block.proposer ? block.proposer.alias : "" }}</td>
+      <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
+    </tr>
+  </app-table>
+</ng-container>

@@ -11,3 +11,13 @@
 <ng-template #default>
   <p>No data found.</p>
 </ng-template>
+<div *ngIf="paginator" class="d-flex justify-content-between p-2">
+  <ngb-pagination
+    [collectionSize]="count"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    (pageChange)="refreshView()"
+    [maxSize]="10"
+  >
+  </ngb-pagination>
+</div>

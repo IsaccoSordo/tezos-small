@@ -17,3 +17,9 @@ export interface Account {
   alias: string;
   address: string;
 }
+
+export interface TableData {
+  count: number;
+  page: number;
+  pageSize: number;
+}
