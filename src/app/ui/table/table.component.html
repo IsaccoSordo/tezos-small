@@ -1,7 +1,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col" *ngFor="let header of headers">Sender</th>
+      <th scope="col" *ngFor="let header of headers">{{header}}</th>
     </tr>
   </thead>
   <tbody *ngIf="list.length > 0; else default">
