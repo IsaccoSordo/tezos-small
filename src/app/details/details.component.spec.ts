@@ -3,6 +3,7 @@ import { MockSelector, provideMockStore } from '@ngrx/store/testing';
 import { DetailsComponent } from './details.component';
 import { ActivatedRoute } from '@angular/router';
 import { selectTransactions } from '../store/tzkt.selectors';
+import { TableComponent } from '../ui/table/table.component';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -19,7 +20,7 @@ describe('DetailsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DetailsComponent],
+      declarations: [DetailsComponent, TableComponent],
       providers: [
         provideMockStore({ selectors }),
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

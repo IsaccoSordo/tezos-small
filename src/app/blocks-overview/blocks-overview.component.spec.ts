@@ -4,6 +4,7 @@ import { BlocksOverviewComponent } from './blocks-overview.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { selectBlocks, selectBlocksCount } from '../store/tzkt.selectors';
 import { RouterTestingModule } from '@angular/router/testing';
+import { TableComponent } from '../ui/table/table.component';
 
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
@@ -22,7 +23,7 @@ describe('BlocksOverviewComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NgbModule, RouterTestingModule.withRoutes([])],
-      declarations: [BlocksOverviewComponent],
+      declarations: [BlocksOverviewComponent, TableComponent],
       providers: [provideMockStore({ selectors })],
     }).compileComponents();
 
