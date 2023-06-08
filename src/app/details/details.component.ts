@@ -18,10 +18,12 @@ export class DetailsComponent implements OnInit {
   constructor(private store: Store, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.store.dispatch(
-      TZKTActions.fetchTransactions({
-        level: +(this.route.snapshot.paramMap.get('level')!!),
-      })
-    );
+    const level: number = +(this.route.snapshot.paramMap.get('level') ?? 'error');
+    !isNaN(level) &&
+      this.store.dispatch(
+        TZKTActions.fetchTransactions({
+          level: level,
+        })
+      );
   }
 }
