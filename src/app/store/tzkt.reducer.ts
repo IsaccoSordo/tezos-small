@@ -24,8 +24,12 @@ export const tzktReducer = createReducer(
   })),
   on(TZKTActions.storeError, (state, { error }) => ({
     ...state,
-    error,
-    loadingCounter: state.loadingCounter - 1,
+    errors: [...state.errors, error],
+    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter, // decrement the counter iff the error is returned by a service
+  })),
+  on(TZKTActions.clearError, (state, { error }) => ({
+    ...state,
+    errors: state.errors.filter((_err, i) => i !== state.errors.indexOf(error)),
   })),
   on(TZKTActions.fetchTransactions, (state) => ({
     ...state,

@@ -1,3 +1,5 @@
-<p *ngIf="error$ | async as error">
-  <ngb-alert type="danger">{{ error }}</ngb-alert>
-</p>
+<ng-container *ngIf="errors$ | async as errors">
+  <p *ngFor="let error of errors">
+    <ngb-alert type="danger" (closed)="onClose(error)">{{ error }}</ngb-alert>
+  </p>
+</ng-container>

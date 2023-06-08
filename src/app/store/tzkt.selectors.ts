@@ -20,7 +20,7 @@ export const selectTransactions = createSelector(
 
 export const selectError = createSelector(
   tzktFeatureSelector,
-  (state) => state.error
+  (state) => state.errors
 );
 
 export const selectLoadingCounter = createSelector(

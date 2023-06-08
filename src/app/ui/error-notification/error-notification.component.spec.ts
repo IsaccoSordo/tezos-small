@@ -11,7 +11,7 @@ describe('ErrorNotificationsComponent', () => {
   const selectors: MockSelector[] = [
     {
       selector: selectError,
-      value: 'test',
+      value: ['test'],
     },
   ];
   beforeEach(async () => {
@@ -31,8 +31,9 @@ describe('ErrorNotificationsComponent', () => {
   });
 
   it('should have as error "test"', (done) => {
-    component.error$.subscribe((error) => {
-      expect(error).toEqual('test');
+    component.errors$.subscribe((errors) => {
+      expect(errors).toHaveSize(1);
+      expect(errors[0]).toBe('test');
       done();
     });
   });
