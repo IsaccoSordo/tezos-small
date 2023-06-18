@@ -3,14 +3,19 @@ import { TestBed } from '@angular/core/testing';
 import { TzktService } from './tzkt.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
+import { ErrorService } from './error.service';
 
 describe('TzktService', () => {
   let service: TzktService;
   const httpSpy = jasmine.createSpyObj('http', ['get']);
+  const errorSpy = jasmine.createSpyObj('error', ['handleError']);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [{ provide: HttpClient, useValue: httpSpy }],
+      providers: [
+        { provide: HttpClient, useValue: httpSpy },
+        { provide: ErrorService, useValue: errorSpy },
+      ],
     });
     service = TestBed.inject(TzktService);
     httpSpy.get.and.returnValue(of());
