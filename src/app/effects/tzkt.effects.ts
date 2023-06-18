@@ -9,9 +9,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Injectable()
 export class TZKTEffects {
   private handleError(error: HttpErrorResponse) {
-    const message = `${error.status}: ${error.message}`;
-
-    return of(TZKTActions.storeError({ error: message }));
+    return of(
+      TZKTActions.storeError({ error: `${error.status}: ${error.message}` })
+    );
   }
 
   fetchBlocks$ = createEffect(() =>
