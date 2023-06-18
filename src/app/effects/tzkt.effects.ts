@@ -1,10 +1,9 @@
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { TZKTActions } from '../store/tzkt.actions';
 import { Injectable } from '@angular/core';
 import { Block } from '../common';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class TZKTEffects {
