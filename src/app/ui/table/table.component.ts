@@ -13,6 +13,7 @@ export class TableComponent {
   @Input() count: number = 100;
   @Input() page = 1; // base value for paginator is 1 (not 0)
   @Input() pageSize = 10;
+  @Input() maxSize = 10;
   @Input() paginator: boolean = false;
   @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
     this.getSnapshot()

@@ -1,7 +1,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col" *ngFor="let header of headers">{{header}}</th>
+      <th scope="col" *ngFor="let header of headers">{{ header }}</th>
     </tr>
   </thead>
   <tbody *ngIf="show; else default">
@@ -14,10 +14,10 @@
 <div *ngIf="paginator" class="d-flex justify-content-between p-2">
   <ngb-pagination
     [collectionSize]="count"
-    [(page)]="page"
     [pageSize]="pageSize"
+    [maxSize]="maxSize"
+    [(page)]="page"
     (pageChange)="refreshView()"
-    [maxSize]="10"
   >
   </ngb-pagination>
 </div>
