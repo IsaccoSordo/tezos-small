@@ -31,7 +31,7 @@ describe('SpinnerComponent', () => {
 
   it('should render spinner', () => {
     const spinner = fixture.debugElement.query(
-      By.css('.spinner-border')
+      By.css('.spinner')
     ).nativeElement;
     expect(spinner).toBeTruthy();
   });
