@@ -11,7 +11,7 @@ export const tzktReducer = createReducer(
   on(TZKTActions.storeBlocks, (state, { blocks }) => ({
     ...state,
     blocks,
-    loadingCounter: state.loadingCounter - 1,
+    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter,
   })),
   on(TZKTActions.fetchBlocksCount, (state) => ({
     ...state,
@@ -20,12 +20,12 @@ export const tzktReducer = createReducer(
   on(TZKTActions.storeBlocksCount, (state, { count }) => ({
     ...state,
     count,
-    loadingCounter: state.loadingCounter - 1,
+    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter,
   })),
   on(TZKTActions.storeError, (state, { error }) => ({
     ...state,
     errors: [...state.errors, error],
-    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter, // decrement the counter iff the error is returned by a service
+    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter,
   })),
   on(TZKTActions.clearError, (state, { error }) => ({
     ...state,
@@ -38,6 +38,6 @@ export const tzktReducer = createReducer(
   on(TZKTActions.storeTransactions, (state, { transactions }) => ({
     ...state,
     transactions,
-    loadingCounter: state.loadingCounter - 1,
+    loadingCounter: state.loadingCounter > 0 ? state.loadingCounter - 1 : state.loadingCounter,
   }))
 );
