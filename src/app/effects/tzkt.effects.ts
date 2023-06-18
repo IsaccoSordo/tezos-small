@@ -9,13 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Injectable()
 export class TZKTEffects {
   private handleError(error: HttpErrorResponse) {
-    let message = '';
-
-    if (error.status === 0) {
-      message = error.error;
-    } else {
-      message = `${error.status}: ${error.message}`;
-    }
+    const message = `${error.status}: ${error.message}`;
 
     return of(TZKTActions.storeError({ error: message }));
   }
@@ -23,36 +17,50 @@ export class TZKTEffects {
   fetchBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TZKTActions.fetchBlocks),
-      switchMap(({ limit, offset }) => this.service.getBlocks(limit, offset)),
-      switchMap((blocks) =>
-        forkJoin(
-          blocks.map((block) =>
-            this.service
-              .getTransactionsCount(block.level)
-              .pipe(map((transactions) => ({ ...block, transactions })))
-          )
+      switchMap(({ limit, offset }) =>
+        this.service.getBlocks(limit, offset).pipe(
+          switchMap((blocks) =>
+            forkJoin(
+              blocks.map((block) =>
+                this.service.getTransactionsCount(block.level).pipe(
+                  map((transactions) => ({ ...block, transactions })),
+                  catchError(
+                    () => of({ ...block, transactions: 0 }) // Default to 0 transactions on error
+                  )
+                )
+              )
+            )
+          ),
+          map((blocks: Block[]) => TZKTActions.storeBlocks({ blocks })),
+          catchError(this.handleError)
         )
-      ),
-      map((blocks: Block[]) => TZKTActions.storeBlocks({ blocks })),
-      catchError(this.handleError)
+      )
     )
   );
 
   fetchBlocksCount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TZKTActions.fetchBlocksCount),
-      switchMap(() => this.service.getBlocksCount()),
-      map((count) => TZKTActions.storeBlocksCount({ count })),
-      catchError(this.handleError)
+      switchMap(() =>
+        this.service.getBlocksCount().pipe(
+          map((count) => TZKTActions.storeBlocksCount({ count })),
+          catchError(this.handleError) // Dispatch error action on error
+        )
+      )
     )
   );
 
   fetchTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TZKTActions.fetchTransactions),
-      switchMap(({ level }) => this.service.getTransactions(level)),
-      map((transactions) => TZKTActions.storeTransactions({ transactions })),
-      catchError(this.handleError)
+      switchMap(({ level }) =>
+        this.service.getTransactions(level).pipe(
+          map((transactions) =>
+            TZKTActions.storeTransactions({ transactions })
+          ),
+          catchError(this.handleError)
+        )
+      )
     )
   );
 
