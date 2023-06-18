@@ -4,7 +4,7 @@
       <th scope="col" *ngFor="let header of headers">{{header}}</th>
     </tr>
   </thead>
-  <tbody *ngIf="list.length > 0; else default">
+  <tbody *ngIf="show; else default">
     <ng-content></ng-content>
   </tbody>
 </table>

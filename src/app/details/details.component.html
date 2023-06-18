@@ -1,7 +1,7 @@
 <ng-container *ngIf="transactions$ | async as transactions">
   <app-table
     [headers]="['Sender', 'Target', 'Amount', 'Status']"
-    [list]="transactions"
+    [show]="transactions.length > 0"
   >
     <tr *ngFor="let transaction of transactions">
       <td>{{ transaction.sender.address }}</td>

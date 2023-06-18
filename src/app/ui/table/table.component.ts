@@ -9,7 +9,7 @@ import { TableData } from 'src/app/common';
 })
 export class TableComponent {
   @Input() headers: string[] = [];
-  @Input() list: any[] = [];
+  @Input() show: boolean = false;
   @Input() count: number = 100;
   @Input() page = 1; // base value for paginator is 1 (not 0)
   @Input() pageSize = 10;
