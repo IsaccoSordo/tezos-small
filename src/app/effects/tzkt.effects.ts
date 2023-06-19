@@ -12,15 +12,13 @@ export class TZKTEffects {
       ofType(TZKTActions.fetchBlocks),
       switchMap(({ limit, offset }) => this.service.getBlocks(limit, offset)),
       switchMap((blocks) =>
-        blocks.length > 0
-          ? forkJoin(
-              blocks.map((block) =>
-                this.service
-                  .getTransactionsCount(block.level)
-                  .pipe(map((transactions) => ({ ...block, transactions })))
-              )
-            )
-          : of([])
+        forkJoin(
+          blocks.map((block) =>
+            this.service
+              .getTransactionsCount(block.level)
+              .pipe(map((transactions) => ({ ...block, transactions })))
+          )
+        )
       ),
       map((blocks: Block[]) => TZKTActions.storeBlocks({ blocks }))
     )
