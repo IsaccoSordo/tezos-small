@@ -1,8 +1,5 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { selectError } from '../../store/tzkt.selectors';
-import { TZKTActions } from 'src/app/store/tzkt.actions';
+import { Component, inject } from '@angular/core';
+import { Store } from 'src/app/store/store.service';
 
 @Component({
   selector: 'app-error-notification',
@@ -10,11 +7,10 @@ import { TZKTActions } from 'src/app/store/tzkt.actions';
   styleUrls: ['./error-notification.component.scss'],
 })
 export class ErrorNotificationComponent {
-  errors$: Observable<string[]> = this.store.select(selectError);
-
-  constructor(private store: Store) {}
+  store = inject(Store);
+  errors = this.store.state.errors;
 
   onClose(error: string) {
-    this.store.dispatch(TZKTActions.clearError({ error }));
+    this.errors.mutate((prev) => prev.splice(prev.indexOf(error), 1));
   }
 }

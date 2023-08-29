@@ -1,4 +1,4 @@
-<ng-container *ngIf="transactions$ | async as transactions">
+<ng-container *ngIf="transactions() as transactions">
   <app-table
     [headers]="['Sender', 'Target', 'Amount', 'Status']"
     [show]="transactions.length > 0"

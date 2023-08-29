@@ -1,52 +1,43 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, catchError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
 import { Block, Transaction } from '../common';
-import { ErrorService } from './error.service';
+import { Store } from '../store/store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TzktService {
-  constructor(private http: HttpClient, private errorService: ErrorService) {}
+  store = inject(Store);
 
-  getBlocksCount(): Observable<number> {
-    return this.http
-      .get<number>('https://api.tzkt.io/v1/blocks/count')
-      .pipe(catchError((err) => this.errorService.handleError(err, 0)));
+  getBlocksCount() {
+    fetch('https://api.tzkt.io/v1/blocks/count')
+      .then((response) => response.json())
+      .then((count: number) => this.store.state.count.set(count));
   }
 
-  getBlocks(limit: number, offset: number): Observable<Block[]> {
-    const params = new HttpParams()
-      .append('limit', limit)
-      .append('offset.pg', offset)
-      .append('sort.desc', 'level');
-    return this.http
-      .get<Block[]>('https://api.tzkt.io/v1/blocks', { params })
-      .pipe(
-        catchError((err) => this.errorService.handleError<Block[]>(err, []))
-      );
+  getBlocks(limit: number, offset: number) {
+    fetch(
+      `https://api.tzkt.io/v1/blocks?limit=${limit}&offset.pg=${offset}&sort.desc=${'level'}`
+    )
+      .then((response) => response.json())
+      .then((blocks: Block[]) => {
+        blocks.map((block) => this.getTransactionsCount(block));
+        this.store.state.blocks.set(blocks);
+      });
   }
 
-  getTransactionsCount(level: number): Observable<number> {
-    const params = new HttpParams().append('level', level);
-    return this.http
-      .get<number>(`https://api.tzkt.io/v1/operations/transactions/count`, {
-        params,
-      })
-      .pipe(catchError((err) => this.errorService.handleError(err, 0)));
+  getTransactionsCount(block: Block) {
+    fetch(
+      `https://api.tzkt.io/v1/operations/transactions/count?level=${block.level}`
+    )
+      .then((response) => response.json())
+      .then((count: number) => (block.transactions = count));
   }
 
-  getTransactions(level: number): Observable<Transaction[]> {
-    const params = new HttpParams().append('level', level);
-    return this.http
-      .get<Transaction[]>(`https://api.tzkt.io/v1/operations/transactions`, {
-        params,
-      })
-      .pipe(
-        catchError((err) =>
-          this.errorService.handleError<Transaction[]>(err, [])
-        )
+  getTransactions(level: number) {
+    fetch(`https://api.tzkt.io/v1/operations/transactions?level=${level}`)
+      .then((response) => response.json())
+      .then((transactions: Transaction[]) =>
+        this.store.state.transactions.set(transactions)
       );
   }
 }
