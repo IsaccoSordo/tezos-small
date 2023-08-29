@@ -1,9 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Observable, Subscription, interval } from 'rxjs';
-import { selectBlocks, selectBlocksCount } from '../store/tzkt.selectors';
 import { Block, TableData } from '../common';
-import { TZKTActions } from '../store/tzkt.actions';
+import { TzktService } from '../services/tzkt.service';
+import { Store } from '../store/store.service';
 
 @Component({
   selector: 'app-blocks-overview',
@@ -11,11 +10,13 @@ import { TZKTActions } from '../store/tzkt.actions';
   styleUrls: ['./blocks-overview.component.scss'],
 })
 export class BlocksOverviewComponent implements OnInit, OnDestroy {
-  blocks$: Observable<Block[]> = this.store.select(selectBlocks);
-  count$: Observable<number> = this.store.select(selectBlocksCount);
-  private subs: Subscription[] = [];
+  service = inject(TzktService);
+  store = inject(Store);
 
-  constructor(private store: Store) {}
+  blocks = this.store.state.blocks;
+  count = this.store.state.count;
+
+  private subs: Subscription[] = [];
 
   ngOnInit(): void {
     this.subs.push(this.getBlocksCount());
@@ -25,16 +26,11 @@ export class BlocksOverviewComponent implements OnInit, OnDestroy {
   }
 
   private getBlocksCount(): Subscription {
-    this.store.dispatch(TZKTActions.fetchBlocksCount());
-
-    return interval(60000).subscribe(() =>
-      this.store.dispatch(TZKTActions.fetchBlocksCount())
-    ); // behind the scenes, the blocks count might increase
+    this.service.getBlocksCount();
+    return interval(60000).subscribe(() => this.service.getBlocksCount()); // behind the scenes, the blocks count might increase
   }
 
   refreshView(event: TableData) {
-    this.store.dispatch(
-      TZKTActions.fetchBlocks({ limit: event.pageSize, offset: event.page - 1 }) // the API offset param starts from 0
-    );
+    this.service.getBlocks(event.pageSize, event.page - 1); // the API offset param starts from 0
   }
 }

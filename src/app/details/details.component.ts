@@ -1,10 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { Transaction } from '../common';
-import { selectTransactions } from '../store/tzkt.selectors';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TZKTActions } from '../store/tzkt.actions';
+import { TzktService } from '../services/tzkt.service';
+import { Store } from '../store/store.service';
 
 @Component({
   selector: 'app-details',
@@ -12,18 +9,16 @@ import { TZKTActions } from '../store/tzkt.actions';
   styleUrls: ['./details.component.scss'],
 })
 export class DetailsComponent implements OnInit {
-  transactions$: Observable<Transaction[]> =
-    this.store.select(selectTransactions);
+  route = inject(ActivatedRoute);
+  store = inject(Store);
+  service = inject(TzktService);
 
-  constructor(private store: Store, private route: ActivatedRoute) {}
+  transactions = this.store.state.transactions;
 
   ngOnInit(): void {
-    const level: number = +(this.route.snapshot.paramMap.get('level') ?? 'error');
-    !isNaN(level) &&
-      this.store.dispatch(
-        TZKTActions.fetchTransactions({
-          level,
-        })
-      );
+    const level: number = +(
+      this.route.snapshot.paramMap.get('level') ?? 'error'
+    );
+    !isNaN(level) && this.service.getTransactions(level);
   }
 }

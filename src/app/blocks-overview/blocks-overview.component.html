@@ -1,8 +1,8 @@
-<ng-container *ngIf="blocks$ | async as blocks">
+<ng-container *ngIf="blocks() as blocks">
   <app-table
     [headers]="['Hash', 'Level', 'Transactions', 'Proposer', 'Timestamp']"
     [show]="blocks.length > 0"
-    [count]="(count$ | async) || 100"
+    [count]="(count()) || 100"
     [paginator]="true"
     (refresh)="refreshView($event)"
   >

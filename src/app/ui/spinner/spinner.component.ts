@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { selectLoadingCounter } from '../../store/tzkt.selectors';
+import { Component, inject } from '@angular/core';
+import { Store } from 'src/app/store/store.service';
 
 @Component({
   selector: 'app-spinner',
@@ -8,7 +7,5 @@ import { selectLoadingCounter } from '../../store/tzkt.selectors';
   styleUrls: ['./spinner.component.scss'],
 })
 export class SpinnerComponent {
-  loadingCounter$ = this.store.select(selectLoadingCounter);
-
-  constructor(private store: Store) {}
+  loadingCounter$ = inject(Store).state.loadingCounter
 }

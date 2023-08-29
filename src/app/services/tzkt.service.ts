@@ -1,52 +1,63 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, catchError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
 import { Block, Transaction } from '../common';
-import { ErrorService } from './error.service';
+import { Store } from '../store/store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TzktService {
-  constructor(private http: HttpClient, private errorService: ErrorService) {}
+  store = inject(Store);
 
-  getBlocksCount(): Observable<number> {
-    return this.http
-      .get<number>('https://api.tzkt.io/v1/blocks/count')
-      .pipe(catchError((err) => this.errorService.handleError(err, 0)));
+  getBlocksCount() {
+    this.store.state.loadingCounter.update((prev) => prev + 1);
+    fetch('https://api.tzkt.io/v1/blocks/count')
+      .then((response) => response.json())
+      .then((count: number) => this.store.state.count.set(count))
+      .catch((error) =>
+        this.store.state.errors.mutate((prev) => prev.push(error.message))
+      )
+      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
 
-  getBlocks(limit: number, offset: number): Observable<Block[]> {
-    const params = new HttpParams()
-      .append('limit', limit)
-      .append('offset.pg', offset)
-      .append('sort.desc', 'level');
-    return this.http
-      .get<Block[]>('https://api.tzkt.io/v1/blocks', { params })
-      .pipe(
-        catchError((err) => this.errorService.handleError<Block[]>(err, []))
-      );
-  }
-
-  getTransactionsCount(level: number): Observable<number> {
-    const params = new HttpParams().append('level', level);
-    return this.http
-      .get<number>(`https://api.tzkt.io/v1/operations/transactions/count`, {
-        params,
+  getBlocks(limit: number, offset: number) {
+    this.store.state.loadingCounter.update((prev) => prev + 1);
+    fetch(
+      `https://api.tzkt.io/v1/blocks?limit=${limit}&offset.pg=${offset}&sort.desc=${'level'}`
+    )
+      .then((response) => response.json())
+      .then((blocks: Block[]) => {
+        blocks.map((block) => this.getTransactionsCount(block));
+        this.store.state.blocks.set(blocks);
       })
-      .pipe(catchError((err) => this.errorService.handleError(err, 0)));
+      .catch((error) =>
+        this.store.state.errors.mutate((prev) => prev.push(error.message))
+      )
+      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
 
-  getTransactions(level: number): Observable<Transaction[]> {
-    const params = new HttpParams().append('level', level);
-    return this.http
-      .get<Transaction[]>(`https://api.tzkt.io/v1/operations/transactions`, {
-        params,
-      })
-      .pipe(
-        catchError((err) =>
-          this.errorService.handleError<Transaction[]>(err, [])
-        )
-      );
+  getTransactionsCount(block: Block) {
+    this.store.state.loadingCounter.update((prev) => prev + 1);
+    fetch(
+      `https://api.tzkt.io/v1/operations/transactions/count?level=${block.level}`
+    )
+      .then((response) => response.json())
+      .then((count: number) => (block.transactions = count))
+      .catch((error) =>
+        this.store.state.errors.mutate((prev) => prev.push(error.message))
+      )
+      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
+  }
+
+  getTransactions(level: number) {
+    this.store.state.loadingCounter.update((prev) => prev + 1);
+    fetch(`https://api.tzkt.io/v1/operations/transactions?level=${level}`)
+      .then((response) => response.json())
+      .then((transactions: Transaction[]) =>
+        this.store.state.transactions.set(transactions)
+      )
+      .catch((error) =>
+        this.store.state.errors.mutate((prev) => prev.push(error.message))
+      )
+      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
 }
