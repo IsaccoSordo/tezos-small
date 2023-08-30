@@ -14,7 +14,9 @@ export class TzktService {
       .then((response) => response.json())
       .then((count: number) => this.store.state.count.set(count))
       .catch((error) =>
-        this.store.state.errors.mutate((prev) => prev.push(error.message))
+        this.store.state.errors.mutate((prev) =>
+          prev.push({ text: error.message })
+        )
       )
       .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
@@ -30,7 +32,9 @@ export class TzktService {
         this.store.state.blocks.set(blocks);
       })
       .catch((error) =>
-        this.store.state.errors.mutate((prev) => prev.push(error.message))
+        this.store.state.errors.mutate((prev) =>
+          prev.push({ text: error.message })
+        )
       )
       .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
@@ -43,7 +47,9 @@ export class TzktService {
       .then((response) => response.json())
       .then((count: number) => (block.transactions = count))
       .catch((error) =>
-        this.store.state.errors.mutate((prev) => prev.push(error.message))
+        this.store.state.errors.mutate((prev) =>
+          prev.push({ text: error.message })
+        )
       )
       .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }
@@ -56,7 +62,9 @@ export class TzktService {
         this.store.state.transactions.set(transactions)
       )
       .catch((error) =>
-        this.store.state.errors.mutate((prev) => prev.push(error.message))
+        this.store.state.errors.mutate((prev) =>
+          prev.push({ text: error.message })
+        )
       )
       .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
   }

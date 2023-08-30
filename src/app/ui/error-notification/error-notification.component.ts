@@ -10,7 +10,7 @@ export class ErrorNotificationComponent {
   store = inject(Store);
   errors = this.store.state.errors;
 
-  onClose(error: string) {
-    this.errors.mutate((prev) => prev.splice(prev.indexOf(error), 1));
+  onClose(index: number) {
+    this.errors.mutate((prev) => prev.splice(index, 1));
   }
 }
