@@ -6,13 +6,10 @@ import { Block } from '../common';
 
 describe('TzktService', () => {
   let service: TzktService;
-  const httpSpy = jasmine.createSpyObj('http', ['get']);
-  const errorSpy = jasmine.createSpyObj('error', ['handleError']);
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(TzktService);
-    httpSpy.get.and.returnValue(of());
   });
 
   it('should be created', () => {
