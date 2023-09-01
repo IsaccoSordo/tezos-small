@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Observable, Subscription, interval } from 'rxjs';
+import { Observable, Subject, Subscription, interval, takeUntil } from 'rxjs';
 import { Block, TableData } from '../common';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
@@ -16,18 +16,21 @@ export class BlocksOverviewComponent implements OnInit, OnDestroy {
   blocks = this.store.state.blocks;
   count = this.store.state.count;
 
-  private subs: Subscription[] = [];
+  private destroy$ = new Subject<boolean>();
 
   ngOnInit(): void {
-    this.subs.push(this.getBlocksCount());
-  }
-  ngOnDestroy(): void {
-    this.subs.forEach((sub) => sub.unsubscribe());
+    this.getBlocksCount();
   }
 
-  private getBlocksCount(): Subscription {
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+  }
+
+  private getBlocksCount() {
     this.service.getBlocksCount();
-    return interval(60000).subscribe(() => this.service.getBlocksCount()); // behind the scenes, the blocks count might increase
+    interval(60000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.service.getBlocksCount()); // behind the scenes, the blocks count might increase
   }
 
   refreshView(event: TableData) {
