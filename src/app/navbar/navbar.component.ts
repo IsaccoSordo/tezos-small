@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
   selector: 'app-navbar',
   template: `
     <div class="navbar-container">
-      <p-menubar [model]="items">
+      <p-menubar>
         <ng-template pTemplate="start">
           <a routerLink="" class="brand-link">
             <i
@@ -25,12 +25,4 @@ import { MenuItem } from 'primeng/api';
   imports: [RouterLink, MenubarModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent {
-  items: MenuItem[] = [
-    {
-      label: 'Blocks',
-      icon: 'pi pi-th-large',
-      routerLink: '/',
-    },
-  ];
-}
+export class NavbarComponent {}

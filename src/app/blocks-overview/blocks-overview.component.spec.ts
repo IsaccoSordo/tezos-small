@@ -8,7 +8,7 @@ import {
 import { provideRouter } from '@angular/router';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
-import { TableData } from '../common';
+import { PageChangeEvent } from '../ui/table/table.component';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
 describe('BlocksOverviewComponent', () => {
@@ -88,17 +88,17 @@ describe('BlocksOverviewComponent', () => {
     const countReq = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
     countReq.flush(100);
 
-    // Handle the initial blocks request from TableComponent
+    // Handle the initial blocks request from ngOnInit
     const initialBlocksReq = httpMock.expectOne(
       (req) => req.url === 'https://api.tzkt.io/v1/blocks',
     );
     initialBlocksReq.flush([]);
 
-    // Trigger refresh with page 0 (0-based indexing)
-    const tableData: TableData = { page: 0, pageSize: 10, count: 100 };
-    component.refreshView(tableData);
+    // Trigger page change to fetch different data
+    const pageEvent: PageChangeEvent = { page: 0, pageSize: 10 };
+    component.onPageChange(pageEvent);
 
-    // Expect blocks request from manual refresh
+    // Expect blocks request from page change
     const blocksReq = httpMock.expectOne(
       (req) =>
         req.url === 'https://api.tzkt.io/v1/blocks' &&
@@ -127,20 +127,20 @@ describe('BlocksOverviewComponent', () => {
     expect(store.state.blocks()[0].hash).toBe('abc123');
   });
 
-  it('should use Subject pattern for refreshView events', () => {
-    const tableData: TableData = { page: 1, pageSize: 20, count: 100 };
+  it('should handle page change events from table', () => {
+    const pageEvent: PageChangeEvent = { page: 1, pageSize: 20 };
 
     fixture.detectChanges();
 
     // Initial count request
     httpMock.expectOne('https://api.tzkt.io/v1/blocks/count').flush(100);
 
-    // Handle the initial blocks request from TableComponent
+    // Handle the initial blocks request from ngOnInit
     httpMock
       .expectOne((req) => req.url === 'https://api.tzkt.io/v1/blocks')
       .flush([]);
 
-    component.refreshView(tableData);
+    component.onPageChange(pageEvent);
 
     const req = httpMock.expectOne(
       (req) =>

@@ -30,11 +30,15 @@ export class TzktService {
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
+    // Ensure parameters have valid values
+    const validLimit = limit ?? 10;
+    const validOffset = offset ?? 0;
+
     return this.http
       .get<Block[]>(`${this.API_BASE}/blocks`, {
         params: {
-          limit: limit.toString(),
-          'offset.pg': offset.toString(),
+          limit: validLimit.toString(),
+          'offset.pg': validOffset.toString(),
           'sort.desc': 'level',
         },
       })

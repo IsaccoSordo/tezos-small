@@ -27,6 +27,13 @@ export class DetailsComponent implements OnInit {
   store = inject(Store);
   transactions = this.store.state.transactions;
 
+  columns = [
+    { field: 'sender', header: 'Sender' },
+    { field: 'target', header: 'Target' },
+    { field: 'amount', header: 'Amount' },
+    { field: 'status', header: 'Status' },
+  ];
+
   ngOnInit(): void {
     const level: number = +(
       this.route.snapshot.paramMap.get('level') ?? 'error'

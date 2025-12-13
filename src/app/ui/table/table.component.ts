@@ -1,51 +1,48 @@
 import {
   Component,
   input,
-  Output,
+  output,
   ChangeDetectionStrategy,
-  signal,
+  TemplateRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PaginatorModule } from 'primeng/paginator';
-import { BehaviorSubject } from 'rxjs';
-import { TableData } from 'src/app/common';
+import { TableModule } from 'primeng/table';
+
+export interface PageChangeEvent {
+  page: number;
+  pageSize: number;
+}
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, PaginatorModule],
+  imports: [CommonModule, TableModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TableComponent {
-  headers = input<string[]>([]);
-  show = input<boolean>(false);
-  count = input<number>(100);
-  maxSize = input<number>(10);
+export class TableComponent<T = any> {
+  // Inputs - data and configuration
+  data = input<T[]>([]);
+  columns = input<{ field: string; header: string }[]>([]);
+  rowTemplate = input<TemplateRef<any> | null>(null);
+  totalRecords = input<number>(0);
+  rows = input<number>(10);
   paginator = input<boolean>(false);
-  page = signal(0); // base value for paginator is 0 (0-based indexing)
-  pageSize = signal<number>(10);
+  scrollable = input<boolean>(true);
+  scrollHeight = input<string>('600px');
 
-  @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
-    this.getSnapshot(),
-  );
-
-  private getSnapshot(): TableData {
-    return {
-      count: this.count(),
-      page: this.page(),
-      pageSize: this.pageSize(),
-    };
-  }
-
-  refreshView() {
-    this.refresh.next(this.getSnapshot());
-  }
+  // Output - emit page change events
+  pageChange = output<PageChangeEvent>();
 
   onPageChange(event: any) {
-    this.page.set(event.page);
-    this.pageSize.set(event.rows);
-    this.refreshView();
+    // PrimeNG lazy load event has 'first' (row index) and 'rows' (page size)
+    // Convert first to page number: page = first / rows
+    const page = event.first ? Math.floor(event.first / event.rows) : 0;
+
+    this.pageChange.emit({
+      page: page,
+      pageSize: event.rows ?? 10,
+    });
   }
 }

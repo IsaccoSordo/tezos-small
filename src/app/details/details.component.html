@@ -4,45 +4,36 @@
     <p class="subtitle">Transaction details for this block</p>
   </div>
 
-  @if (transactions(); as transactions) {
-    <app-table
-      [headers]="['Sender', 'Target', 'Amount', 'Status']"
-      [show]="transactions.length > 0"
-    >
-      @for (transaction of transactions; track $index) {
-        <tr class="data-row">
-          <td>
-            <span class="address-field">
-              <i
-                class="pi pi-user"
-                style="font-size: 0.8rem; margin-right: 0.3rem"
-              ></i>
-              {{ transaction.sender.address }}
-            </span>
-          </td>
-          <td>
-            <span class="address-field">
-              <i
-                class="pi pi-send"
-                style="font-size: 0.8rem; margin-right: 0.3rem"
-              ></i>
-              {{ transaction.target.address }}
-            </span>
-          </td>
-          <td>
-            <span class="amount">{{ transaction.amount }} ꜩ</span>
-          </td>
-          <td>
-            <span
-              [class]="
-                'status-badge status-' + transaction.status.toLowerCase()
-              "
-            >
-              {{ transaction.status }}
-            </span>
-          </td>
-        </tr>
-      }
-    </app-table>
-  }
+  <app-table
+    [data]="transactions()"
+    [columns]="columns"
+    [scrollable]="true"
+    [scrollHeight]="'600px'"
+    [rowTemplate]="transactionRow"
+  ></app-table>
+
+  <ng-template #transactionRow let-transaction>
+    <tr class="data-row">
+      <td>
+        <span class="address-field">
+          <i class="pi pi-user" style="font-size: 0.8rem; margin-right: 0.3rem"></i>
+          {{ transaction.sender.address }}
+        </span>
+      </td>
+      <td>
+        <span class="address-field">
+          <i class="pi pi-send" style="font-size: 0.8rem; margin-right: 0.3rem"></i>
+          {{ transaction.target.address }}
+        </span>
+      </td>
+      <td>
+        <span class="amount">{{ transaction.amount }} ꜩ</span>
+      </td>
+      <td>
+        <span [class]="'status-badge status-' + transaction.status.toLowerCase()">
+          {{ transaction.status }}
+        </span>
+      </td>
+    </tr>
+  </ng-template>
 </div>

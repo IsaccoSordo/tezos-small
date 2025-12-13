@@ -1,40 +1,48 @@
 <div class="table-container">
-  <table class="custom-table">
-    <thead>
+  <p-table
+    [value]="data()"
+    [scrollable]="scrollable()"
+    [scrollHeight]="scrollHeight()"
+    [paginator]="paginator()"
+    [rows]="rows()"
+    [totalRecords]="totalRecords()"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="paginator()"
+    [lazy]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    (onLazyLoad)="onPageChange($event)"
+  >
+    <ng-template pTemplate="header">
       <tr>
-        @for (header of headers(); track header) {
-          <th>{{ header }}</th>
+        @for (column of columns(); track column.field) {
+          <th>{{ column.header }}</th>
         }
       </tr>
-    </thead>
-    @if (show()) {
-      <tbody>
-        <ng-content></ng-content>
-      </tbody>
-    } @else {
-      <tbody>
-        <tr>
-          <td [attr.colspan]="headers().length" class="empty-message">
-            <div class="no-data-container">
-              <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc"></i>
-              <p>No data found.</p>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    }
-  </table>
+    </ng-template>
 
-  @if (paginator()) {
-    <div class="paginator-container">
-      <p-paginator
-        [rows]="pageSize()"
-        [totalRecords]="count()"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        (onPageChange)="onPageChange($event)"
-      ></p-paginator>
-    </div>
-  }
+    <ng-template pTemplate="body" let-rowData>
+      @if (rowTemplate()) {
+        <ng-container
+          *ngTemplateOutlet="rowTemplate()!; context: { $implicit: rowData }"
+        ></ng-container>
+      } @else {
+        <tr>
+          @for (column of columns(); track column.field) {
+            <td>{{ rowData[column.field] }}</td>
+          }
+        </tr>
+      }
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columns().length" class="empty-message">
+          <div class="no-data-container">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc"></i>
+            <p>No data found.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>
