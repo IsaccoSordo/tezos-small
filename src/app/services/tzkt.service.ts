@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, tap, switchMap, map, of } from 'rxjs';
+import { Observable, tap, switchMap, map, of, from, mergeMap, toArray } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -29,21 +29,22 @@ export class TzktService {
       }
     }).pipe(
       switchMap((blocks) => {
-        // Fetch transaction counts for all blocks in parallel
-        const transactionCounts$ = blocks.map((block) =>
-          this.getTransactionsCount(block.level).pipe(
-            tap({ next: (count) => block.transactions = count })
-          )
-        );
-
         // Handle empty blocks case
-        if (transactionCounts$.length === 0) {
+        if (blocks.length === 0) {
           this.store.state.blocks.set(blocks);
           return of(blocks);
         }
 
-        // Wait for all transaction counts, then update store and emit blocks
-        return forkJoin(transactionCounts$).pipe(
+        // Fetch transaction counts with concurrency limit of 5 to avoid rate limiting
+        return from(blocks).pipe(
+          mergeMap(
+            (block) =>
+              this.getTransactionsCount(block.level).pipe(
+                tap({ next: (count) => block.transactions = count })
+              ),
+            5 // Limit to 5 concurrent requests
+          ),
+          toArray(),
           tap(() => this.store.state.blocks.set(blocks)),
           map(() => blocks)
         );
