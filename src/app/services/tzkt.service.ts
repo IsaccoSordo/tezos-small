@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, tap } from 'rxjs';
+import { Observable, forkJoin, tap, switchMap, map, of } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -28,20 +28,25 @@ export class TzktService {
         'sort.desc': 'level'
       }
     }).pipe(
-      tap({
-        next: (blocks) => {
-          // Fetch transaction counts for all blocks in parallel
-          const transactionCounts$ = blocks.map((block) =>
-            this.getTransactionsCount(block.level).pipe(
-              tap({ next: (count) => block.transactions = count })
-            )
-          );
+      switchMap((blocks) => {
+        // Fetch transaction counts for all blocks in parallel
+        const transactionCounts$ = blocks.map((block) =>
+          this.getTransactionsCount(block.level).pipe(
+            tap({ next: (count) => block.transactions = count })
+          )
+        );
 
-          // Subscribe to all transaction count requests
-          forkJoin(transactionCounts$).subscribe();
-
+        // Handle empty blocks case
+        if (transactionCounts$.length === 0) {
           this.store.state.blocks.set(blocks);
+          return of(blocks);
         }
+
+        // Wait for all transaction counts, then update store and emit blocks
+        return forkJoin(transactionCounts$).pipe(
+          tap(() => this.store.state.blocks.set(blocks)),
+          map(() => blocks)
+        );
       })
     );
   }

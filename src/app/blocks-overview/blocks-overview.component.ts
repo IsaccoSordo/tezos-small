@@ -42,7 +42,7 @@ export class BlocksOverviewComponent implements OnInit {
     // Handle table refresh events reactively
     this.refresh$
       .pipe(
-        switchMap((event) => this.service.getBlocks(event.pageSize, event.page - 1)),
+        switchMap((event) => this.service.getBlocks(event.pageSize, event.page)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();

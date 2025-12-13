@@ -7,23 +7,21 @@ import { Store } from 'src/app/store/store.service';
   selector: 'app-spinner',
   template: `
     @if (loadingCounter$()) {
-      <div class="spinner-backdrop">
-        <div class="spinner-container">
-          <p-progressSpinner
-            [style]="{ width: '70px', height: '70px' }"
-            strokeWidth="4"
-            fill="transparent"
-            animationDuration="1s"
-          ></p-progressSpinner>
-        </div>
-      </div>
+    <div class="spinner-backdrop">
+      <p-progressSpinner
+        [style]="{ width: '70px', height: '70px' }"
+        strokeWidth="4"
+        fill="transparent"
+        animationDuration="1s"
+      />
+    </div>
     }
   `,
   styleUrls: ['./spinner.component.scss'],
   standalone: true,
   imports: [CommonModule, ProgressSpinnerModule],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpinnerComponent {
-  loadingCounter$ = inject(Store).state.loadingCounter
+  loadingCounter$ = inject(Store).state.loadingCounter;
 }
