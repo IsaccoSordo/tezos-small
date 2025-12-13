@@ -1,0 +1,206 @@
+# Tezos Small
+
+> A modern Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API, built with PrimeNG UI components and signal-based reactive state management.
+
+This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and comprehensive HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
+
+**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, TZKT API
+**Node Requirements**: v20.19+ or v22.12+
+**Last Updated**: 2025-12-13
+
+## Core Documentation
+
+- [README.md](README.md): Complete project overview, features, quick start guide, testing instructions, and architecture documentation
+- [package.json](package.json): Dependencies, scripts, and project metadata
+- [tsconfig.json](tsconfig.json): TypeScript strict mode configuration
+- [angular.json](angular.json): Angular CLI and build configuration
+- [karma.conf.js](karma.conf.js): Multi-browser test runner configuration
+
+## Application Configuration
+
+- [src/main.ts](src/main.ts): Application bootstrap with zoneless change detection
+- [src/app/app.config.ts](src/app/app.config.ts): Global providers, HTTP interceptors registration, PrimeNG theme configuration (Aura preset)
+- [src/app/app.routes.ts](src/app/app.routes.ts): Application routing configuration with lazy loading
+
+## TypeScript Interfaces
+
+- [src/app/common.ts](src/app/common.ts): Shared TypeScript interfaces (Block, Transaction, Account, Column, TableConfig)
+
+## Services & State Management
+
+- [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
+- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using Angular Signals
+- [src/app/store/tzkt.state.ts](src/app/store/tzkt.state.ts): Reactive signal-based state definitions
+
+## HTTP Interceptors
+
+- [src/app/interceptors/loading.interceptor.ts](src/app/interceptors/loading.interceptor.ts): Functional interceptor for automatic loading state management using counter-based approach
+- [src/app/interceptors/error.interceptor.ts](src/app/interceptors/error.interceptor.ts): Centralized HTTP error handling with PrimeNG toast notifications
+- [src/app/interceptors/cache.interceptor.ts](src/app/interceptors/cache.interceptor.ts): HTTP response caching interceptor
+
+## Error Handling
+
+- [src/app/core/global-error.handler.ts](src/app/core/global-error.handler.ts): Custom Angular ErrorHandler for unhandled exceptions
+
+## Components
+
+- [src/app/app.component.ts](src/app/app.component.ts): Root application component
+- [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with branding
+- [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Main blocks listing page with pagination and real-time counts
+- [src/app/details/details.component.ts](src/app/details/details.component.ts): Transaction details page for individual blocks
+
+## Reusable UI Components
+
+- [src/app/ui/table/table.component.ts](src/app/ui/table/table.component.ts): Generic data table with pagination, sorting, and customizable columns using PrimeNG Table
+- [src/app/ui/spinner/spinner.component.ts](src/app/ui/spinner/spinner.component.ts): Loading indicator using PrimeNG ProgressSpinner
+
+## Angular 21 Best Practices
+
+**TypeScript Standards**
+- Use strict type checking (enabled in tsconfig.json)
+- Avoid `any` types; prefer explicit interfaces
+- Leverage type inference where appropriate
+- Define interfaces for all API responses and data models
+
+**Angular Conventions**
+- Use standalone components (no NgModules)
+- Prefer signals for reactive state management (see store.service.ts)
+- Use functional HTTP interceptors with `withInterceptors()`
+- Enable zoneless change detection for better performance
+- Use `input()` and `output()` functions for component APIs
+- Apply OnPush change detection strategy
+
+**Component Patterns**
+- Keep components small and focused (single responsibility)
+- Use smart/container components for data management
+- Use presentational/dumb components for UI rendering
+- Implement proper lifecycle hooks
+- Unsubscribe from observables to prevent memory leaks
+
+**Template Guidance**
+- Use native control flow (`@if`, `@for`, `@switch`) instead of structural directives
+- Avoid complex logic in templates
+- Use async pipe for observables
+- Leverage signals with `()` syntax for reactive updates
+
+**Service Design**
+- Use `providedIn: 'root'` for singleton services
+- Follow single responsibility principle
+- Return observables for async operations
+- Handle errors gracefully with proper error messages
+
+**RxJS Patterns**
+- Use `tap` for side effects without transforming values
+- Use `map` for value transformations
+- Use `catchError` for error handling
+- Use `finalize` for cleanup operations
+- Use `forkJoin` for combining parallel requests
+
+**Accessibility**
+- Ensure WCAG AA compliance
+- Use semantic HTML elements
+- Provide ARIA labels where needed
+- PrimeNG components include built-in accessibility support
+
+## API Integration
+
+**TZKT API** (https://api.tzkt.io/v1)
+- Base URL: `https://api.tzkt.io/v1`
+- `/blocks/count`: Total block count
+- `/blocks?limit=X&offset=Y`: Paginated blocks
+- `/operations/transactions/count?level=X`: Transaction count per block
+- `/operations/transactions?level=X`: Block transactions
+
+**Integration Notes**
+- All HTTP calls go through interceptors (loading + error + cache)
+- No manual loading/error state management needed in services
+- Responses are mapped to TypeScript interfaces (Block, Transaction)
+- Counter-based loading ensures proper handling of concurrent requests
+
+## Testing
+
+**Test Files**
+- [src/app/app.component.spec.ts](src/app/app.component.spec.ts): Root component tests
+- [src/app/services/tzkt.service.spec.ts](src/app/services/tzkt.service.spec.ts): API service tests with HttpClientTestingModule
+- [src/app/blocks-overview/blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts): Blocks page tests
+- [src/app/details/details.component.spec.ts](src/app/details/details.component.spec.ts): Details page tests
+- [src/app/ui/table/table.component.spec.ts](src/app/ui/table/table.component.spec.ts): Table component tests
+- [src/app/ui/spinner/spinner.component.spec.ts](src/app/ui/spinner/spinner.component.spec.ts): Spinner component tests
+- [src/app/navbar/navbar.component.spec.ts](src/app/navbar/navbar.component.spec.ts): Navbar tests
+
+**Testing Commands**
+- `npm test`: Run tests in watch mode with browser auto-detection
+- `npm test:headless`: Run tests in ChromeHeadless without watch
+- `npm test -- --code-coverage`: Generate coverage reports
+
+**Testing Best Practices**
+- Use Jasmine for test framework (describe, it, expect)
+- Use Karma for test runner with multi-browser support
+- Mock HTTP calls with HttpClientTestingModule
+- Test component inputs, outputs, and user interactions
+- Verify error handling and edge cases
+- Aim for high code coverage
+
+## Architecture Patterns
+
+**State Management**
+- Centralized signal-based state in `StoreService`
+- Reactive updates using Angular Signals
+- No external state management library needed
+
+**Data Flow**
+1. Component calls service method
+2. Service makes HTTP request to TZKT API
+3. Loading interceptor increments counter
+4. Response/error handled by interceptors
+5. Service updates store with new data
+6. Components react to signal changes
+
+**Error Handling Flow**
+1. HTTP errors caught by error interceptor
+2. User-friendly toast notifications displayed
+3. Error logged to console for debugging
+4. Global error handler catches unhandled exceptions
+
+## PrimeNG Components Used
+
+- `p-table`: Data tables with pagination, sorting, filtering
+- `p-progressSpinner`: Loading indicators
+- `p-toast`: Toast notifications for errors and messages
+- `p-button`: Styled buttons
+- Available: 90+ additional PrimeNG components for future enhancements
+
+## Development Commands
+
+- `npm start`: Start development server on http://localhost:4200
+- `npm run build`: Production build to dist/tezos-small
+- `npm run watch`: Build in watch mode
+- `npm test`: Run tests
+- `npm run lint`: Run ESLint
+
+## Optional
+
+**Additional Resources**
+- [Angular Documentation](https://angular.io/docs): Official Angular framework docs
+- [Angular AI Development Guide](https://angular.dev/ai/develop-with-ai): Guidelines for using LLMs with Angular projects
+- [PrimeNG Documentation](https://primeng.org): UI component library documentation
+- [TZKT API Documentation](https://tzkt.io/api/): Tezos blockchain API reference
+- [RxJS Documentation](https://rxjs.dev/): Reactive programming library docs
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/): TypeScript language reference
+
+**Project Repository**
+- GitHub: https://github.com/IsaccoSordo/tezos-small
+
+**License**
+- MIT License (see LICENCE file)
+
+**Browser Support**
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Test runner auto-detects installed browsers
+
+**Code Style**
+- OnPush change detection for performance
+- Standalone components architecture
+- TypeScript strict mode enabled
+- SCSS styling with modular components
+- BEM naming conventions
