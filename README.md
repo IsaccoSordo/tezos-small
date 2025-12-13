@@ -57,7 +57,7 @@ A sleek, modern Angular application for exploring **Tezos blockchain** blocks an
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/IsaccoSordo/tezos-small.git
 cd tezos-small
 
 # Install dependencies
