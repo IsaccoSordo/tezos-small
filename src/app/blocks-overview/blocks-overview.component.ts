@@ -1,40 +1,54 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Observable, Subject, Subscription, interval, takeUntil } from 'rxjs';
-import { Block, TableData } from '../common';
+import { Component, inject, ChangeDetectionStrategy, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { interval, switchMap, Subject } from 'rxjs';
+import { TableData } from '../common';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
+import { TableComponent } from '../ui/table/table.component';
 
 @Component({
   selector: 'app-blocks-overview',
   templateUrl: './blocks-overview.component.html',
   styleUrls: ['./blocks-overview.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [CommonModule, RouterLink, TableComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BlocksOverviewComponent implements OnInit, OnDestroy {
-  service = inject(TzktService);
-  store = inject(Store);
+export class BlocksOverviewComponent implements OnInit {
+  private service = inject(TzktService);
+  private destroyRef = inject(DestroyRef);
+  private refresh$ = new Subject<TableData>();
 
+  store = inject(Store);
   blocks = this.store.state.blocks;
   count = this.store.state.count;
 
-  private destroy$ = new Subject<boolean>();
-
   ngOnInit(): void {
-    this.getBlocksCount();
-  }
+    // Initial fetch on component initialization
+    this.service.getBlocksCount()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
 
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-  }
-
-  private getBlocksCount() {
-    this.service.getBlocksCount();
+    // Poll every 60 seconds
     interval(60000)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.service.getBlocksCount()); // behind the scenes, the blocks count might increase
+      .pipe(
+        switchMap(() => this.service.getBlocksCount()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+
+    // Handle table refresh events reactively
+    this.refresh$
+      .pipe(
+        switchMap((event) => this.service.getBlocks(event.pageSize, event.page - 1)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
   }
 
   refreshView(event: TableData) {
-    this.service.getBlocks(event.pageSize, event.page - 1); // the API offset param starts from 0
+    this.refresh$.next(event);
   }
 }

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -6,6 +7,8 @@ import { Component } from '@angular/core';
     <a class="nav-item nav-link" routerLink="">TezosSmall</a>
   </nav>`,
   styleUrls: ['./navbar.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavbarComponent {}

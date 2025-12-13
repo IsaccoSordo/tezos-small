@@ -1,0 +1,440 @@
+# Tezos Small - Codebase Guidelines
+
+## Project Overview
+
+This is an Angular 21 application for exploring Tezos blockchain data via the TzKT API. It displays blocks, transactions, and related blockchain information.
+
+## Tech Stack
+
+- **Framework**: Angular 21
+- **Language**: TypeScript 5.9
+- **UI**: Bootstrap 5.3 + ng-bootstrap
+- **State Management**: Custom Signal-based Store
+- **HTTP Client**: Angular HttpClient
+- **Reactive Programming**: RxJS 7.8
+
+## Architecture
+
+### State Management Pattern
+
+We use a **Signal-based architecture** (not NgRx, not traditional Observables in templates):
+
+```
+HTTP Observable → Service (side effects) → Store (Signals) → Components → Template
+```
+
+**Store Pattern:**
+- Central store service with signals (`Store.state.blocks`, `Store.state.count`, etc.)
+- Services update store signals via RxJS `tap()` operators
+- Components hold references to store signals
+- Templates bind signals directly using `signal()` syntax
+
+**Example:**
+```typescript
+// Store
+export class Store {
+  readonly state: TZKTState = {
+    blocks: signal([]),
+    count: signal(0),
+    errors: signal([]),
+    loadingCounter: signal(0),
+    transactions: signal([]),
+  };
+}
+
+// Service updates store
+getBlocksCount(): Observable<number> {
+  return this.http.get<number>(`${API}/blocks/count`).pipe(
+    tap({ next: (count) => this.store.state.count.set(count) })
+  );
+}
+
+// Component reads from store
+export class BlocksOverviewComponent {
+  store = inject(Store);
+  blocks = this.store.state.blocks; // Signal reference
+  count = this.store.state.count;   // Signal reference
+}
+
+// Template binds signal
+@if (blocks(); as blocks) {
+  @for (block of blocks; track block.hash) {
+    <div>{{ block.level }}</div>
+  }
+}
+```
+
+### Component Structure
+
+All components follow these patterns:
+
+1. **Standalone components** - No NgModules
+2. **OnPush change detection** - For performance
+3. **Dependency injection via `inject()`** - No constructor DI
+4. **Signal-based reactivity** - Not async pipe
+5. **Modern control flow syntax** - `@if`, `@for`, `@switch` (not `*ngIf`, `*ngFor`)
+
+## Code Style & Best Practices
+
+### RxJS & Subscriptions
+
+**NEVER use async pipe** - We use Signals, not Observable properties in templates.
+
+**Subscription Management:**
+- ✅ Subscribe in `ngOnInit` (NOT in constructor)
+- ✅ Use `DestroyRef` with `takeUntilDestroyed(this.destroyRef)`
+- ✅ Use Subject pattern for event streams
+- ❌ Never subscribe in methods (use Subject + reactive streams instead)
+- ❌ Never use nested subscriptions
+
+**Good Pattern:**
+```typescript
+export class MyComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+  private action$ = new Subject<ActionData>();
+
+  ngOnInit(): void {
+    // Set up reactive stream
+    this.action$
+      .pipe(
+        switchMap((data) => this.service.doSomething(data)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
+  }
+
+  handleEvent(data: ActionData) {
+    this.action$.next(data); // Just emit, don't subscribe
+  }
+}
+```
+
+**Bad Pattern:**
+```typescript
+// ❌ Don't do this
+handleEvent(data: ActionData) {
+  this.service.doSomething(data)
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(); // Subscription in method
+}
+```
+
+### Services
+
+- All services use `providedIn: 'root'`
+- Services communicate with API and update Store signals via `tap()`
+- Handle errors using `catchError()` and update `store.state.errors`
+- Manage loading state via `store.state.loadingCounter`
+- Always use `finalize()` to decrement loading counter
+
+**Service Pattern:**
+```typescript
+@Injectable({ providedIn: 'root' })
+export class TzktService {
+  private http = inject(HttpClient);
+  private store = inject(Store);
+
+  getData(): Observable<Data> {
+    this.store.state.loadingCounter.update((prev) => prev + 1);
+    return this.http.get<Data>(`${API}/endpoint`).pipe(
+      tap({ next: (data) => this.store.state.data.set(data) }),
+      catchError((error) => {
+        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
+        return of([]);
+      }),
+      finalize(() => this.store.state.loadingCounter.update((prev) => prev - 1))
+    );
+  }
+}
+```
+
+### Component Lifecycle
+
+1. **Constructor**: Not used (use field initializers)
+2. **ngOnInit**: All subscriptions and initialization logic
+3. **No ngOnDestroy**: Use `takeUntilDestroyed()` instead
+
+### Templates
+
+- Use modern Angular control flow: `@if`, `@for`, `@switch`
+- Bind signals with `signal()` syntax
+- Use `track` in `@for` loops (e.g., `track block.hash`)
+- Keep templates clean and delegate logic to components
+
+### Dependency Injection
+
+- Always use `inject()` function (not constructor injection)
+- Private services: `private service = inject(TzktService)`
+- Public references: `store = inject(Store)`
+
+### File Organization
+
+```
+src/app/
+├── blocks-overview/    # Feature component
+├── details/            # Feature component
+├── navbar/             # Layout component
+├── services/           # API services
+├── store/              # Signal-based state
+├── ui/                 # Reusable UI components
+│   ├── error-notification/
+│   ├── spinner/
+│   └── table/
+└── common.ts          # Shared types
+```
+
+### Naming Conventions
+
+- Components: `{feature}.component.ts`
+- Services: `{name}.service.ts`
+- Interfaces/Types: PascalCase (e.g., `Block`, `Transaction`, `TableData`)
+- Observables: End with `$` (e.g., `refresh$`, `action$`)
+- Signals: No suffix (e.g., `blocks`, `count`)
+- Private fields: Prefix with `private`
+
+## TypeScript Guidelines
+
+- Use `readonly` for immutable properties
+- Prefer `const` over `let`
+- Use type inference when obvious
+- Explicit types for function parameters and return values
+- Use `inject()` with explicit types
+
+## Testing
+
+### Framework & Tools
+
+- **Test Runner**: Jasmine + Karma (Angular 21 default)
+- **HTTP Testing**: `HttpTestingController` from `@angular/common/http/testing`
+- **Command**: `npm test`
+- All components/services must have corresponding `.spec.ts` files
+
+### Testing Best Practices (Angular 21 + Signals)
+
+**General Principles:**
+- ✅ Write meaningful tests that verify behavior, not just existence
+- ✅ Test user interactions and state changes
+- ✅ Test error handling and edge cases
+- ✅ Use `await fixture.whenStable()` for async operations with signals
+- ✅ Reset shared state (Store signals) in `afterEach()` hooks
+- ❌ Don't write "smoke tests" that only check `expect(component).toBeTruthy()`
+
+**Component Testing:**
+
+```typescript
+// ✅ GOOD: Standalone component with proper providers
+describe('MyComponent', () => {
+  let component: MyComponent;
+  let fixture: ComponentFixture<MyComponent>;
+  let store: Store;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MyComponent], // ← Import standalone component
+      providers: [Store]       // ← Provide dependencies
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(MyComponent);
+    component = fixture.componentInstance;
+    store = TestBed.inject(Store);
+  });
+
+  afterEach(() => {
+    // Reset store signals after each test
+    store.state.data.set([]);
+  });
+});
+
+// ❌ BAD: Using declarations (old NgModule style)
+beforeEach(() => {
+  TestBed.configureTestingModule({
+    declarations: [MyComponent] // ❌ Wrong for standalone components
+  });
+});
+```
+
+**Testing Signals:**
+
+```typescript
+// Test signal state changes
+it('should update store signal when data is fetched', () => {
+  service.getData().subscribe();
+
+  const req = httpMock.expectOne(url);
+  req.flush(mockData);
+
+  expect(store.state.data()).toEqual(mockData); // ← Read signal value
+});
+
+// Test reactive UI updates
+it('should display data when signal changes', async () => {
+  store.state.data.set(mockData);
+
+  fixture.detectChanges();
+  await fixture.whenStable(); // ← Wait for signals to propagate
+
+  const element = fixture.nativeElement;
+  expect(element.textContent).toContain('expected value');
+});
+```
+
+**Service Testing with HttpTestingController:**
+
+```typescript
+describe('MyService', () => {
+  let service: MyService;
+  let httpMock: HttpTestingController;
+  let store: Store;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),          // ← New Angular API
+        provideHttpClientTesting(),   // ← Enables HttpTestingController
+        MyService,
+        Store
+      ]
+    });
+    service = TestBed.inject(MyService);
+    httpMock = TestBed.inject(HttpTestingController);
+    store = TestBed.inject(Store);
+  });
+
+  afterEach(() => {
+    httpMock.verify(); // ← Verify no outstanding requests
+    store.state.data.set([]); // ← Reset signals
+  });
+
+  it('should fetch data and update store', (done) => {
+    service.getData().subscribe(() => {
+      expect(store.state.data()).toEqual(mockData);
+      done();
+    });
+
+    const req = httpMock.expectOne('https://api.example.com/data');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockData);
+  });
+
+  it('should handle errors gracefully', (done) => {
+    service.getData().subscribe(() => {
+      expect(store.state.errors().length).toBeGreaterThan(0);
+      expect(store.state.data()).toEqual([]);
+      done();
+    });
+
+    const req = httpMock.expectOne('https://api.example.com/data');
+    req.error(new ProgressEvent('Network error'));
+  });
+});
+```
+
+**Testing Input Signals (Angular 21):**
+
+```typescript
+it('should accept input values', () => {
+  // Use setInput for signal-based inputs
+  fixture.componentRef.setInput('count', 500);
+  fixture.detectChanges();
+
+  expect(component.count()).toBe(500);
+});
+```
+
+**Testing Component Interactions:**
+
+```typescript
+it('should call method when button is clicked', () => {
+  spyOn(component, 'handleClick');
+
+  const button = fixture.nativeElement.querySelector('button');
+  button.click();
+
+  expect(component.handleClick).toHaveBeenCalled();
+});
+
+it('should emit event on user action', (done) => {
+  component.refresh.subscribe(data => {
+    expect(data.page).toBe(2);
+    done();
+  });
+
+  component.page.set(2);
+  component.refreshView();
+});
+```
+
+**Testing Error States:**
+
+```typescript
+it('should display error message when API fails', async () => {
+  store.state.errors.set([{ text: 'Failed to load' }]);
+
+  fixture.detectChanges();
+  await fixture.whenStable();
+
+  expect(fixture.nativeElement.textContent).toContain('Failed to load');
+});
+```
+
+**Testing Loading States:**
+
+```typescript
+it('should increment and decrement loading counter', (done) => {
+  expect(store.state.loadingCounter()).toBe(0);
+
+  service.getData().subscribe(() => {
+    expect(store.state.loadingCounter()).toBe(0); // ← Finalized
+    done();
+  });
+
+  expect(store.state.loadingCounter()).toBe(1); // ← While loading
+
+  httpMock.expectOne(url).flush(data);
+});
+```
+
+### Test Coverage Goals
+
+- **Components**: Test signal bindings, user interactions, error states, loading states
+- **Services**: Test HTTP calls, error handling, store updates, loading counter management
+- **UI Components**: Test input/output bindings, event emissions, conditional rendering
+- **Edge Cases**: Test null/undefined values, empty arrays, network failures
+
+### Anti-Patterns to Avoid
+
+❌ **Don't use HttpClientModule in tests** - Use `provideHttpClient()` and `provideHttpClientTesting()`
+❌ **Don't forget httpMock.verify()** - Always verify no outstanding requests
+❌ **Don't test implementation details** - Test behavior, not internal methods
+❌ **Don't skip error cases** - Always test error handling
+❌ **Don't forget to reset signals** - Clean up shared state in `afterEach()`
+❌ **Don't use declarations for standalone components** - Use `imports` array
+
+## Key Anti-Patterns to Avoid
+
+❌ **Don't use async pipe** - We use Signals
+❌ **Don't subscribe in constructors** - Use `ngOnInit`
+❌ **Don't subscribe in methods** - Use Subject pattern
+❌ **Don't use NgModules** - All components are standalone
+❌ **Don't use old control flow** - Use `@if/@for` not `*ngIf/*ngFor`
+❌ **Don't expose Observables to templates** - Expose Signals instead
+❌ **Don't forget takeUntilDestroyed** - Always clean up subscriptions
+❌ **Don't use manual change detection** - OnPush + Signals handle it
+
+## External APIs
+
+- **TzKT API**: `https://api.tzkt.io/v1`
+- Used for fetching Tezos blockchain data (blocks, transactions, counts)
+
+## Build & Development
+
+- Start dev server: `npm start`
+- Build: `npm run build`
+- Run tests: `npm test`
+
+## Additional Notes
+
+- This project was upgraded to Angular 21
+- Bootstrap is available globally for styling
+- All HTTP requests include error handling and loading states
+- The app uses OnPush change detection for optimal performance
