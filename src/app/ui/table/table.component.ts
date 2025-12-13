@@ -23,10 +23,10 @@ export class TableComponent {
   headers = input<string[]>([]);
   show = input<boolean>(false);
   count = input<number>(100);
-  page = signal(1); // base value for paginator is 1 (not 0)
-  pageSize = input<number>(10);
   maxSize = input<number>(10);
   paginator = input<boolean>(false);
+  page = signal(1); // base value for paginator is 1 (not 0)
+  pageSize = signal<number>(10);
 
   @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
     this.getSnapshot()
@@ -45,7 +45,8 @@ export class TableComponent {
   }
 
   onPageChange(event: any) {
-    this.page.set(event.page);
+    this.page.set(event.page + 1);
+    this.pageSize.set(event.rows);
     this.refreshView();
   }
 }
