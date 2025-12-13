@@ -1,34 +1,41 @@
-<table class="table table-striped">
-  <thead>
-    <tr>
-      @for (header of headers(); track header) {
-        <th scope="col">{{ header }}</th>
-      }
-    </tr>
-  </thead>
-  @if (show()) {
-    <tbody>
-      <ng-content></ng-content>
-    </tbody>
-  } @else {
-    <tbody>
+<div class="table-container">
+  <table class="custom-table">
+    <thead>
       <tr>
-        <td colspan="100%">
-          <p>No data found.</p>
-        </td>
+        @for (header of headers(); track header) {
+          <th>{{ header }}</th>
+        }
       </tr>
-    </tbody>
+    </thead>
+    @if (show()) {
+      <tbody>
+        <ng-content></ng-content>
+      </tbody>
+    } @else {
+      <tbody>
+        <tr>
+          <td [attr.colspan]="headers().length" class="empty-message">
+            <div class="no-data-container">
+              <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+              <p>No data found.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    }
+  </table>
+
+  @if (paginator()) {
+    <div class="paginator-container">
+      <p-paginator
+        [first]="(page() - 1) * pageSize()"
+        [rows]="pageSize()"
+        [totalRecords]="count()"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        (onPageChange)="onPageChange($event)"
+      ></p-paginator>
+    </div>
   }
-</table>
-@if (paginator()) {
-  <div class="d-flex justify-content-between p-2">
-    <ngb-pagination
-      [collectionSize]="count()"
-      [pageSize]="pageSize()"
-      [maxSize]="maxSize()"
-      [(page)]="page"
-      (pageChange)="refreshView()"
-    >
-    </ngb-pagination>
-  </div>
-}
+</div>

@@ -4,10 +4,10 @@
 
 [![Angular](https://img.shields.io/badge/Angular-21.0-dd0031?logo=angular)](https://angular.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952b3?logo=bootstrap)](https://getbootstrap.com)
+[![PrimeNG](https://img.shields.io/badge/PrimeNG-Latest-007ad9?logo=prime)](https://primeng.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](#license)
 
-A sleek, modern Angular application for exploring **Tezos blockchain** blocks and transactions through the [TZKT API](https://tzkt.io/api/).
+A sleek, modern Angular application for exploring **Tezos blockchain** blocks and transactions through the [TZKT API](https://tzkt.io/api/), built with **PrimeNG** UI components.
 
 [Features](#features) • [Quick Start](#quick-start) • [Development](#development) • [Architecture](#architecture)
 
@@ -34,15 +34,17 @@ A sleek, modern Angular application for exploring **Tezos blockchain** blocks an
 - Standalone Angular components with OnPush change detection
 - Reactive data flow with RxJS
 - Real-time block count updates
-- Smart loading states and error handling
-- Bootstrap 5 + ng-bootstrap for responsive design
+- Smart loading states with PrimeNG ProgressSpinner
+- Toast notifications for error handling
+- PrimeNG Aura theme for modern, beautiful UI
 
 🎨 **Modern Stack**
 
 - Angular 21 with latest standalone APIs
+- **PrimeNG** - Enterprise-grade UI component library
 - TypeScript strict mode
 - SCSS styling with modular components
-- Comprehensive error notification system
+- 90+ available PrimeNG components for future enhancements
 
 ---
 
@@ -449,8 +451,8 @@ Key operators used in the application:
 
 ### UI
 
-- `bootstrap@5.3.3` - CSS framework
-- `@ng-bootstrap/ng-bootstrap@20.0.0` - Angular Bootstrap components
+- `primeng` - Enterprise Angular UI component library
+- `primeicons` - Premium icon library
 
 ### Testing
 
@@ -549,11 +551,42 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ---
 
+## 🎨 UI Framework
+
+This application uses **PrimeNG**, the most comprehensive open-source UI component library for Angular in 2025.
+
+### Why PrimeNG?
+
+- **90+ Components**: From basic buttons to advanced data tables and charts
+- **Modern Themes**: Using Aura theme with blue color scheme
+- **Enterprise-Ready**: Battle-tested in production environments
+- **Excellent Performance**: Optimized for Angular's latest features
+- **Active Development**: Regular updates and Angular 21 support
+- **Multiple Design Systems**: Supports Material, Bootstrap, Tailwind CSS themes
+
+### PrimeNG Components Used
+
+- **Menubar** - Modern navigation with gradient branding
+- **Table** - Advanced data table with pagination, sorting, and filtering
+- **Toast** - Elegant notification system for errors
+- **ProgressSpinner** - Smooth loading indicator
+- **Icons** - PrimeIcons library for consistent iconography
+
+### Theme Customization
+
+The application uses the **Aura Light Blue** theme, which can be changed in [src/styles.scss](src/styles.scss):
+
+```scss
+@import 'primeng/resources/themes/lara-light/theme.css';
+```
+
+Available themes include: Aura, Material, Bootstrap, Tailwind variants, and many more.
+
 ## 📚 Additional Resources
 
 - [Angular Documentation](https://angular.io/docs)
+- [PrimeNG Documentation](https://primeng.org)
 - [TZKT API Documentation](https://tzkt.io/api/)
 - [RxJS Guide](https://rxjs.dev/)
-- [Bootstrap Documentation](https://getbootstrap.com/docs)
 
 ---

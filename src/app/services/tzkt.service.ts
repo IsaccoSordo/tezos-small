@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
+import { Observable, forkJoin, tap } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -16,10 +16,6 @@ export class TzktService {
     return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
       tap({
         next: (count) => this.store.state.count.set(count)
-      }),
-      catchError((error) => {
-        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
-        return of(0);
       })
     );
   }
@@ -46,10 +42,6 @@ export class TzktService {
 
           this.store.state.blocks.set(blocks);
         }
-      }),
-      catchError((error) => {
-        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
-        return of([]);
       })
     );
   }
@@ -57,12 +49,7 @@ export class TzktService {
   getTransactionsCount(level: number): Observable<number> {
     return this.http.get<number>(`${this.API_BASE}/operations/transactions/count`, {
       params: { level: level.toString() }
-    }).pipe(
-      catchError((error) => {
-        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
-        return of(0);
-      })
-    );
+    });
   }
 
   getTransactions(level: number): Observable<Transaction[]> {
@@ -71,10 +58,6 @@ export class TzktService {
     }).pipe(
       tap({
         next: (transactions) => this.store.state.transactions.set(transactions)
-      }),
-      catchError((error) => {
-        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
-        return of([]);
       })
     );
   }

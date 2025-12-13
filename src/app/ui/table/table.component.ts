@@ -1,6 +1,6 @@
 import { Component, input, Output, ChangeDetectionStrategy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { PaginatorModule } from 'primeng/paginator';
 import { BehaviorSubject } from 'rxjs';
 import { TableData } from 'src/app/common';
 
@@ -9,7 +9,7 @@ import { TableData } from 'src/app/common';
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, NgbPaginationModule],
+  imports: [CommonModule, PaginatorModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent {
@@ -27,7 +27,8 @@ export class TableComponent {
 
   constructor() {
     effect(() => {
-      // Track signal changes for snapshot updates
+      // Track signal changes for change detection
+      // Just reading the signals is enough to trigger updates with OnPush
       this.count();
       this.pageSize();
     });
@@ -43,5 +44,11 @@ export class TableComponent {
 
   refreshView() {
     this.refresh.next(this.getSnapshot());
+  }
+
+  onPageChange(event: any) {
+    // PrimeNG uses 0-based page index, but we use 1-based
+    this.page.set(event.page + 1);
+    this.refreshView();
   }
 }

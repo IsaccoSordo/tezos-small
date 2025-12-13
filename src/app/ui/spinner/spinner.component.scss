@@ -1,31 +1,29 @@
-@use '../../../styles.scss' as styles;
-
-.spinner {
-  position: absolute;
-  top: 35vh;
-  left: 50vw;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid styles.$tezos_blue; 
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s linear infinite;
-  margin: 50px auto;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.backdrop {
-  position: absolute;
+.spinner-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba($color: #000000, $alpha: 0.2);
-  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.spinner-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep {
+  .spinner-container .p-progress-spinner-circle {
+    stroke: #0d6efd !important;
+  }
 }
