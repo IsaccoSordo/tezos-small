@@ -117,6 +117,8 @@ src/app/
 ├── blocks-overview/          # Main blocks listing page
 ├── details/                  # Transaction details page
 ├── navbar/                   # Navigation component
+├── interceptors/
+│   └── loading.interceptor.ts # HTTP loading state interceptor
 ├── services/
 │   └── tzkt.service.ts      # TZKT API integration
 ├── store/
@@ -153,6 +155,27 @@ loadingCounter = signal(0);
 errors = signal<Error[]>([]);
 ```
 
+### HTTP Interceptors
+
+The application uses **functional HTTP interceptors** (Angular 21+) for automatic loading state management:
+
+#### Loading Interceptor
+
+The `loadingInterceptor` automatically manages the loading counter for all HTTP requests:
+
+- **Increments** the counter when any HTTP request starts
+- **Decrements** the counter when the request completes (success or error)
+- **Counter-based approach** ensures the loading indicator remains visible until all concurrent requests finish
+
+**Benefits:**
+
+- No manual loading state management in service methods
+- Handles concurrent requests correctly
+- Centralized loading logic
+- Scalable and maintainable
+
+The interceptor is registered globally in [app.config.ts](src/app/app.config.ts) using the modern `withInterceptors()` pattern.
+
 ### API Integration
 
 The `TzktService` handles all blockchain API calls:
@@ -161,6 +184,8 @@ The `TzktService` handles all blockchain API calls:
 - `getBlocks(limit, offset)` - Paginated block listing
 - `getTransactionsCount(level)` - Get transaction count for a block
 - `getTransactions(level)` - Fetch transactions for a block
+
+All loading states are automatically managed by the HTTP interceptor.
 
 ---
 

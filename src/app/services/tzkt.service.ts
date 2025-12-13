@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, finalize, forkJoin, of, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -13,7 +13,6 @@ export class TzktService {
   private readonly API_BASE = 'https://api.tzkt.io/v1';
 
   getBlocksCount(): Observable<number> {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
     return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
       tap({
         next: (count) => this.store.state.count.set(count)
@@ -21,13 +20,11 @@ export class TzktService {
       catchError((error) => {
         this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
         return of(0);
-      }),
-      finalize(() => this.store.state.loadingCounter.update((prev) => prev - 1))
+      })
     );
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
     return this.http.get<Block[]>(`${this.API_BASE}/blocks`, {
       params: {
         limit: limit.toString(),
@@ -53,26 +50,22 @@ export class TzktService {
       catchError((error) => {
         this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
         return of([]);
-      }),
-      finalize(() => this.store.state.loadingCounter.update((prev) => prev - 1))
+      })
     );
   }
 
   getTransactionsCount(level: number): Observable<number> {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
     return this.http.get<number>(`${this.API_BASE}/operations/transactions/count`, {
       params: { level: level.toString() }
     }).pipe(
       catchError((error) => {
         this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
         return of(0);
-      }),
-      finalize(() => this.store.state.loadingCounter.update((prev) => prev - 1))
+      })
     );
   }
 
   getTransactions(level: number): Observable<Transaction[]> {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
     return this.http.get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
       params: { level: level.toString() }
     }).pipe(
@@ -82,8 +75,7 @@ export class TzktService {
       catchError((error) => {
         this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
         return of([]);
-      }),
-      finalize(() => this.store.state.loadingCounter.update((prev) => prev - 1))
+      })
     );
   }
 }
