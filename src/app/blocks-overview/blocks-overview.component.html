@@ -1,4 +1,4 @@
-<ng-container *ngIf="blocks() as blocks">
+@if (blocks(); as blocks) {
   <app-table
     [headers]="['Hash', 'Level', 'Transactions', 'Proposer', 'Timestamp']"
     [show]="blocks.length > 0"
@@ -6,14 +6,16 @@
     [paginator]="true"
     (refresh)="refreshView($event)"
   >
-    <tr *ngFor="let block of blocks">
-      <td>
-        <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
-      </td>
-      <td>{{ block.level }}</td>
-      <td>{{ block.transactions }}</td>
-      <td>{{ block.proposer?.alias ?? "\<none>" }}</td>
-      <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
-    </tr>
+    @for (block of blocks; track block.hash) {
+      <tr>
+        <td>
+          <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
+        </td>
+        <td>{{ block.level }}</td>
+        <td>{{ block.transactions }}</td>
+        <td>{{ block.proposer?.alias ?? "\<none>" }}</td>
+        <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
+      </tr>
+    }
   </app-table>
-</ng-container>
+}

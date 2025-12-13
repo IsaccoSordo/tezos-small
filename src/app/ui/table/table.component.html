@@ -1,23 +1,34 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col" *ngFor="let header of headers">{{ header }}</th>
+      @for (header of headers(); track header) {
+        <th scope="col">{{ header }}</th>
+      }
     </tr>
   </thead>
-  <tbody *ngIf="show; else default">
-    <ng-content></ng-content>
-  </tbody>
+  @if (show()) {
+    <tbody>
+      <ng-content></ng-content>
+    </tbody>
+  } @else {
+    <tbody>
+      <tr>
+        <td colspan="100%">
+          <p>No data found.</p>
+        </td>
+      </tr>
+    </tbody>
+  }
 </table>
-<ng-template #default>
-  <p>No data found.</p>
-</ng-template>
-<div *ngIf="paginator" class="d-flex justify-content-between p-2">
-  <ngb-pagination
-    [collectionSize]="count"
-    [pageSize]="pageSize"
-    [maxSize]="maxSize"
-    [(page)]="page"
-    (pageChange)="refreshView()"
-  >
-  </ngb-pagination>
-</div>
+@if (paginator()) {
+  <div class="d-flex justify-content-between p-2">
+    <ngb-pagination
+      [collectionSize]="count()"
+      [pageSize]="pageSize()"
+      [maxSize]="maxSize()"
+      [(page)]="page"
+      (pageChange)="refreshView()"
+    >
+    </ngb-pagination>
+  </div>
+}

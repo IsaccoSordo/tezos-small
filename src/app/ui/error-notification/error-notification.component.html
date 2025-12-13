@@ -1,5 +1,5 @@
-<ng-container>
-  <p *ngFor="let error of errors(); let i = index">
-    <ngb-alert type="danger" (closed)="onClose(i)">{{ error.text }}</ngb-alert>
+@for (error of errors(); track $index) {
+  <p>
+    <ngb-alert type="danger" (closed)="onClose($index)">{{ error.text }}</ngb-alert>
   </p>
-</ng-container>
+}

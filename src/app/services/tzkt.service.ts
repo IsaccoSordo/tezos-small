@@ -1,4 +1,6 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -6,66 +8,74 @@ import { Store } from '../store/store.service';
   providedIn: 'root',
 })
 export class TzktService {
-  store = inject(Store);
+  private http = inject(HttpClient);
+  private store = inject(Store);
+  private readonly API_BASE = 'https://api.tzkt.io/v1';
 
-  getBlocksCount() {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
-    fetch('https://api.tzkt.io/v1/blocks/count')
-      .then((response) => response.json())
-      .then((count: number) => this.store.state.count.set(count))
-      .catch((error) =>
-        this.store.state.errors.mutate((prev) =>
-          prev.push({ text: error.message })
-        )
-      )
-      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
-  }
-
-  getBlocks(limit: number, offset: number) {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
-    fetch(
-      `https://api.tzkt.io/v1/blocks?limit=${limit}&offset.pg=${offset}&sort.desc=${'level'}`
-    )
-      .then((response) => response.json())
-      .then((blocks: Block[]) => {
-        blocks.map((block) => this.getTransactionsCount(block));
-        this.store.state.blocks.set(blocks);
+  getBlocksCount(): Observable<number> {
+    return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
+      tap({
+        next: (count) => this.store.state.count.set(count)
+      }),
+      catchError((error) => {
+        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
+        return of(0);
       })
-      .catch((error) =>
-        this.store.state.errors.mutate((prev) =>
-          prev.push({ text: error.message })
-        )
-      )
-      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
+    );
   }
 
-  getTransactionsCount(block: Block) {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
-    fetch(
-      `https://api.tzkt.io/v1/operations/transactions/count?level=${block.level}`
-    )
-      .then((response) => response.json())
-      .then((count: number) => (block.transactions = count))
-      .catch((error) =>
-        this.store.state.errors.mutate((prev) =>
-          prev.push({ text: error.message })
-        )
-      )
-      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
+  getBlocks(limit: number, offset: number): Observable<Block[]> {
+    return this.http.get<Block[]>(`${this.API_BASE}/blocks`, {
+      params: {
+        limit: limit.toString(),
+        'offset.pg': offset.toString(),
+        'sort.desc': 'level'
+      }
+    }).pipe(
+      tap({
+        next: (blocks) => {
+          // Fetch transaction counts for all blocks in parallel
+          const transactionCounts$ = blocks.map((block) =>
+            this.getTransactionsCount(block.level).pipe(
+              tap({ next: (count) => block.transactions = count })
+            )
+          );
+
+          // Subscribe to all transaction count requests
+          forkJoin(transactionCounts$).subscribe();
+
+          this.store.state.blocks.set(blocks);
+        }
+      }),
+      catchError((error) => {
+        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
+        return of([]);
+      })
+    );
   }
 
-  getTransactions(level: number) {
-    this.store.state.loadingCounter.update((prev) => prev + 1);
-    fetch(`https://api.tzkt.io/v1/operations/transactions?level=${level}`)
-      .then((response) => response.json())
-      .then((transactions: Transaction[]) =>
-        this.store.state.transactions.set(transactions)
-      )
-      .catch((error) =>
-        this.store.state.errors.mutate((prev) =>
-          prev.push({ text: error.message })
-        )
-      )
-      .then(() => this.store.state.loadingCounter.update((prev) => prev - 1));
+  getTransactionsCount(level: number): Observable<number> {
+    return this.http.get<number>(`${this.API_BASE}/operations/transactions/count`, {
+      params: { level: level.toString() }
+    }).pipe(
+      catchError((error) => {
+        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
+        return of(0);
+      })
+    );
+  }
+
+  getTransactions(level: number): Observable<Transaction[]> {
+    return this.http.get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
+      params: { level: level.toString() }
+    }).pipe(
+      tap({
+        next: (transactions) => this.store.state.transactions.set(transactions)
+      }),
+      catchError((error) => {
+        this.store.state.errors.update((prev) => [...prev, { text: error.message }]);
+        return of([]);
+      })
+    );
   }
 }

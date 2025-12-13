@@ -1,13 +1,15 @@
-<ng-container *ngIf="transactions() as transactions">
+@if (transactions(); as transactions) {
   <app-table
     [headers]="['Sender', 'Target', 'Amount', 'Status']"
     [show]="transactions.length > 0"
   >
-    <tr *ngFor="let transaction of transactions">
-      <td>{{ transaction.sender.address }}</td>
-      <td>{{ transaction.target.address }}</td>
-      <td>{{ transaction.amount }}</td>
-      <td>{{ transaction.status }}</td>
-    </tr>
+    @for (transaction of transactions; track $index) {
+      <tr>
+        <td>{{ transaction.sender.address }}</td>
+        <td>{{ transaction.target.address }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.status }}</td>
+      </tr>
+    }
   </app-table>
-</ng-container>
+}
