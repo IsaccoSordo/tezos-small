@@ -25,7 +25,7 @@ export class TzktService {
     return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
       tap({
         next: (count) => this.store.state.count.set(count),
-      }),
+      })
     );
   }
 
@@ -51,15 +51,15 @@ export class TzktService {
             mergeMap(
               (block) =>
                 this.getTransactionsCount(block.level).pipe(
-                  tap({ next: (count) => (block.transactions = count) }),
+                  tap({ next: (count) => (block.transactions = count) })
                 ),
-              5, // Limit to 5 concurrent requests
+              5
             ),
             toArray(),
             tap(() => this.store.state.blocks.set(blocks)),
-            map(() => blocks),
+            map(() => blocks)
           );
-        }),
+        })
       );
   }
 
@@ -68,7 +68,7 @@ export class TzktService {
       `${this.API_BASE}/operations/transactions/count`,
       {
         params: { level: level.toString() },
-      },
+      }
     );
   }
 
@@ -81,7 +81,7 @@ export class TzktService {
         tap({
           next: (transactions) =>
             this.store.state.transactions.set(transactions),
-        }),
+        })
       );
   }
 }
