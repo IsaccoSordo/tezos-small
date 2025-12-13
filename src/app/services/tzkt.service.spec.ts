@@ -8,6 +8,16 @@ import { TzktService } from './tzkt.service';
 import { Store } from '../store/store.service';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
+/**
+ * TzktService Test Suite
+ *
+ * Testing Best Practices Applied:
+ * - Nested describe blocks organize tests by method/feature
+ * - afterEach resets store state for test isolation
+ * - fakeAsync with tick() handles timing-dependent assertions
+ * - Tests cover happy path, error handling, and loading states
+ * - HttpTestingController verifies all HTTP interactions
+ */
 describe('TzktService', () => {
   let service: TzktService;
   let httpMock: HttpTestingController;

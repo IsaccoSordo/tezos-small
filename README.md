@@ -96,7 +96,9 @@ Ensure you're using **Node.js v20.19+ or v22.12+** for running tests. The projec
 ### Run Unit Tests
 
 ```bash
-npm test
+npm test                           # Watch mode with auto-reload
+npm test -- --watch=false          # Run once (for CI/automated testing)
+npm test -- --code-coverage        # Generate coverage reports
 ```
 
 Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](https://jasmine.github.io).
@@ -106,21 +108,59 @@ Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](h
 - **Windows**: Chrome
 - **Linux**: ChromeHeadless
 
-Tests automatically re-run in watch mode when you modify source files. Press `Ctrl+C` to stop.
+### Testing Best Practices
 
-### Generate Coverage Report
+Our test suite follows Angular community best practices:
 
-```bash
-npm test -- --code-coverage
+**🔧 Helper Functions**
+- Reusable helper functions reduce code duplication for common mock patterns
+- Examples: `initializeComponent()`, `flushCountRequest()`, `flushInitialBlocksRequest()`
+
+**📋 Single Responsibility**
+- Each test verifies one specific behavior
+- Tests are named clearly with "should..." statements
+- Focused assertions make failures easy to diagnose
+
+**🎯 Test Organization**
+- Nested `describe` blocks group related tests by feature/scenario
+- `beforeEach` sets up common test fixtures
+- `afterEach` cleans up resources and verifies HTTP mocks
+
+**⏱️ Async Testing**
+- `fakeAsync` with `tick()` for timer-based operations
+- `fixture.destroy()` ensures proper cleanup of subscriptions
+- `HttpTestingController` verifies all HTTP interactions
+
+**Example Test Structure:**
+
+```typescript
+describe('MyComponent', () => {
+  // Helper functions for common patterns
+  const initializeComponent = () => {
+    fixture.detectChanges();
+    tick(); // Handle async timers
+  };
+
+  beforeEach(async () => {
+    // Setup common test fixtures
+  });
+
+  afterEach(() => {
+    httpMock.verify(); // Ensure no pending requests
+  });
+
+  it('should initialize and fetch data', fakeAsync(() => {
+    initializeComponent();
+    flushMockRequests();
+
+    expect(component.data()).toBeTruthy();
+
+    fixture.destroy(); // Cleanup
+  }));
+});
 ```
 
-Coverage reports are generated in `coverage/tezos-small/` directory.
-
-### Run Tests in CI/Headless Mode
-
-```bash
-npm test -- --browsers=Firefox --watch=false
-```
+All test files include JSDoc headers documenting the patterns applied. See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts) for a complete example.
 
 ---
 

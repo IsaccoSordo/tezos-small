@@ -1,6 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TableComponent, PageChangeEvent } from './table.component';
 
+/**
+ * TableComponent Test Suite
+ *
+ * Testing Best Practices Applied:
+ * - Nested describe blocks group related tests (initialization, inputs, events)
+ * - Each test has a focused, single responsibility
+ * - Input signal testing uses componentRef.setInput for proper signal updates
+ * - Event emission tests verify component outputs work correctly
+ */
 describe('TableComponent', () => {
   let component: TableComponent;
   let fixture: ComponentFixture<TableComponent>;
