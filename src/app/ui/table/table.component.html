@@ -28,7 +28,6 @@
   @if (paginator()) {
     <div class="paginator-container">
       <p-paginator
-        [first]="(page() - 1) * pageSize()"
         [rows]="pageSize()"
         [totalRecords]="count()"
         [rowsPerPageOptions]="[10, 25, 50]"

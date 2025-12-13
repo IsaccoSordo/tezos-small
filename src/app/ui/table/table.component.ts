@@ -4,7 +4,6 @@ import {
   Output,
   ChangeDetectionStrategy,
   signal,
-  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaginatorModule } from 'primeng/paginator';
@@ -25,7 +24,7 @@ export class TableComponent {
   count = input<number>(100);
   maxSize = input<number>(10);
   paginator = input<boolean>(false);
-  page = signal(1); // base value for paginator is 1 (not 0)
+  page = signal(0); // base value for paginator is 0 (0-based indexing)
   pageSize = signal<number>(10);
 
   @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
@@ -45,7 +44,7 @@ export class TableComponent {
   }
 
   onPageChange(event: any) {
-    this.page.set(event.page + 1);
+    this.page.set(event.page);
     this.pageSize.set(event.rows);
     this.refreshView();
   }
