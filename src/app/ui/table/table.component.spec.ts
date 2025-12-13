@@ -7,7 +7,7 @@ describe('TableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TableComponent]
+      imports: [TableComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableComponent);
@@ -91,7 +91,7 @@ describe('TableComponent', () => {
       fixture.componentRef.setInput('pageSize', 10);
       fixture.detectChanges();
 
-      component.refresh.subscribe(data => {
+      component.refresh.subscribe((data) => {
         expect(data.count).toBe(100);
         expect(data.page).toBe(1);
         expect(data.pageSize).toBe(10);
@@ -106,7 +106,7 @@ describe('TableComponent', () => {
       fixture.detectChanges();
 
       let emissionCount = 0;
-      component.refresh.subscribe(data => {
+      component.refresh.subscribe((data) => {
         emissionCount++;
         // Skip the initial emission from BehaviorSubject
         if (emissionCount === 2) {
@@ -126,7 +126,7 @@ describe('TableComponent', () => {
       component.page.set(2);
       component.refreshView();
 
-      component.refresh.subscribe(data => {
+      component.refresh.subscribe((data) => {
         if (data.page === 2) {
           expect(data.page).toBe(2);
           done();

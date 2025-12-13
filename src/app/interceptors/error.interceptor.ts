@@ -19,7 +19,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // Server-side error
         switch (error.status) {
           case 0:
-            errorMessage = 'Unable to connect to server. Please check your internet connection.';
+            errorMessage =
+              'Unable to connect to server. Please check your internet connection.';
             summary = 'Connection Error';
             break;
           case 400:
@@ -31,7 +32,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             summary = 'Authentication Required';
             break;
           case 403:
-            errorMessage = 'Access forbidden. You don\'t have permission.';
+            errorMessage = "Access forbidden. You don't have permission.";
             summary = 'Access Denied';
             break;
           case 404:
@@ -47,7 +48,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             summary = 'Service Unavailable';
             break;
           default:
-            errorMessage = error.error?.message || `Error: ${error.status} ${error.statusText}`;
+            errorMessage =
+              error.error?.message ||
+              `Error: ${error.status} ${error.statusText}`;
             summary = `HTTP ${error.status}`;
         }
       }
@@ -57,7 +60,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         severity: 'error',
         summary: summary,
         detail: errorMessage,
-        life: 5000
+        life: 5000,
       });
 
       // Log to console for debugging
@@ -65,11 +68,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         status: error.status,
         message: errorMessage,
         url: req.url,
-        error: error
+        error: error,
       });
 
       // Re-throw the error so components can handle it if needed
       return throwError(() => error);
-    })
+    }),
   );
 };

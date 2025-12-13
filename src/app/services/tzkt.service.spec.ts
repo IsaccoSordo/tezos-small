@@ -1,6 +1,9 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { TzktService } from './tzkt.service';
 import { Store } from '../store/store.service';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
@@ -13,13 +16,35 @@ describe('TzktService', () => {
   const API_BASE = 'https://api.tzkt.io/v1';
 
   const mockBlocks = [
-    { hash: 'abc123', level: 100, transactions: 0, proposer: { alias: 'Baker1' }, timestamp: '2025-01-01T00:00:00Z' },
-    { hash: 'def456', level: 101, transactions: 0, proposer: { alias: 'Baker2' }, timestamp: '2025-01-01T00:01:00Z' }
+    {
+      hash: 'abc123',
+      level: 100,
+      transactions: 0,
+      proposer: { alias: 'Baker1' },
+      timestamp: '2025-01-01T00:00:00Z',
+    },
+    {
+      hash: 'def456',
+      level: 101,
+      transactions: 0,
+      proposer: { alias: 'Baker2' },
+      timestamp: '2025-01-01T00:01:00Z',
+    },
   ];
 
   const mockTransactions = [
-    { sender: { address: 'addr1', alias: 'User1' }, target: { address: 'addr2', alias: 'User2' }, amount: 100, status: 'applied' },
-    { sender: { address: 'addr3', alias: 'User3' }, target: { address: 'addr4', alias: 'User4' }, amount: 200, status: 'applied' }
+    {
+      sender: { address: 'addr1', alias: 'User1' },
+      target: { address: 'addr2', alias: 'User2' },
+      amount: 100,
+      status: 'applied',
+    },
+    {
+      sender: { address: 'addr3', alias: 'User3' },
+      target: { address: 'addr4', alias: 'User4' },
+      amount: 200,
+      status: 'applied',
+    },
   ];
 
   beforeEach(() => {
@@ -28,8 +53,8 @@ describe('TzktService', () => {
         provideHttpClient(withInterceptors([loadingInterceptor])),
         provideHttpClientTesting(),
         TzktService,
-        Store
-      ]
+        Store,
+      ],
     });
     service = TestBed.inject(TzktService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -98,25 +123,28 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/blocks` &&
-        req.params.get('limit') === '10' &&
-        req.params.get('offset.pg') === '0' &&
-        req.params.get('sort.desc') === 'level'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/blocks` &&
+          req.params.get('limit') === '10' &&
+          req.params.get('offset.pg') === '0' &&
+          req.params.get('sort.desc') === 'level',
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockBlocks);
 
       // Expect transaction count requests for each block
-      const txReq1 = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions/count` &&
-        req.params.get('level') === '100'
+      const txReq1 = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/operations/transactions/count` &&
+          req.params.get('level') === '100',
       );
       txReq1.flush(5);
 
-      const txReq2 = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions/count` &&
-        req.params.get('level') === '101'
+      const txReq2 = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/operations/transactions/count` &&
+          req.params.get('level') === '101',
       );
       txReq2.flush(3);
     });
@@ -126,10 +154,11 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/blocks` &&
-        req.params.get('limit') === '20' &&
-        req.params.get('offset.pg') === '5'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/blocks` &&
+          req.params.get('limit') === '20' &&
+          req.params.get('offset.pg') === '5',
       );
       req.flush([]);
     });
@@ -141,7 +170,7 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req => req.url === `${API_BASE}/blocks`);
+      const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
       req.error(new ProgressEvent('Network error'));
     });
 
@@ -152,7 +181,7 @@ describe('TzktService', () => {
 
       expect(store.state.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne(req => req.url === `${API_BASE}/blocks`);
+      const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
       req.flush([]);
 
       tick();
@@ -168,9 +197,10 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions/count` &&
-        req.params.get('level') === '12345'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/operations/transactions/count` &&
+          req.params.get('level') === '12345',
       );
       expect(req.request.method).toBe('GET');
       req.flush(42);
@@ -183,8 +213,8 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions/count`
+      const req = httpMock.expectOne(
+        (req) => req.url === `${API_BASE}/operations/transactions/count`,
       );
       req.error(new ProgressEvent('Network error'));
     });
@@ -198,9 +228,10 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions` &&
-        req.params.get('level') === '12345'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === `${API_BASE}/operations/transactions` &&
+          req.params.get('level') === '12345',
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockTransactions);
@@ -213,8 +244,8 @@ describe('TzktService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions`
+      const req = httpMock.expectOne(
+        (req) => req.url === `${API_BASE}/operations/transactions`,
       );
       req.error(new ProgressEvent('Network error'));
     });
@@ -226,8 +257,8 @@ describe('TzktService', () => {
 
       expect(store.state.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne(req =>
-        req.url === `${API_BASE}/operations/transactions`
+      const req = httpMock.expectOne(
+        (req) => req.url === `${API_BASE}/operations/transactions`,
       );
       req.flush(mockTransactions);
 

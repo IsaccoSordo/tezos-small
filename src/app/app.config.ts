@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZonelessChangeDetection, ErrorHandler } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZonelessChangeDetection,
+  ErrorHandler,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
@@ -19,11 +23,11 @@ export const appConfig: ApplicationConfig = {
         preset: Aura,
         options: {
           darkModeSelector: false,
-          cssLayer: false
-        }
-      }
+          cssLayer: false,
+        },
+      },
     }),
     MessageService,
-    { provide: ErrorHandler, useClass: GlobalErrorHandler }
-  ]
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+  ],
 };

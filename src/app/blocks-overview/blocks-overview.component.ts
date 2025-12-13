@@ -1,4 +1,10 @@
-import { Component, inject, ChangeDetectionStrategy, OnInit, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  ChangeDetectionStrategy,
+  OnInit,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -14,7 +20,7 @@ import { TableComponent } from '../ui/table/table.component';
   styleUrls: ['./blocks-overview.component.scss'],
   standalone: true,
   imports: [CommonModule, RouterLink, TableComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlocksOverviewComponent implements OnInit {
   private service = inject(TzktService);
@@ -27,7 +33,8 @@ export class BlocksOverviewComponent implements OnInit {
 
   ngOnInit(): void {
     // Initial fetch on component initialization
-    this.service.getBlocksCount()
+    this.service
+      .getBlocksCount()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
 
@@ -35,15 +42,17 @@ export class BlocksOverviewComponent implements OnInit {
     interval(60000)
       .pipe(
         switchMap(() => this.service.getBlocksCount()),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
 
     // Handle table refresh events reactively
     this.refresh$
       .pipe(
-        switchMap((event) => this.service.getBlocks(event.pageSize, event.page)),
-        takeUntilDestroyed(this.destroyRef)
+        switchMap((event) =>
+          this.service.getBlocks(event.pageSize, event.page),
+        ),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }

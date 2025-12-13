@@ -1,6 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, switchMap, map, of, from, mergeMap, toArray } from 'rxjs';
+import {
+  Observable,
+  tap,
+  switchMap,
+  map,
+  of,
+  from,
+  mergeMap,
+  toArray,
+} from 'rxjs';
 import { Block, Transaction } from '../common';
 import { Store } from '../store/store.service';
 
@@ -15,56 +24,64 @@ export class TzktService {
   getBlocksCount(): Observable<number> {
     return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
       tap({
-        next: (count) => this.store.state.count.set(count)
-      })
+        next: (count) => this.store.state.count.set(count),
+      }),
     );
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
-    return this.http.get<Block[]>(`${this.API_BASE}/blocks`, {
-      params: {
-        limit: limit.toString(),
-        'offset.pg': offset.toString(),
-        'sort.desc': 'level'
-      }
-    }).pipe(
-      switchMap((blocks) => {
-        // Handle empty blocks case
-        if (blocks.length === 0) {
-          this.store.state.blocks.set(blocks);
-          return of(blocks);
-        }
-
-        // Fetch transaction counts with concurrency limit of 5 to avoid rate limiting
-        return from(blocks).pipe(
-          mergeMap(
-            (block) =>
-              this.getTransactionsCount(block.level).pipe(
-                tap({ next: (count) => block.transactions = count })
-              ),
-            5 // Limit to 5 concurrent requests
-          ),
-          toArray(),
-          tap(() => this.store.state.blocks.set(blocks)),
-          map(() => blocks)
-        );
+    return this.http
+      .get<Block[]>(`${this.API_BASE}/blocks`, {
+        params: {
+          limit: limit.toString(),
+          'offset.pg': offset.toString(),
+          'sort.desc': 'level',
+        },
       })
-    );
+      .pipe(
+        switchMap((blocks) => {
+          // Handle empty blocks case
+          if (blocks.length === 0) {
+            this.store.state.blocks.set(blocks);
+            return of(blocks);
+          }
+
+          // Fetch transaction counts with concurrency limit of 5 to avoid rate limiting
+          return from(blocks).pipe(
+            mergeMap(
+              (block) =>
+                this.getTransactionsCount(block.level).pipe(
+                  tap({ next: (count) => (block.transactions = count) }),
+                ),
+              5, // Limit to 5 concurrent requests
+            ),
+            toArray(),
+            tap(() => this.store.state.blocks.set(blocks)),
+            map(() => blocks),
+          );
+        }),
+      );
   }
 
   getTransactionsCount(level: number): Observable<number> {
-    return this.http.get<number>(`${this.API_BASE}/operations/transactions/count`, {
-      params: { level: level.toString() }
-    });
+    return this.http.get<number>(
+      `${this.API_BASE}/operations/transactions/count`,
+      {
+        params: { level: level.toString() },
+      },
+    );
   }
 
   getTransactions(level: number): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
-      params: { level: level.toString() }
-    }).pipe(
-      tap({
-        next: (transactions) => this.store.state.transactions.set(transactions)
+    return this.http
+      .get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
+        params: { level: level.toString() },
       })
-    );
+      .pipe(
+        tap({
+          next: (transactions) =>
+            this.store.state.transactions.set(transactions),
+        }),
+      );
   }
 }

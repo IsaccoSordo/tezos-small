@@ -5,5 +5,5 @@ import { DetailsComponent } from './details/details.component';
 export const routes: Routes = [
   { path: '', component: BlocksOverviewComponent },
   { path: 'details/:level', component: DetailsComponent },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];

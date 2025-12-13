@@ -7,14 +7,14 @@ import { Store } from 'src/app/store/store.service';
   selector: 'app-spinner',
   template: `
     @if (loadingCounter$()) {
-    <div class="spinner-backdrop">
-      <p-progressSpinner
-        [style]="{ width: '70px', height: '70px' }"
-        strokeWidth="4"
-        fill="transparent"
-        animationDuration="1s"
-      />
-    </div>
+      <div class="spinner-backdrop">
+        <p-progressSpinner
+          [style]="{ width: '70px', height: '70px' }"
+          strokeWidth="4"
+          fill="transparent"
+          animationDuration="1s"
+        />
+      </div>
     }
   `,
   styleUrls: ['./spinner.component.scss'],

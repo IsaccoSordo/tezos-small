@@ -28,7 +28,7 @@ export class TableComponent {
   pageSize = signal<number>(10);
 
   @Output() refresh: BehaviorSubject<TableData> = new BehaviorSubject(
-    this.getSnapshot()
+    this.getSnapshot(),
   );
 
   private getSnapshot(): TableData {

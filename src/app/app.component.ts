@@ -10,7 +10,7 @@ import { SpinnerComponent } from './ui/spinner/spinner.component';
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [RouterOutlet, NavbarComponent, SpinnerComponent, ToastModule],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   title = 'tezos-small';
