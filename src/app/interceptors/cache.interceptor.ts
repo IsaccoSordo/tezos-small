@@ -10,11 +10,16 @@ import { Observable, shareReplay } from 'rxjs';
  * Cache configuration:
  * - bufferSize: 1 (replay the last emitted value)
  * - refCount: true (automatically clean up when no subscribers)
- * - windowTime: 60000ms (60 seconds TTL)
+ * - TTL: 60000ms (60 seconds)
  */
 
-// Cache storage for observables
-const cache = new Map<string, Observable<HttpEvent<unknown>>>();
+interface CacheEntry {
+  observable: Observable<HttpEvent<unknown>>;
+  timestamp: number;
+}
+
+// Cache storage for observables with timestamps
+const cache = new Map<string, CacheEntry>();
 const CACHE_TTL = 60000; // 60 seconds
 
 /**
@@ -25,14 +30,13 @@ function getCacheKey(url: string): string {
 }
 
 /**
- * Clear specific cache entry or entire cache
+ * Check if cache entry is still valid based on TTL
+ *
+ * @param entry The cache entry to validate
  */
-export function clearHttpCache(url?: string): void {
-  if (url) {
-    cache.delete(url);
-  } else {
-    cache.clear();
-  }
+function isCacheValid(entry: CacheEntry): boolean {
+  const now = Date.now();
+  return entry.timestamp + CACHE_TTL >= now;
 }
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
@@ -42,22 +46,31 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const cacheKey = getCacheKey(req.urlWithParams);
+  const now = Date.now();
+  const entry = cache.get(cacheKey);
 
   // Check if we have a cached observable for this request
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)!;
+  if (entry && isCacheValid(entry)) {
+    return entry.observable;
   }
 
-  // Create a new observable with shareReplay and cache it
+  // If cache is stale, remove it
+  if (entry) {
+    cache.delete(cacheKey);
+  }
+
+  // Create a new observable with shareReplay and cache it with timestamp
   const cached$ = next(req).pipe(
     shareReplay({
       bufferSize: 1,
       refCount: true,
-      windowTime: CACHE_TTL,
     }),
   );
 
-  cache.set(cacheKey, cached$);
+  cache.set(cacheKey, {
+    observable: cached$,
+    timestamp: now,
+  });
 
   return cached$;
 };

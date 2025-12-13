@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { interval, switchMap } from 'rxjs';
+import { timer, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
@@ -60,17 +60,8 @@ export class BlocksOverviewComponent implements OnInit {
         }
       });
 
-    // Initial fetch on component initialization
-    this.service
-      .getBlocksCount()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
-
-    // Note: Initial blocks fetch is handled by PrimeNG's lazy loading
-    // The table will automatically trigger onLazyLoad when it initializes
-
-    // Poll every 60 seconds
-    interval(60000)
+    // Fetch blocks count immediately and then poll every 60 seconds
+    timer(0, 60000)
       .pipe(
         switchMap(() => this.service.getBlocksCount()),
         takeUntilDestroyed(this.destroyRef),
@@ -80,8 +71,8 @@ export class BlocksOverviewComponent implements OnInit {
 
   onPageChange(event: PageChangeEvent): void {
     // Ensure valid values with defaults
-    const page = event.page ?? 0;
-    const pageSize = event.pageSize ?? 10;
+    const page = event.page;
+    const pageSize = event.pageSize;
 
     this.currentPage.set(page);
     this.pageSize.set(pageSize);
@@ -97,8 +88,8 @@ export class BlocksOverviewComponent implements OnInit {
   }
 
   private fetchBlocks(): void {
-    const limit = this.pageSize() ?? 10;
-    const offset = this.currentPage() ?? 0;
+    const limit = this.pageSize();
+    const offset = this.currentPage();
 
     this.service
       .getBlocks(limit, offset)

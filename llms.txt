@@ -130,16 +130,79 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Testing Commands**
 - `npm test`: Run tests in watch mode with browser auto-detection
+- `npm test -- --watch=false`: Run tests once without watch mode (use this for CI/automated testing)
 - `npm test:headless`: Run tests in ChromeHeadless without watch
 - `npm test -- --code-coverage`: Generate coverage reports
 
 **Testing Best Practices**
 - Use Jasmine for test framework (describe, it, expect)
 - Use Karma for test runner with multi-browser support
-- Mock HTTP calls with HttpClientTestingModule
+- Mock HTTP calls with HttpClientTestingModule and HttpTestingController
 - Test component inputs, outputs, and user interactions
 - Verify error handling and edge cases
 - Aim for high code coverage
+
+**Test Organization Patterns**
+- Create helper functions to reduce duplication (e.g., `initializeComponent()`, `flushCountRequest()`)
+- Use nested describe blocks to group related tests by feature/scenario
+- Each test should have a single, focused responsibility
+- Use clear test names with "should..." statements
+- Add JSDoc headers to test suites documenting best practices applied
+
+**Async Testing Patterns**
+- Use `fakeAsync` with `tick()` for timer-based operations (e.g., `timer(0, 60000)`)
+- Always call `fixture.destroy()` in fakeAsync tests to cleanup subscriptions
+- Use `httpMock.verify()` in afterEach to ensure no pending HTTP requests
+- For observable-based async: use `done` callback or `fakeAsync` with `tick()`
+- Handle `takeUntilDestroyed()` by destroying fixture before test ends
+
+**Example Test Pattern**
+```typescript
+/**
+ * ComponentName Test Suite
+ *
+ * Testing Best Practices Applied:
+ * - Helper functions reduce code duplication
+ * - Each test has single responsibility
+ * - fakeAsync with tick() for async operations
+ * - fixture.destroy() ensures cleanup
+ */
+describe('ComponentName', () => {
+  let component, fixture, httpMock, store;
+
+  // Helper functions
+  const initializeComponent = () => {
+    fixture.detectChanges();
+    tick(); // Trigger timers
+  };
+
+  const flushMockRequest = () => {
+    const req = httpMock.expectOne(url);
+    req.flush(data);
+  };
+
+  beforeEach(async () => {
+    // Setup test fixtures
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('should do something specific', fakeAsync(() => {
+    initializeComponent();
+    flushMockRequest();
+
+    expect(component.data()).toBeTruthy();
+
+    fixture.destroy(); // Critical for cleanup
+  }));
+});
+```
+
+**Reference Implementation**
+- See [src/app/blocks-overview/blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts) for complete example
+- All major test files have JSDoc headers with patterns used
 
 ## Architecture Patterns
 
@@ -192,7 +255,7 @@ This is a single-page application featuring block browsing, transaction details,
 - GitHub: https://github.com/IsaccoSordo/tezos-small
 
 **License**
-- MIT License (see LICENCE file)
+- GNU GENERAL PUBLIC LICENSE (see LICENCE file)
 
 **Browser Support**
 - Modern browsers (Chrome, Firefox, Safari, Edge)

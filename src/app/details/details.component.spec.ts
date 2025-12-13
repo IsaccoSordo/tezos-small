@@ -10,6 +10,15 @@ import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
+/**
+ * DetailsComponent Test Suite
+ *
+ * Testing Best Practices Applied:
+ * - Nested describe blocks organize tests by scenario (valid/invalid route params)
+ * - Each test suite has its own beforeEach with appropriate test doubles
+ * - Tests verify single responsibilities (fetch, display, loading state)
+ * - afterEach ensures no pending HTTP requests
+ */
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
   let fixture: ComponentFixture<DetailsComponent>;
