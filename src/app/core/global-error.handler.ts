@@ -18,11 +18,8 @@ export class GlobalErrorHandler implements ErrorHandler {
       summary: 'Application Error',
       detail: message,
       life: 5000,
-      sticky: false
+      sticky: false,
     });
-
-    // In production, you would also send to error tracking service (Sentry, LogRocket, etc.)
-    // this.errorTrackingService.logError(error);
   }
 
   private getUserFriendlyMessage(error: Error): string {
