@@ -10,7 +10,8 @@ export class GlobalErrorHandler implements ErrorHandler {
     console.error('Global error caught:', error);
 
     // Get user-friendly error message
-    const message = this.getUserFriendlyMessage(error);
+    const message =
+      error.message || 'An unexpected error occurred. Please try again.';
 
     // Display error toast
     this.messageService.add({
@@ -20,19 +21,5 @@ export class GlobalErrorHandler implements ErrorHandler {
       life: 5000,
       sticky: false,
     });
-  }
-
-  private getUserFriendlyMessage(error: Error): string {
-    // Check for specific error types and provide friendly messages
-    if (error.message.includes('network')) {
-      return 'Network connection error. Please check your internet connection.';
-    }
-
-    if (error.message.includes('timeout')) {
-      return 'Request timed out. Please try again.';
-    }
-
-    // Default message
-    return error.message || 'An unexpected error occurred. Please try again.';
   }
 }
