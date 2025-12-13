@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BlocksOverviewComponent } from './blocks-overview.component';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
 import { TableData } from '../common';
-import { of } from 'rxjs';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
@@ -23,7 +23,7 @@ describe('BlocksOverviewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [BlocksOverviewComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([loadingInterceptor])),
         provideHttpClientTesting(),
         provideRouter([]),
         TzktService,
@@ -57,6 +57,12 @@ describe('BlocksOverviewComponent', () => {
     expect(req.request.method).toBe('GET');
     req.flush(5000);
 
+    // Handle the blocks request triggered by TableComponent's initial refresh event
+    const blocksReq = httpMock.expectOne(req =>
+      req.url === 'https://api.tzkt.io/v1/blocks'
+    );
+    blocksReq.flush([]);
+
     expect(store.state.count()).toBe(5000);
   });
 
@@ -67,11 +73,17 @@ describe('BlocksOverviewComponent', () => {
     const countReq = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
     countReq.flush(100);
 
+    // Handle the initial blocks request from TableComponent
+    const initialBlocksReq = httpMock.expectOne(req =>
+      req.url === 'https://api.tzkt.io/v1/blocks'
+    );
+    initialBlocksReq.flush([]);
+
     // Trigger refresh
     const tableData: TableData = { page: 1, pageSize: 10, count: 100 };
     component.refreshView(tableData);
 
-    // Expect blocks request
+    // Expect blocks request from manual refresh
     const blocksReq = httpMock.expectOne(req =>
       req.url === 'https://api.tzkt.io/v1/blocks' &&
       req.params.get('limit') === '10' &&
@@ -105,6 +117,9 @@ describe('BlocksOverviewComponent', () => {
     // Initial count request
     httpMock.expectOne('https://api.tzkt.io/v1/blocks/count').flush(100);
 
+    // Handle the initial blocks request from TableComponent
+    httpMock.expectOne(req => req.url === 'https://api.tzkt.io/v1/blocks').flush([]);
+
     component.refreshView(tableData);
 
     const req = httpMock.expectOne(req =>
@@ -122,19 +137,38 @@ describe('BlocksOverviewComponent', () => {
     const req = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
     req.error(new ProgressEvent('Network error'));
 
+    // Handle the blocks request triggered by TableComponent
+    const blocksReq = httpMock.expectOne(req =>
+      req.url === 'https://api.tzkt.io/v1/blocks'
+    );
+    blocksReq.flush([]);
+
     expect(store.state.errors().length).toBeGreaterThan(0);
     expect(store.state.count()).toBe(0);
   });
 
-  it('should display blocks in template when data is available', async () => {
-    store.state.blocks.set(mockBlocks);
-    store.state.count.set(100);
-
+  it('should display blocks in template when data is available', () => {
     fixture.detectChanges();
-    await fixture.whenStable();
 
     // Initial count request
     httpMock.expectOne('https://api.tzkt.io/v1/blocks/count').flush(100);
+
+    // Handle the blocks request triggered by TableComponent
+    httpMock.expectOne(req => req.url === 'https://api.tzkt.io/v1/blocks').flush(mockBlocks);
+
+    // Flush transaction count requests for each block
+    httpMock.expectOne(req =>
+      req.url === 'https://api.tzkt.io/v1/operations/transactions/count' &&
+      req.params.get('level') === '100'
+    ).flush(5);
+
+    httpMock.expectOne(req =>
+      req.url === 'https://api.tzkt.io/v1/operations/transactions/count' &&
+      req.params.get('level') === '101'
+    ).flush(3);
+
+    // Trigger change detection to update the view
+    fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
     expect(compiled.textContent).toContain('abc123');
@@ -146,10 +180,16 @@ describe('BlocksOverviewComponent', () => {
 
     fixture.detectChanges();
 
+    // Two requests are made: count request + blocks request from TableComponent
+    expect(store.state.loadingCounter()).toBe(2);
+
+    const countReq = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
+    countReq.flush(100);
+
     expect(store.state.loadingCounter()).toBe(1);
 
-    const req = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
-    req.flush(100);
+    const blocksReq = httpMock.expectOne(req => req.url === 'https://api.tzkt.io/v1/blocks');
+    blocksReq.flush([]);
 
     expect(store.state.loadingCounter()).toBe(0);
   });

@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DetailsComponent } from './details.component';
 import { ActivatedRoute } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -26,7 +27,7 @@ describe('DetailsComponent', () => {
       await TestBed.configureTestingModule({
         imports: [DetailsComponent],
         providers: [
-          provideHttpClient(),
+          provideHttpClient(withInterceptors([loadingInterceptor])),
           provideHttpClientTesting(),
           { provide: ActivatedRoute, useValue: activatedRouteSpy },
           TzktService,
@@ -72,6 +73,13 @@ describe('DetailsComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
+      // Flush the HTTP request triggered by ngOnInit
+      const req = httpMock.expectOne(req =>
+        req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
+        req.params.get('level') === '12345'
+      );
+      req.flush(mockTransactions);
+
       const compiled = fixture.nativeElement;
       expect(compiled.textContent).toContain('addr1');
     });
@@ -113,7 +121,7 @@ describe('DetailsComponent', () => {
       await TestBed.configureTestingModule({
         imports: [DetailsComponent],
         providers: [
-          provideHttpClient(),
+          provideHttpClient(withInterceptors([loadingInterceptor])),
           provideHttpClientTesting(),
           { provide: ActivatedRoute, useValue: activatedRouteSpyInvalid },
           TzktService,

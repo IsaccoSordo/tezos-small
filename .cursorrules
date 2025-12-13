@@ -206,7 +206,9 @@ src/app/
 
 - **Test Runner**: Jasmine + Karma (Angular 21 default)
 - **HTTP Testing**: `HttpTestingController` from `@angular/common/http/testing`
+- **Async Testing**: `fakeAsync` and `tick()` for interceptor testing
 - **Command**: `npm test`
+- **Node.js**: v22.12+ or v20.19+ required
 - All components/services must have corresponding `.spec.ts` files
 
 ### Testing Best Practices (Angular 21 + Signals)
@@ -215,9 +217,12 @@ src/app/
 - ✅ Write meaningful tests that verify behavior, not just existence
 - ✅ Test user interactions and state changes
 - ✅ Test error handling and edge cases
-- ✅ Use `await fixture.whenStable()` for async operations with signals
+- ✅ Use `fakeAsync` and `tick()` for testing HTTP interceptors
 - ✅ Reset shared state (Store signals) in `afterEach()` hooks
+- ✅ Organize tests with nested `describe()` blocks
+- ✅ Always flush HTTP requests in tests using `httpMock.verify()`
 - ❌ Don't write "smoke tests" that only check `expect(component).toBeTruthy()`
+- ❌ Don't use `await fixture.whenStable()` with HTTP tests (causes timeouts)
 
 **Component Testing:**
 
@@ -231,17 +236,34 @@ describe('MyComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MyComponent], // ← Import standalone component
-      providers: [Store]       // ← Provide dependencies
+      providers: [
+        provideRouter([]),    // ← Use provideRouter, not RouterTestingModule
+        Store
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MyComponent);
     component = fixture.componentInstance;
     store = TestBed.inject(Store);
+    fixture.detectChanges(); // ← Initialize component in beforeEach
   });
 
   afterEach(() => {
     // Reset store signals after each test
     store.state.data.set([]);
+  });
+
+  // Organize tests with nested describe blocks
+  describe('initialization', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
+  });
+
+  describe('user interactions', () => {
+    it('should handle button click', () => {
+      // Test user interactions
+    });
   });
 });
 
@@ -249,6 +271,13 @@ describe('MyComponent', () => {
 beforeEach(() => {
   TestBed.configureTestingModule({
     declarations: [MyComponent] // ❌ Wrong for standalone components
+  });
+});
+
+// ❌ BAD: Using deprecated RouterTestingModule
+beforeEach(() => {
+  TestBed.configureTestingModule({
+    imports: [RouterTestingModule] // ❌ Use provideRouter([]) instead
   });
 });
 ```
@@ -289,7 +318,7 @@ describe('MyService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),          // ← New Angular API
+        provideHttpClient(withInterceptors([loadingInterceptor])),
         provideHttpClientTesting(),   // ← Enables HttpTestingController
         MyService,
         Store
@@ -302,7 +331,10 @@ describe('MyService', () => {
 
   afterEach(() => {
     httpMock.verify(); // ← Verify no outstanding requests
-    store.state.data.set([]); // ← Reset signals
+    // Reset store signals
+    store.state.data.set([]);
+    store.state.errors.set([]);
+    store.state.loadingCounter.set(0);
   });
 
   it('should fetch data and update store', (done) => {
@@ -326,6 +358,20 @@ describe('MyService', () => {
     const req = httpMock.expectOne('https://api.example.com/data');
     req.error(new ProgressEvent('Network error'));
   });
+
+  // Testing HTTP interceptors with fakeAsync
+  it('should increment and decrement loading counter', fakeAsync(() => {
+    expect(store.state.loadingCounter()).toBe(0);
+
+    service.getData().subscribe();
+    expect(store.state.loadingCounter()).toBe(1);
+
+    const req = httpMock.expectOne('https://api.example.com/data');
+    req.flush(mockData);
+    tick(); // ← Wait for finalize() to complete
+
+    expect(store.state.loadingCounter()).toBe(0);
+  }));
 });
 ```
 
@@ -404,11 +450,75 @@ it('should increment and decrement loading counter', (done) => {
 ### Anti-Patterns to Avoid
 
 ❌ **Don't use HttpClientModule in tests** - Use `provideHttpClient()` and `provideHttpClientTesting()`
+❌ **Don't use RouterTestingModule** - Use `provideRouter([])`
 ❌ **Don't forget httpMock.verify()** - Always verify no outstanding requests
 ❌ **Don't test implementation details** - Test behavior, not internal methods
 ❌ **Don't skip error cases** - Always test error handling
 ❌ **Don't forget to reset signals** - Clean up shared state in `afterEach()`
 ❌ **Don't use declarations for standalone components** - Use `imports` array
+❌ **Don't use `await fixture.whenStable()` with HTTP tests** - Causes timeouts, flush requests instead
+❌ **Don't forget `tick()` when testing interceptors** - Use `fakeAsync` with `tick()`
+
+### Common Testing Issues & Solutions
+
+**Issue: "Expected no open requests, found 1: GET..."**
+- **Cause**: HTTP requests triggered by component initialization not flushed
+- **Solution**: Flush all requests after `fixture.detectChanges()`
+```typescript
+fixture.detectChanges(); // Triggers ngOnInit
+
+// Flush all requests made during initialization
+const countReq = httpMock.expectOne('/blocks/count');
+countReq.flush(100);
+
+const blocksReq = httpMock.expectOne('/blocks');
+blocksReq.flush([]);
+```
+
+**Issue: "Expected 1 to be 0" (Loading Counter)**
+- **Cause**: `finalize()` in interceptor executes asynchronously
+- **Solution**: Use `fakeAsync` and `tick()`
+```typescript
+it('should manage loading state', fakeAsync(() => {
+  service.getData().subscribe();
+  const req = httpMock.expectOne(url);
+  req.flush(data);
+  tick(); // Wait for finalize() to complete
+  expect(store.state.loadingCounter()).toBe(0);
+}));
+```
+
+**Issue: "Timeout - Async function did not complete within 5000ms"**
+- **Cause**: Using `await fixture.whenStable()` with unflushed HTTP requests
+- **Solution**: Remove `whenStable()` and flush requests synchronously
+```typescript
+// ❌ BAD
+fixture.detectChanges();
+await fixture.whenStable(); // Times out!
+httpMock.expectOne(url).flush(data);
+
+// ✅ GOOD
+fixture.detectChanges();
+httpMock.expectOne(url).flush(data);
+fixture.detectChanges(); // Trigger view update
+```
+
+**Issue: "Expected one matching request, found 2"**
+- **Cause**: Multiple requests match the same criteria (e.g., TableComponent's BehaviorSubject emits on init)
+- **Solution**: Be more specific with matchers or flush initial requests first
+```typescript
+// Flush initial request from component initialization
+const initialReq = httpMock.expectOne(req => req.url.includes('/blocks'));
+initialReq.flush([]);
+
+// Then trigger and expect your specific request
+component.refreshView(data);
+const specificReq = httpMock.expectOne(req =>
+  req.url.includes('/blocks') &&
+  req.params.get('limit') === '10'
+);
+specificReq.flush(mockData);
+```
 
 ## Key Anti-Patterns to Avoid
 

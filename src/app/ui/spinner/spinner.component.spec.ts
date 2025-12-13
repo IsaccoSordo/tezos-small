@@ -35,7 +35,7 @@ describe('SpinnerComponent', () => {
     store.state.loadingCounter.set(0);
     fixture.detectChanges();
 
-    const spinner = fixture.nativeElement.querySelector('.spinner-border');
+    const spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeNull();
   });
 
@@ -44,7 +44,7 @@ describe('SpinnerComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const spinner = fixture.nativeElement.querySelector('.spinner-border');
+    const spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeTruthy();
   });
 
@@ -53,21 +53,21 @@ describe('SpinnerComponent', () => {
     store.state.loadingCounter.set(0);
     fixture.detectChanges();
     await fixture.whenStable();
-    let spinner = fixture.nativeElement.querySelector('.spinner-border');
+    let spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeNull();
 
     // Start loading
     store.state.loadingCounter.set(2);
     fixture.detectChanges();
     await fixture.whenStable();
-    spinner = fixture.nativeElement.querySelector('.spinner-border');
+    spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeTruthy();
 
     // Stop loading
     store.state.loadingCounter.set(0);
     fixture.detectChanges();
     await fixture.whenStable();
-    spinner = fixture.nativeElement.querySelector('.spinner-border');
+    spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeNull();
   });
 
@@ -76,7 +76,7 @@ describe('SpinnerComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const spinner = fixture.nativeElement.querySelector('.spinner-border');
+    const spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).toBeTruthy();
     expect(component.loadingCounter$()).toBe(3);
   });

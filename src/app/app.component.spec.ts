@@ -1,37 +1,27 @@
-import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
-import { DetailsComponent } from './details/details.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { SpinnerComponent } from './ui/spinner/spinner.component';
-import { ErrorNotificationComponent } from './ui/error-notification/error-notification.component';
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
-      declarations: [
-        AppComponent,
-        BlocksOverviewComponent,
-        DetailsComponent,
-        SpinnerComponent,
-        NavbarComponent,
-        ErrorNotificationComponent,
-      ],
-      providers: [],
+      imports: [AppComponent],
+      providers: [provideRouter([])],
     }).compileComponents();
+
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
   });
 
-  it(`should have as title 'tezos-small'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('tezos-small');
+  it(`should have the title 'tezos-small'`, () => {
+    expect(component.title).toEqual('tezos-small');
   });
 });

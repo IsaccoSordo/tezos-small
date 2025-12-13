@@ -14,124 +14,124 @@ describe('TableComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
-    fixture.detectChanges();
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    // Reset component state
+    component.page.set(1);
   });
 
-  it('should have default values for inputs', () => {
-    expect(component.headers()).toEqual([]);
-    expect(component.show()).toBe(false);
-    expect(component.count()).toBe(100);
-    expect(component.pageSize()).toBe(10);
-    expect(component.maxSize()).toBe(10);
-    expect(component.paginator()).toBe(false);
-  });
-
-  it('should have page signal initialized to 1', () => {
-    expect(component.page()).toBe(1);
-  });
-
-  it('should create snapshot with current values', () => {
-    fixture.componentRef.setInput('count', 200);
-    fixture.componentRef.setInput('pageSize', 20);
-    fixture.detectChanges();
-
-    const snapshot = component['getSnapshot']();
-    expect(snapshot.count).toBe(200);
-    expect(snapshot.page).toBe(1);
-    expect(snapshot.pageSize).toBe(20);
-  });
-
-  it('should emit refresh event when refreshView is called', (done) => {
-    fixture.componentRef.setInput('count', 150);
-    fixture.componentRef.setInput('pageSize', 15);
-    component.page.set(3);
-    fixture.detectChanges();
-
-    component.refresh.subscribe(data => {
-      expect(data.count).toBe(150);
-      expect(data.page).toBe(3);
-      expect(data.pageSize).toBe(15);
-      done();
+  describe('initialization', () => {
+    it('should create', () => {
+      fixture.detectChanges();
+      expect(component).toBeTruthy();
     });
 
-    component.refreshView();
-  });
+    it('should have default values for all inputs', () => {
+      expect(component.headers()).toEqual([]);
+      expect(component.show()).toBe(false);
+      expect(component.count()).toBe(100);
+      expect(component.pageSize()).toBe(10);
+      expect(component.maxSize()).toBe(10);
+      expect(component.paginator()).toBe(false);
+      expect(component.page()).toBe(1);
+    });
 
-  it('should update page signal', () => {
-    expect(component.page()).toBe(1);
-
-    component.page.set(5);
-
-    expect(component.page()).toBe(5);
-  });
-
-  it('should accept custom headers input', () => {
-    const headers = ['Name', 'Age', 'Email'];
-    fixture.componentRef.setInput('headers', headers);
-    fixture.detectChanges();
-
-    expect(component.headers()).toEqual(headers);
-  });
-
-  it('should accept show input', () => {
-    fixture.componentRef.setInput('show', true);
-    fixture.detectChanges();
-
-    expect(component.show()).toBe(true);
-  });
-
-  it('should accept count input', () => {
-    fixture.componentRef.setInput('count', 500);
-    fixture.detectChanges();
-
-    expect(component.count()).toBe(500);
-  });
-
-  it('should accept pageSize input', () => {
-    fixture.componentRef.setInput('pageSize', 25);
-    fixture.detectChanges();
-
-    expect(component.pageSize()).toBe(25);
-  });
-
-  it('should accept paginator input', () => {
-    fixture.componentRef.setInput('paginator', true);
-    fixture.detectChanges();
-
-    expect(component.paginator()).toBe(true);
-  });
-
-  it('should have BehaviorSubject refresh output', () => {
-    expect(component.refresh).toBeDefined();
-    expect(component.refresh.subscribe).toBeDefined();
-  });
-
-  it('should emit initial value on refresh subscription', (done) => {
-    fixture.componentRef.setInput('count', 100);
-    fixture.componentRef.setInput('pageSize', 10);
-    fixture.detectChanges();
-
-    component.refresh.subscribe(data => {
-      expect(data.count).toBe(100);
-      expect(data.page).toBe(1);
-      expect(data.pageSize).toBe(10);
-      done();
+    it('should initialize BehaviorSubject refresh output', () => {
+      expect(component.refresh).toBeDefined();
+      expect(component.refresh.subscribe).toBeDefined();
     });
   });
 
-  it('should update snapshot when page changes', (done) => {
-    fixture.detectChanges();
+  describe('input signals', () => {
+    it('should accept and update input values', () => {
+      const headers = ['Name', 'Age', 'Email'];
 
-    component.page.set(2);
-    component.refreshView();
+      fixture.componentRef.setInput('headers', headers);
+      fixture.componentRef.setInput('show', true);
+      fixture.componentRef.setInput('count', 500);
+      fixture.componentRef.setInput('pageSize', 25);
+      fixture.componentRef.setInput('paginator', true);
+      fixture.detectChanges();
 
-    component.refresh.subscribe(data => {
-      if (data.page === 2) {
-        expect(data.page).toBe(2);
+      expect(component.headers()).toEqual(headers);
+      expect(component.show()).toBe(true);
+      expect(component.count()).toBe(500);
+      expect(component.pageSize()).toBe(25);
+      expect(component.paginator()).toBe(true);
+    });
+  });
+
+  describe('page signal', () => {
+    it('should update page signal value', () => {
+      expect(component.page()).toBe(1);
+
+      component.page.set(5);
+
+      expect(component.page()).toBe(5);
+    });
+  });
+
+  describe('snapshot creation', () => {
+    it('should create snapshot with current signal values', () => {
+      fixture.componentRef.setInput('count', 200);
+      fixture.componentRef.setInput('pageSize', 20);
+      component.page.set(3);
+      fixture.detectChanges();
+
+      const snapshot = component['getSnapshot']();
+
+      expect(snapshot.count).toBe(200);
+      expect(snapshot.page).toBe(3);
+      expect(snapshot.pageSize).toBe(20);
+    });
+  });
+
+  describe('refresh event emission', () => {
+    it('should emit initial value on subscription', (done) => {
+      fixture.componentRef.setInput('count', 100);
+      fixture.componentRef.setInput('pageSize', 10);
+      fixture.detectChanges();
+
+      component.refresh.subscribe(data => {
+        expect(data.count).toBe(100);
+        expect(data.page).toBe(1);
+        expect(data.pageSize).toBe(10);
         done();
-      }
+      });
+    });
+
+    it('should emit updated snapshot when refreshView is called', (done) => {
+      fixture.componentRef.setInput('count', 150);
+      fixture.componentRef.setInput('pageSize', 15);
+      component.page.set(3);
+      fixture.detectChanges();
+
+      let emissionCount = 0;
+      component.refresh.subscribe(data => {
+        emissionCount++;
+        // Skip the initial emission from BehaviorSubject
+        if (emissionCount === 2) {
+          expect(data.count).toBe(150);
+          expect(data.page).toBe(3);
+          expect(data.pageSize).toBe(15);
+          done();
+        }
+      });
+
+      component.refreshView();
+    });
+
+    it('should emit current page value when page changes and refreshView is called', (done) => {
+      fixture.detectChanges();
+
+      component.page.set(2);
+      component.refreshView();
+
+      component.refresh.subscribe(data => {
+        if (data.page === 2) {
+          expect(data.page).toBe(2);
+          done();
+        }
+      });
     });
   });
 });
