@@ -16,7 +16,7 @@ describe('TableComponent', () => {
 
   afterEach(() => {
     // Reset component state
-    component.page.set(1);
+    component.page.set(0);
   });
 
   describe('initialization', () => {
@@ -32,7 +32,7 @@ describe('TableComponent', () => {
       expect(component.pageSize()).toBe(10);
       expect(component.maxSize()).toBe(10);
       expect(component.paginator()).toBe(false);
-      expect(component.page()).toBe(1);
+      expect(component.page()).toBe(0);
     });
 
     it('should initialize BehaviorSubject refresh output', () => {
@@ -48,7 +48,7 @@ describe('TableComponent', () => {
       fixture.componentRef.setInput('headers', headers);
       fixture.componentRef.setInput('show', true);
       fixture.componentRef.setInput('count', 500);
-      fixture.componentRef.setInput('pageSize', 25);
+      component.pageSize.set(25);
       fixture.componentRef.setInput('paginator', true);
       fixture.detectChanges();
 
@@ -62,7 +62,7 @@ describe('TableComponent', () => {
 
   describe('page signal', () => {
     it('should update page signal value', () => {
-      expect(component.page()).toBe(1);
+      expect(component.page()).toBe(0);
 
       component.page.set(5);
 
@@ -73,7 +73,7 @@ describe('TableComponent', () => {
   describe('snapshot creation', () => {
     it('should create snapshot with current signal values', () => {
       fixture.componentRef.setInput('count', 200);
-      fixture.componentRef.setInput('pageSize', 20);
+      component.pageSize.set(20);
       component.page.set(3);
       fixture.detectChanges();
 
@@ -88,12 +88,12 @@ describe('TableComponent', () => {
   describe('refresh event emission', () => {
     it('should emit initial value on subscription', (done) => {
       fixture.componentRef.setInput('count', 100);
-      fixture.componentRef.setInput('pageSize', 10);
+      component.pageSize.set(10);
       fixture.detectChanges();
 
       component.refresh.subscribe((data) => {
         expect(data.count).toBe(100);
-        expect(data.page).toBe(1);
+        expect(data.page).toBe(0);
         expect(data.pageSize).toBe(10);
         done();
       });
@@ -101,7 +101,7 @@ describe('TableComponent', () => {
 
     it('should emit updated snapshot when refreshView is called', (done) => {
       fixture.componentRef.setInput('count', 150);
-      fixture.componentRef.setInput('pageSize', 15);
+      component.pageSize.set(15);
       component.page.set(3);
       fixture.detectChanges();
 

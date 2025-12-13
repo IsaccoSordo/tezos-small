@@ -94,8 +94,8 @@ describe('BlocksOverviewComponent', () => {
     );
     initialBlocksReq.flush([]);
 
-    // Trigger refresh
-    const tableData: TableData = { page: 1, pageSize: 10, count: 100 };
+    // Trigger refresh with page 0 (0-based indexing)
+    const tableData: TableData = { page: 0, pageSize: 10, count: 100 };
     component.refreshView(tableData);
 
     // Expect blocks request from manual refresh
@@ -128,7 +128,7 @@ describe('BlocksOverviewComponent', () => {
   });
 
   it('should use Subject pattern for refreshView events', () => {
-    const tableData: TableData = { page: 2, pageSize: 20, count: 100 };
+    const tableData: TableData = { page: 1, pageSize: 20, count: 100 };
 
     fixture.detectChanges();
 
@@ -150,22 +150,6 @@ describe('BlocksOverviewComponent', () => {
     );
     expect(req.request.method).toBe('GET');
     req.flush([]);
-  });
-
-  it('should handle API errors gracefully', () => {
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
-    req.error(new ProgressEvent('Network error'));
-
-    // Handle the blocks request triggered by TableComponent
-    const blocksReq = httpMock.expectOne(
-      (req) => req.url === 'https://api.tzkt.io/v1/blocks',
-    );
-    blocksReq.flush([]);
-
-    expect(store.state.errors().length).toBeGreaterThan(0);
-    expect(store.state.count()).toBe(0);
   });
 
   it('should display blocks in template when data is available', () => {

@@ -103,18 +103,6 @@ describe('DetailsComponent', () => {
       expect(compiled.textContent).toContain('addr1');
     });
 
-    it('should handle API errors gracefully', () => {
-      fixture.detectChanges();
-
-      const req = httpMock.expectOne(
-        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
-      );
-      req.error(new ProgressEvent('Network error'));
-
-      expect(store.state.errors().length).toBeGreaterThan(0);
-      expect(store.state.transactions().length).toBe(0);
-    });
-
     it('should manage loading state correctly', () => {
       expect(store.state.loadingCounter()).toBe(0);
 

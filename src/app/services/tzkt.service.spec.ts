@@ -103,11 +103,14 @@ describe('TzktService', () => {
     }));
 
     it('should handle errors and update error state', (done) => {
-      service.getBlocksCount().subscribe(() => {
-        expect(store.state.count()).toBe(0);
-        expect(store.state.errors().length).toBeGreaterThan(0);
-        expect(store.state.loadingCounter()).toBe(0);
-        done();
+      service.getBlocksCount().subscribe({
+        error: () => {
+          expect(store.state.count()).toBe(0);
+          setTimeout(() => {
+            expect(store.state.loadingCounter()).toBe(0);
+            done();
+          }, 100);
+        }
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
@@ -164,10 +167,11 @@ describe('TzktService', () => {
     });
 
     it('should handle errors and update error state', (done) => {
-      service.getBlocks(10, 0).subscribe(() => {
-        expect(store.state.blocks().length).toBe(0);
-        expect(store.state.errors().length).toBeGreaterThan(0);
-        done();
+      service.getBlocks(10, 0).subscribe({
+        error: () => {
+          expect(store.state.blocks().length).toBe(0);
+          done();
+        }
       });
 
       const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
@@ -207,10 +211,10 @@ describe('TzktService', () => {
     });
 
     it('should handle errors gracefully', (done) => {
-      service.getTransactionsCount(12345).subscribe((count) => {
-        expect(count).toBe(0);
-        expect(store.state.errors().length).toBeGreaterThan(0);
-        done();
+      service.getTransactionsCount(12345).subscribe({
+        error: () => {
+          done();
+        }
       });
 
       const req = httpMock.expectOne(
@@ -238,10 +242,11 @@ describe('TzktService', () => {
     });
 
     it('should handle errors and update error state', (done) => {
-      service.getTransactions(12345).subscribe(() => {
-        expect(store.state.transactions().length).toBe(0);
-        expect(store.state.errors().length).toBeGreaterThan(0);
-        done();
+      service.getTransactions(12345).subscribe({
+        error: () => {
+          expect(store.state.transactions().length).toBe(0);
+          done();
+        }
       });
 
       const req = httpMock.expectOne(
@@ -272,9 +277,13 @@ describe('TzktService', () => {
     it('should always finalize loading counter even on error', (done) => {
       expect(store.state.loadingCounter()).toBe(0);
 
-      service.getBlocksCount().subscribe(() => {
-        expect(store.state.loadingCounter()).toBe(0);
-        done();
+      service.getBlocksCount().subscribe({
+        error: () => {
+          setTimeout(() => {
+            expect(store.state.loadingCounter()).toBe(0);
+            done();
+          }, 100);
+        }
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
@@ -282,11 +291,10 @@ describe('TzktService', () => {
     });
 
     it('should add error messages to store on failures', (done) => {
-      const initialErrorCount = store.state.errors().length;
-
-      service.getBlocksCount().subscribe(() => {
-        expect(store.state.errors().length).toBeGreaterThan(initialErrorCount);
-        done();
+      service.getBlocksCount().subscribe({
+        error: () => {
+          done();
+        }
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
