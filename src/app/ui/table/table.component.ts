@@ -36,14 +36,16 @@ export class TableComponent<T = unknown> {
   // Output - emit page change events
   pageChange = output<PageChangeEvent>();
 
-  onPageChange(event: { first: number; rows: number }) {
+  onPageChange(event: { first?: number | null; rows?: number | null }) {
     // PrimeNG lazy load event has 'first' (row index) and 'rows' (page size)
     // Convert first to page number: page = first / rows
-    const page = event.first ? Math.floor(event.first / event.rows) : 0;
+    const first = event.first ?? 0;
+    const rows = event.rows ?? 10;
+    const page = first ? Math.floor(first / rows) : 0;
 
     this.pageChange.emit({
       page: page,
-      pageSize: event.rows ?? 10,
+      pageSize: rows,
     });
   }
 }

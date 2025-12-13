@@ -1,4 +1,4 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpEvent } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
 
 /**
@@ -14,7 +14,7 @@ import { Observable, shareReplay } from 'rxjs';
  */
 
 // Cache storage for observables
-const cache = new Map<string, Observable<unknown>>();
+const cache = new Map<string, Observable<HttpEvent<unknown>>>();
 const CACHE_TTL = 60000; // 60 seconds
 
 /**
