@@ -110,7 +110,7 @@ describe('TzktService', () => {
             expect(store.state.loadingCounter()).toBe(0);
             done();
           }, 100);
-        }
+        },
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
@@ -171,7 +171,7 @@ describe('TzktService', () => {
         error: () => {
           expect(store.state.blocks().length).toBe(0);
           done();
-        }
+        },
       });
 
       const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
@@ -214,7 +214,7 @@ describe('TzktService', () => {
       service.getTransactionsCount(12345).subscribe({
         error: () => {
           done();
-        }
+        },
       });
 
       const req = httpMock.expectOne(
@@ -246,7 +246,7 @@ describe('TzktService', () => {
         error: () => {
           expect(store.state.transactions().length).toBe(0);
           done();
-        }
+        },
       });
 
       const req = httpMock.expectOne(
@@ -283,7 +283,7 @@ describe('TzktService', () => {
             expect(store.state.loadingCounter()).toBe(0);
             done();
           }, 100);
-        }
+        },
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
@@ -294,7 +294,7 @@ describe('TzktService', () => {
       service.getBlocksCount().subscribe({
         error: () => {
           done();
-        }
+        },
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);

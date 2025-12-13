@@ -121,7 +121,7 @@ describe('DetailsComponent', () => {
 
   describe('without block level (invalid route param)', () => {
     const activatedRouteSpyInvalid = {
-      snapshot: { paramMap: { get: (param: string) => null } },
+      snapshot: { paramMap: { get: () => null } },
     };
 
     beforeEach(async () => {

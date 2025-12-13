@@ -9,6 +9,7 @@
     [columns]="columns"
     [totalRecords]="count() || 0"
     [rows]="pageSize()"
+    [first]="currentPage() * pageSize()"
     [paginator]="true"
     [scrollable]="true"
     [scrollHeight]="'600px'"
@@ -20,7 +21,10 @@
     <tr class="data-row">
       <td>
         <a [routerLink]="['/details', block.level]" class="hash-link">
-          <i class="pi pi-link" style="font-size: 0.8rem; margin-right: 0.3rem"></i>
+          <i
+            class="pi pi-link"
+            style="font-size: 0.8rem; margin-right: 0.3rem"
+          ></i>
           {{ block.hash }}
         </a>
       </td>
@@ -29,7 +33,10 @@
       </td>
       <td>
         <span class="transaction-count">
-          <i class="pi pi-exchange" style="font-size: 0.9rem; margin-right: 0.3rem"></i>
+          <i
+            class="pi pi-exchange"
+            style="font-size: 0.9rem; margin-right: 0.3rem"
+          ></i>
           {{ block.transactions }}
         </span>
       </td>

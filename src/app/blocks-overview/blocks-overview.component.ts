@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { interval, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
@@ -25,6 +25,8 @@ import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
 export class BlocksOverviewComponent implements OnInit {
   private service = inject(TzktService);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   store = inject(Store);
   blocks = this.store.state.blocks;
@@ -43,6 +45,21 @@ export class BlocksOverviewComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    // Restore pagination state from query params
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const page = params.get('page');
+        const pageSize = params.get('pageSize');
+
+        if (page !== null) {
+          this.currentPage.set(Number(page));
+        }
+        if (pageSize !== null) {
+          this.pageSize.set(Number(pageSize));
+        }
+      });
+
     // Initial fetch on component initialization
     this.service
       .getBlocksCount()
@@ -63,8 +80,19 @@ export class BlocksOverviewComponent implements OnInit {
 
   onPageChange(event: PageChangeEvent): void {
     // Ensure valid values with defaults
-    this.currentPage.set(event.page ?? 0);
-    this.pageSize.set(event.pageSize ?? 10);
+    const page = event.page ?? 0;
+    const pageSize = event.pageSize ?? 10;
+
+    this.currentPage.set(page);
+    this.pageSize.set(pageSize);
+
+    // Update query params to preserve pagination state
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page, pageSize },
+      queryParamsHandling: 'merge',
+    });
+
     this.fetchBlocks();
   }
 

@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-navbar',

@@ -16,13 +16,19 @@
     <tr class="data-row">
       <td>
         <span class="address-field">
-          <i class="pi pi-user" style="font-size: 0.8rem; margin-right: 0.3rem"></i>
+          <i
+            class="pi pi-user"
+            style="font-size: 0.8rem; margin-right: 0.3rem"
+          ></i>
           {{ transaction.sender.address }}
         </span>
       </td>
       <td>
         <span class="address-field">
-          <i class="pi pi-send" style="font-size: 0.8rem; margin-right: 0.3rem"></i>
+          <i
+            class="pi pi-send"
+            style="font-size: 0.8rem; margin-right: 0.3rem"
+          ></i>
           {{ transaction.target.address }}
         </span>
       </td>
@@ -30,7 +36,9 @@
         <span class="amount">{{ transaction.amount }} ꜩ</span>
       </td>
       <td>
-        <span [class]="'status-badge status-' + transaction.status.toLowerCase()">
+        <span
+          [class]="'status-badge status-' + transaction.status.toLowerCase()"
+        >
           {{ transaction.status }}
         </span>
       </td>
