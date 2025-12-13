@@ -1,6 +1,78 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+function getDefaultBrowser() {
+    const { execSync } = require('child_process');
+    const fs = require('fs');
+    const os = require('os');
+    const platform = os.platform();
+
+    // Browser detection with cross-platform paths
+    const browserConfigs = [
+        // Firefox
+        {
+            name: 'Firefox',
+            executable: platform === 'win32' ? 'firefox.exe' : 'firefox',
+            paths: platform === 'darwin'
+                ? ['/Applications/Firefox.app/Contents/MacOS/firefox']
+                : platform === 'win32'
+                    ? ['C:\\Program Files\\Mozilla Firefox\\firefox.exe', 'C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe']
+                    : ['/usr/bin/firefox', '/snap/bin/firefox']
+        },
+        // Chrome
+        {
+            name: 'Chrome',
+            executable: platform === 'win32' ? 'chrome.exe' : 'google-chrome',
+            paths: platform === 'darwin'
+                ? ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
+                : platform === 'win32'
+                    ? ['C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe']
+                    : ['/usr/bin/google-chrome', '/snap/bin/chromium', '/usr/bin/chromium-browser']
+        },
+        // Chromium
+        {
+            name: 'Chromium',
+            executable: platform === 'win32' ? 'chromium.exe' : 'chromium',
+            paths: platform === 'darwin'
+                ? ['/Applications/Chromium.app/Contents/MacOS/Chromium']
+                : platform === 'win32'
+                    ? ['C:\\Program Files\\Chromium\\Application\\chromium.exe']
+                    : ['/usr/bin/chromium', '/usr/bin/chromium-browser']
+        },
+        // Safari (macOS only)
+        {
+            name: 'Safari',
+            executable: 'safari',
+            paths: ['/Applications/Safari.app/Contents/MacOS/Safari']
+        }
+    ];
+
+    // Try each browser
+    for (const browser of browserConfigs) {
+        // First, try common paths for this platform
+        for (const path of browser.paths) {
+            if (fs.existsSync(path)) {
+                console.log(`✅ Detected browser: ${browser.name}`);
+                return browser.name;
+            }
+        }
+
+        // Then, try to find executable in PATH
+        try {
+            execSync(`which ${browser.executable}`, { stdio: 'ignore' });
+            console.log(`✅ Detected browser: ${browser.name}`);
+            return browser.name;
+        } catch (e) {
+            // Browser not found, continue to next
+        }
+    }
+
+    // Fallback: use ChromeHeadless as last resort
+    console.warn('⚠️  No browsers detected. Falling back to ChromeHeadless.');
+    return 'ChromeHeadless';
+}
+
+
 module.exports = function (config) {
     config.set({
         basePath: '',
@@ -50,26 +122,3 @@ module.exports = function (config) {
         }
     });
 };
-
-function getDefaultBrowser() {
-    const os = require('os');
-    const fs = require('fs');
-    const path = require('path');
-    const platform = os.platform();
-
-    const browserPaths = {
-        'Firefox': '/Applications/Firefox.app',
-        'Google Chrome': '/Applications/Google Chrome.app',
-        'Chromium': '/Applications/Chromium.app',
-        'Safari': '/Applications/Safari.app'
-    };
-
-    for (const [browserName, browserPath] of Object.entries(browserPaths)) {
-        if (fs.existsSync(browserPath)) {
-            console.log(`🌐 Detected browser: ${browserName}`);
-            return browserName;
-        }
-    }
-
-    throw new Error('No supported browsers found on the system.');
-}
