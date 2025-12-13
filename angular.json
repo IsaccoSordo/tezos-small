@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tezos-small:build:production"
+              "buildTarget": "tezos-small:build:production"
             },
             "development": {
-              "browserTarget": "tezos-small:build:development"
+              "buildTarget": "tezos-small:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tezos-small:build"
+            "buildTarget": "tezos-small:build"
           }
         },
         "test": {

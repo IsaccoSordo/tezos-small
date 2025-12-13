@@ -7,6 +7,7 @@ import { Store } from '../store/store.service';
   selector: 'app-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
+  standalone: false
 })
 export class DetailsComponent implements OnInit {
   route = inject(ActivatedRoute);

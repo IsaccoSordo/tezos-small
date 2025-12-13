@@ -6,5 +6,6 @@ import { Component } from '@angular/core';
     <a class="nav-item nav-link" routerLink="">TezosSmall</a>
   </nav>`,
   styleUrls: ['./navbar.component.scss'],
+  standalone: false
 })
 export class NavbarComponent {}

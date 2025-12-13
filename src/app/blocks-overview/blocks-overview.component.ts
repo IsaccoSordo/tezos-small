@@ -8,6 +8,7 @@ import { Store } from '../store/store.service';
   selector: 'app-blocks-overview',
   templateUrl: './blocks-overview.component.html',
   styleUrls: ['./blocks-overview.component.scss'],
+  standalone: false
 })
 export class BlocksOverviewComponent implements OnInit, OnDestroy {
   service = inject(TzktService);

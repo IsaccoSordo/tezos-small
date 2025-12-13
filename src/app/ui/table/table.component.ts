@@ -6,6 +6,7 @@ import { TableData } from 'src/app/common';
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
+  standalone: false
 })
 export class TableComponent {
   @Input() headers: string[] = [];

@@ -5,6 +5,7 @@ import { Store } from 'src/app/store/store.service';
   selector: 'app-spinner',
   templateUrl: './spinner.component.html',
   styleUrls: ['./spinner.component.scss'],
+  standalone: false
 })
 export class SpinnerComponent {
   loadingCounter$ = inject(Store).state.loadingCounter
