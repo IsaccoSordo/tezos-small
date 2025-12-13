@@ -1,21 +1,49 @@
-@if (blocks(); as blocks) {
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="pi pi-th-large"></i> Tezos Blocks</h1>
+    <p class="subtitle">Explore the latest blocks on the Tezos blockchain</p>
+  </div>
+
   <app-table
-    [headers]="['Hash', 'Level', 'Transactions', 'Proposer', 'Timestamp']"
-    [show]="blocks.length > 0"
-    [count]="(count()) || 100"
+    [data]="blocks()"
+    [columns]="columns"
+    [totalRecords]="count() || 0"
+    [rows]="pageSize()"
+    [first]="currentPage() * pageSize()"
     [paginator]="true"
-    (refresh)="refreshView($event)"
-  >
-    @for (block of blocks; track block.hash) {
-      <tr>
-        <td>
-          <a [routerLink]="['/details', block.level]">{{ block.hash }}</a>
-        </td>
-        <td>{{ block.level }}</td>
-        <td>{{ block.transactions }}</td>
-        <td>{{ block.proposer?.alias ?? "\<none>" }}</td>
-        <td>{{ block.timestamp | date : "dd.MM.yyyy HH:mm" }}</td>
-      </tr>
-    }
-  </app-table>
-}
+    [scrollable]="true"
+    [scrollHeight]="'600px'"
+    [rowTemplate]="blockRow"
+    (pageChange)="onPageChange($event)"
+  ></app-table>
+
+  <ng-template #blockRow let-block>
+    <tr class="data-row">
+      <td>
+        <a [routerLink]="['/details', block.level]" class="hash-link">
+          <i
+            class="pi pi-link"
+            style="font-size: 0.8rem; margin-right: 0.3rem"
+          ></i>
+          {{ block.hash }}
+        </a>
+      </td>
+      <td>
+        <span class="badge level-badge">{{ block.level }}</span>
+      </td>
+      <td>
+        <span class="transaction-count">
+          <i
+            class="pi pi-exchange"
+            style="font-size: 0.9rem; margin-right: 0.3rem"
+          ></i>
+          {{ block.transactions }}
+        </span>
+      </td>
+      <td>{{ block.proposer?.alias ?? "\<none>" }}</td>
+      <td class="timestamp">
+        {{ block.timestamp | date: "dd.MM.yyyy HH:mm" }}
+      </td>
+    </tr>
+  </ng-template>
+</div>

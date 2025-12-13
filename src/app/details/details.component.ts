@@ -1,4 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -12,7 +17,7 @@ import { TableComponent } from '../ui/table/table.component';
   styleUrls: ['./details.component.scss'],
   standalone: true,
   imports: [CommonModule, TableComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -22,15 +27,20 @@ export class DetailsComponent implements OnInit {
   store = inject(Store);
   transactions = this.store.state.transactions;
 
+  columns = [
+    { field: 'sender', header: 'Sender' },
+    { field: 'target', header: 'Target' },
+    { field: 'amount', header: 'Amount' },
+    { field: 'status', header: 'Status' },
+  ];
+
   ngOnInit(): void {
     const level: number = +(
       this.route.snapshot.paramMap.get('level') ?? 'error'
     );
 
     if (!isNaN(level)) {
-      this.service.getTransactions(level)
-        .pipe(this.destroyRef)
-        .subscribe();
+      this.service.getTransactions(level).pipe(this.destroyRef).subscribe();
     }
   }
 }

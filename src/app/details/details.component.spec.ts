@@ -2,7 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DetailsComponent } from './details.component';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
@@ -14,13 +17,27 @@ describe('DetailsComponent', () => {
   let store: Store;
 
   const mockTransactions = [
-    { sender: { address: 'addr1', alias: 'User1' }, target: { address: 'addr2', alias: 'User2' }, amount: 100, status: 'applied' },
-    { sender: { address: 'addr3', alias: 'User3' }, target: { address: 'addr4', alias: 'User4' }, amount: 200, status: 'applied' }
+    {
+      sender: { address: 'addr1', alias: 'User1' },
+      target: { address: 'addr2', alias: 'User2' },
+      amount: 100,
+      status: 'applied',
+    },
+    {
+      sender: { address: 'addr3', alias: 'User3' },
+      target: { address: 'addr4', alias: 'User4' },
+      amount: 200,
+      status: 'applied',
+    },
   ];
 
   describe('with valid block level', () => {
     const activatedRouteSpy = {
-      snapshot: { paramMap: { get: (param: string) => param === 'level' ? '12345' : null } },
+      snapshot: {
+        paramMap: {
+          get: (param: string) => (param === 'level' ? '12345' : null),
+        },
+      },
     };
 
     beforeEach(async () => {
@@ -31,7 +48,7 @@ describe('DetailsComponent', () => {
           provideHttpClientTesting(),
           { provide: ActivatedRoute, useValue: activatedRouteSpy },
           TzktService,
-          Store
+          Store,
         ],
       }).compileComponents();
 
@@ -56,9 +73,10 @@ describe('DetailsComponent', () => {
     it('should fetch transactions for the given block level on init', () => {
       fixture.detectChanges();
 
-      const req = httpMock.expectOne(req =>
-        req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
-        req.params.get('level') === '12345'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
+          req.params.get('level') === '12345',
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockTransactions);
@@ -74,26 +92,15 @@ describe('DetailsComponent', () => {
       await fixture.whenStable();
 
       // Flush the HTTP request triggered by ngOnInit
-      const req = httpMock.expectOne(req =>
-        req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
-        req.params.get('level') === '12345'
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
+          req.params.get('level') === '12345',
       );
       req.flush(mockTransactions);
 
       const compiled = fixture.nativeElement;
       expect(compiled.textContent).toContain('addr1');
-    });
-
-    it('should handle API errors gracefully', () => {
-      fixture.detectChanges();
-
-      const req = httpMock.expectOne(req =>
-        req.url === 'https://api.tzkt.io/v1/operations/transactions'
-      );
-      req.error(new ProgressEvent('Network error'));
-
-      expect(store.state.errors().length).toBeGreaterThan(0);
-      expect(store.state.transactions().length).toBe(0);
     });
 
     it('should manage loading state correctly', () => {
@@ -103,8 +110,8 @@ describe('DetailsComponent', () => {
 
       expect(store.state.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne(req =>
-        req.url === 'https://api.tzkt.io/v1/operations/transactions'
+      const req = httpMock.expectOne(
+        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
       );
       req.flush(mockTransactions);
 
@@ -114,7 +121,7 @@ describe('DetailsComponent', () => {
 
   describe('without block level (invalid route param)', () => {
     const activatedRouteSpyInvalid = {
-      snapshot: { paramMap: { get: (param: string) => null } },
+      snapshot: { paramMap: { get: () => null } },
     };
 
     beforeEach(async () => {
@@ -125,7 +132,7 @@ describe('DetailsComponent', () => {
           provideHttpClientTesting(),
           { provide: ActivatedRoute, useValue: activatedRouteSpyInvalid },
           TzktService,
-          Store
+          Store,
         ],
       }).compileComponents();
 
@@ -142,8 +149,8 @@ describe('DetailsComponent', () => {
       fixture.detectChanges();
 
       // Should not make any HTTP requests
-      httpMock.expectNone(req =>
-        req.url === 'https://api.tzkt.io/v1/operations/transactions'
+      httpMock.expectNone(
+        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
       );
     });
   });

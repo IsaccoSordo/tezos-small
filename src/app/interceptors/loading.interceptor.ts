@@ -23,6 +23,6 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     finalize(() => {
       // Decrement loading counter when request completes (success or error)
       store.state.loadingCounter.update((prev) => prev - 1);
-    })
+    }),
   );
 };

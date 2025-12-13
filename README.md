@@ -4,10 +4,10 @@
 
 [![Angular](https://img.shields.io/badge/Angular-21.0-dd0031?logo=angular)](https://angular.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952b3?logo=bootstrap)](https://getbootstrap.com)
+[![PrimeNG](https://img.shields.io/badge/PrimeNG-Latest-007ad9?logo=prime)](https://primeng.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](#license)
 
-A sleek, modern Angular application for exploring **Tezos blockchain** blocks and transactions through the [TZKT API](https://tzkt.io/api/).
+A sleek, modern Angular application for exploring **Tezos blockchain** blocks and transactions through the [TZKT API](https://tzkt.io/api/), built with **PrimeNG** UI components.
 
 [Features](#features) • [Quick Start](#quick-start) • [Development](#development) • [Architecture](#architecture)
 
@@ -25,24 +25,27 @@ A sleek, modern Angular application for exploring **Tezos blockchain** blocks an
 
 📊 **Transaction Details**
 
-- Deep dive into individual block transactions
+- Deep-dive into individual block transactions
 - View sender, receiver, amount, and transaction status
 - Clean, responsive table layout
 
 ⚡ **Performance & UX**
 
-- Standalone Angular components with OnPush change detection
+- **Zoneless change detection** (Angular 21) - no Zone.js overhead
+- Standalone Angular components with signal-based reactivity
 - Reactive data flow with RxJS
 - Real-time block count updates
-- Smart loading states and error handling
-- Bootstrap 5 + ng-bootstrap for responsive design
+- Smart loading states with PrimeNG ProgressSpinner
+- Toast notifications for error handling
+- PrimeNG Aura theme for modern, beautiful UI
 
 🎨 **Modern Stack**
 
 - Angular 21 with latest standalone APIs
+- **PrimeNG** - Enterprise-grade UI component library
 - TypeScript strict mode
 - SCSS styling with modular components
-- Comprehensive error notification system
+- 90+ available PrimeNG components for future enhancements
 
 ---
 
@@ -50,7 +53,7 @@ A sleek, modern Angular application for exploring **Tezos blockchain** blocks an
 
 ### Prerequisites
 
-- **Node.js**: v22.12.0 or higher
+- **Node.js**: v20.19+ or v22.12+
 - **npm**: v8.0.0 or higher
 
 ### Installation
@@ -84,11 +87,11 @@ Build artifacts will be stored in the `dist/tezos-small` directory.
 
 ## 🧪 Testing
 
-This project follows comprehensive testing best practices with **62 test suites** covering components, services, and UI elements.
+This project follows comprehensive testing best practices with full test coverage for components, services, interceptors, and UI elements.
 
 ### Prerequisites
 
-Ensure you're using **Node.js v22.12+** or **v20.19+** for running tests. The project uses Angular 21's testing infrastructure.
+Ensure you're using **Node.js v20.19+ or v22.12+** for running tests. The project uses Angular 21's testing infrastructure.
 
 ### Run Unit Tests
 
@@ -103,13 +106,7 @@ Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](h
 - **Windows**: Chrome
 - **Linux**: ChromeHeadless
 
-### Run Tests in Watch Mode
-
-```bash
-npm test
-```
-
-Tests automatically re-run when you modify source files. Press `Ctrl+C` to stop.
+Tests automatically re-run in watch mode when you modify source files. Press `Ctrl+C` to stop.
 
 ### Generate Coverage Report
 
@@ -127,207 +124,6 @@ npm test -- --browsers=Firefox --watch=false
 
 ---
 
-## 📋 Testing Architecture
-
-### Test Structure
-
-All test files follow the `.spec.ts` naming convention and are colocated with their source files:
-
-```
-src/app/
-├── blocks-overview/
-│   ├── blocks-overview.component.ts
-│   └── blocks-overview.component.spec.ts ✅
-├── services/
-│   ├── tzkt.service.ts
-│   └── tzkt.service.spec.ts ✅
-└── ui/
-    ├── table/
-    │   ├── table.component.ts
-    │   └── table.component.spec.ts ✅
-```
-
-### Key Testing Patterns
-
-#### 1. **HTTP Interceptor Testing**
-
-The `loadingInterceptor` is tested using `fakeAsync` and `tick()` to ensure proper async behavior:
-
-```typescript
-it('should increment and decrement loading counter', fakeAsync(() => {
-  expect(store.state.loadingCounter()).toBe(0);
-
-  service.getBlocksCount().subscribe();
-  expect(store.state.loadingCounter()).toBe(1);
-
-  const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
-  req.flush(100);
-  tick(); // Ensure finalize() completes
-
-  expect(store.state.loadingCounter()).toBe(0);
-}));
-```
-
-#### 2. **Signal-Based State Testing**
-
-All components use Angular Signals, which are tested by verifying state changes:
-
-```typescript
-it('should update store signal when data is fetched', () => {
-  service.getBlocks(10, 0).subscribe();
-
-  const req = httpMock.expectOne(req => req.url.includes('/blocks'));
-  req.flush(mockBlocks);
-
-  expect(store.state.blocks()).toEqual(mockBlocks);
-});
-```
-
-#### 3. **BehaviorSubject Event Emission**
-
-The `TableComponent` uses BehaviorSubject for refresh events, tested with proper emission handling:
-
-```typescript
-it('should emit initial value on subscription', (done) => {
-  fixture.componentRef.setInput('count', 100);
-  fixture.detectChanges();
-
-  component.refresh.subscribe(data => {
-    expect(data.count).toBe(100);
-    done();
-  });
-});
-```
-
-#### 4. **HTTP Request Flushing**
-
-All HTTP tests properly flush requests to avoid "Expected no open requests" errors:
-
-```typescript
-beforeEach(() => {
-  // Setup with HttpTestingController
-  httpMock = TestBed.inject(HttpTestingController);
-});
-
-afterEach(() => {
-  httpMock.verify(); // Ensures all requests are flushed
-});
-```
-
-#### 5. **Nested Describe Blocks**
-
-Tests are organized using nested `describe()` blocks for better readability:
-
-```typescript
-describe('TableComponent', () => {
-  describe('initialization', () => {
-    it('should create', () => { ... });
-  });
-
-  describe('input signals', () => {
-    it('should accept and update input values', () => { ... });
-  });
-
-  describe('refresh event emission', () => {
-    it('should emit initial value', () => { ... });
-  });
-});
-```
-
----
-
-## 🎯 Test Coverage
-
-Current test coverage includes:
-
-### Components (100% Coverage)
-- ✅ `AppComponent` - Application root
-- ✅ `BlocksOverviewComponent` - Blocks listing with pagination
-- ✅ `DetailsComponent` - Transaction details view
-- ✅ `NavbarComponent` - Navigation header
-- ✅ `TableComponent` - Reusable data table
-- ✅ `SpinnerComponent` - Loading indicator
-
-### Services (100% Coverage)
-- ✅ `TzktService` - API integration
-  - Block fetching and counting
-  - Transaction retrieval
-  - Error handling
-  - Loading state management
-- ✅ `Store` - Signal-based state management
-
-### Interceptors (100% Coverage)
-- ✅ `loadingInterceptor` - Automatic loading state tracking
-
----
-
-## 🛡️ Testing Best Practices
-
-### Do's ✅
-- **Use `provideHttpClient()` and `provideHttpClientTesting()`** - Modern Angular API
-- **Use `fakeAsync` and `tick()`** - For testing async operations with interceptors
-- **Always flush HTTP requests** - Call `httpMock.verify()` in `afterEach()`
-- **Reset signals in `afterEach()`** - Prevent test pollution
-- **Use nested `describe()` blocks** - Organize related tests
-- **Test user interactions** - Not just existence checks
-- **Test error states** - Handle network failures gracefully
-
-### Don'ts ❌
-- **Don't use deprecated `RouterTestingModule`** - Use `provideRouter([])`
-- **Don't use `HttpClientModule` in tests** - Use `provideHttpClient()`
-- **Don't skip `httpMock.verify()`** - Always verify no pending requests
-- **Don't use `declarations` for standalone components** - Use `imports` array
-- **Don't forget to test edge cases** - Empty arrays, null values, errors
-
----
-
-## 🔧 Common Testing Issues & Solutions
-
-### Issue: "Expected no open requests"
-**Solution:** Flush all HTTP requests triggered by component initialization:
-```typescript
-fixture.detectChanges(); // Triggers ngOnInit
-
-const countReq = httpMock.expectOne('/blocks/count');
-countReq.flush(100);
-
-const blocksReq = httpMock.expectOne('/blocks');
-blocksReq.flush([]);
-```
-
-### Issue: "Expected 1 to be 0" (Loading Counter)
-**Solution:** Use `fakeAsync` and `tick()` to ensure `finalize()` completes:
-```typescript
-it('should manage loading state', fakeAsync(() => {
-  service.getData().subscribe();
-
-  const req = httpMock.expectOne(url);
-  req.flush(data);
-  tick(); // Wait for finalize()
-
-  expect(store.state.loadingCounter()).toBe(0);
-}));
-```
-
-### Issue: Timeout in async tests
-**Solution:** Remove `await fixture.whenStable()` and flush requests synchronously:
-```typescript
-fixture.detectChanges();
-httpMock.expectOne(url).flush(data);
-// Don't use: await fixture.whenStable()
-```
-
----
-
-## 📚 Additional Testing Resources
-
-- [Angular Testing Guide](https://angular.io/guide/testing)
-- [Jasmine Documentation](https://jasmine.github.io/)
-- [Karma Configuration](https://karma-runner.github.io/latest/config/configuration-file.html)
-- [HttpTestingController API](https://angular.io/api/common/http/testing/HttpTestingController)
-
----
-
 ## 📁 Architecture
 
 ### Project Structure
@@ -337,7 +133,10 @@ src/app/
 ├── blocks-overview/          # Main blocks listing page
 ├── details/                  # Transaction details page
 ├── navbar/                   # Navigation component
+├── core/
+│   └── global-error.handler.ts # Global error handling
 ├── interceptors/
+│   ├── error.interceptor.ts  # HTTP error handling with toast notifications
 │   └── loading.interceptor.ts # HTTP loading state interceptor
 ├── services/
 │   └── tzkt.service.ts      # TZKT API integration
@@ -345,7 +144,6 @@ src/app/
 │   ├── store.service.ts     # Global state management
 │   └── tzkt.state.ts        # Reactive signals for state
 ├── ui/                       # Reusable UI components
-│   ├── error-notification/
 │   ├── spinner/
 │   └── table/
 ├── app.routes.ts            # Application routing
@@ -359,9 +157,9 @@ src/app/
 | ---------------------------- | --------------------------------------- |
 | `BlocksOverviewComponent`    | Displays paginated list of blocks       |
 | `DetailsComponent`           | Shows transactions for a specific block |
+| `NavbarComponent`            | Navigation header with branding         |
 | `TableComponent`             | Reusable data table with pagination     |
 | `SpinnerComponent`           | Loading indicator                       |
-| `ErrorNotificationComponent` | User-friendly error alerts              |
 
 ### State Management
 
@@ -377,7 +175,16 @@ errors = signal<Error[]>([]);
 
 ### HTTP Interceptors
 
-The application uses **functional HTTP interceptors** (Angular 21+) for automatic loading state management:
+The application uses **functional HTTP interceptors** (Angular 21+) for cross-cutting concerns:
+
+#### Error Interceptor
+
+The `errorInterceptor` provides centralized HTTP error handling:
+
+- **Intercepts all HTTP errors** and displays user-friendly toast notifications via PrimeNG `MessageService`
+- **Status-specific messages** for common HTTP errors (404, 500, 503, etc.)
+- **Automatic error logging** to console for debugging
+- **Rethrows errors** so components can handle them if needed
 
 #### Loading Interceptor
 
@@ -389,12 +196,12 @@ The `loadingInterceptor` automatically manages the loading counter for all HTTP 
 
 **Benefits:**
 
-- No manual loading state management in service methods
+- No manual error/loading state management in service methods
 - Handles concurrent requests correctly
-- Centralized loading logic
+- Centralized cross-cutting concerns
 - Scalable and maintainable
 
-The interceptor is registered globally in [app.config.ts](src/app/app.config.ts) using the modern `withInterceptors()` pattern.
+Both interceptors are registered globally in [app.config.ts](src/app/app.config.ts) using the modern `withInterceptors()` pattern.
 
 ### API Integration
 
@@ -405,7 +212,7 @@ The `TzktService` handles all blockchain API calls:
 - `getTransactionsCount(level)` - Get transaction count for a block
 - `getTransactions(level)` - Fetch transactions for a block
 
-All loading states are automatically managed by the HTTP interceptor.
+All loading and error states are automatically managed by HTTP interceptors.
 
 ---
 
@@ -449,8 +256,9 @@ Key operators used in the application:
 
 ### UI
 
-- `bootstrap@5.3.3` - CSS framework
-- `@ng-bootstrap/ng-bootstrap@20.0.0` - Angular Bootstrap components
+- `primeng@21.0.1` - Enterprise Angular UI component library
+- `@primeuix/themes@2.0.2` - Modern theming system
+- `primeicons@7.0.0` - Premium icon library
 
 ### Testing
 
@@ -523,9 +331,36 @@ interface Account {
 
 Configuration can be found in:
 
-- `tsconfig.json` - TypeScript configuration
-- `angular.json` - Angular CLI configuration
-- `karma.conf.js` - Test runner configuration
+- [tsconfig.json](tsconfig.json) - TypeScript configuration
+- [angular.json](angular.json) - Angular CLI configuration
+- [karma.conf.js](karma.conf.js) - Test runner configuration
+- [app.config.ts](src/app/app.config.ts) - Application providers and PrimeNG theme configuration
+
+### PrimeNG Theme
+
+The application uses **PrimeNG Aura** theme configured via TypeScript in [app.config.ts](src/app/app.config.ts):
+
+```typescript
+providePrimeNG({
+  theme: {
+    preset: Aura,
+    options: {
+      darkModeSelector: false,
+      cssLayer: false,
+    },
+  },
+})
+```
+
+You can change the theme preset by importing different presets from `@primeuix/themes`.
+
+### Error Handling
+
+The application implements comprehensive error handling:
+
+- **GlobalErrorHandler** - Custom Angular ErrorHandler for catching unhandled errors
+- **Error Interceptor** - HTTP-specific error handling with toast notifications
+- **MessageService** - PrimeNG service for displaying user-friendly error messages
 
 ### Browser Support
 
@@ -552,8 +387,8 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 ## 📚 Additional Resources
 
 - [Angular Documentation](https://angular.io/docs)
+- [PrimeNG Documentation](https://primeng.org)
 - [TZKT API Documentation](https://tzkt.io/api/)
 - [RxJS Guide](https://rxjs.dev/)
-- [Bootstrap Documentation](https://getbootstrap.com/docs)
 
 ---

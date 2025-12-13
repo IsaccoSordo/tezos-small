@@ -1,14 +1,27 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MenubarModule } from 'primeng/menubar';
 
 @Component({
   selector: 'app-navbar',
-  template: ` <nav class="navbar navbar-light bg-light">
-    <a class="nav-item nav-link" routerLink="">TezosSmall</a>
-  </nav>`,
+  template: `
+    <div class="navbar-container">
+      <p-menubar>
+        <ng-template pTemplate="start">
+          <a routerLink="" class="brand-link">
+            <i
+              class="pi pi-box"
+              style="font-size: 1.5rem; margin-right: 0.5rem;"
+            ></i>
+            <span class="brand-text">TezosSmall</span>
+          </a>
+        </ng-template>
+      </p-menubar>
+    </div>
+  `,
   styleUrls: ['./navbar.component.scss'],
   standalone: true,
-  imports: [RouterLink],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [RouterLink, MenubarModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {}

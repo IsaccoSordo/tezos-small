@@ -1,6 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 
-/* Importing Bootstrap SCSS file. */
-@use 'bootstrap/scss/bootstrap';
+/* Tezos Brand Color */
+$tezos-blue: #0d6efd;
 
-$tezos_blue: #0d6efd;
+/* Global Styles */
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Custom styling for a modern look */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}

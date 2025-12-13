@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TableComponent } from './table.component';
+import { TableComponent, PageChangeEvent } from './table.component';
 
 describe('TableComponent', () => {
   let component: TableComponent;
@@ -7,16 +7,11 @@ describe('TableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TableComponent]
+      imports: [TableComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TableComponent);
     component = fixture.componentInstance;
-  });
-
-  afterEach(() => {
-    // Reset component state
-    component.page.set(1);
   });
 
   describe('initialization', () => {
@@ -26,112 +21,87 @@ describe('TableComponent', () => {
     });
 
     it('should have default values for all inputs', () => {
-      expect(component.headers()).toEqual([]);
-      expect(component.show()).toBe(false);
-      expect(component.count()).toBe(100);
-      expect(component.pageSize()).toBe(10);
-      expect(component.maxSize()).toBe(10);
+      expect(component.data()).toEqual([]);
+      expect(component.columns()).toEqual([]);
+      expect(component.totalRecords()).toBe(0);
+      expect(component.rows()).toBe(10);
       expect(component.paginator()).toBe(false);
-      expect(component.page()).toBe(1);
-    });
-
-    it('should initialize BehaviorSubject refresh output', () => {
-      expect(component.refresh).toBeDefined();
-      expect(component.refresh.subscribe).toBeDefined();
+      expect(component.scrollable()).toBe(true);
+      expect(component.scrollHeight()).toBe('600px');
     });
   });
 
   describe('input signals', () => {
     it('should accept and update input values', () => {
-      const headers = ['Name', 'Age', 'Email'];
+      const columns = [
+        { field: 'name', header: 'Name' },
+        { field: 'age', header: 'Age' },
+        { field: 'email', header: 'Email' },
+      ];
+      const data = [
+        { name: 'John', age: 30, email: 'john@example.com' },
+        { name: 'Jane', age: 25, email: 'jane@example.com' },
+      ];
 
-      fixture.componentRef.setInput('headers', headers);
-      fixture.componentRef.setInput('show', true);
-      fixture.componentRef.setInput('count', 500);
-      fixture.componentRef.setInput('pageSize', 25);
+      fixture.componentRef.setInput('columns', columns);
+      fixture.componentRef.setInput('data', data);
+      fixture.componentRef.setInput('totalRecords', 500);
+      fixture.componentRef.setInput('rows', 25);
       fixture.componentRef.setInput('paginator', true);
+      fixture.componentRef.setInput('scrollable', false);
       fixture.detectChanges();
 
-      expect(component.headers()).toEqual(headers);
-      expect(component.show()).toBe(true);
-      expect(component.count()).toBe(500);
-      expect(component.pageSize()).toBe(25);
+      expect(component.columns()).toEqual(columns);
+      expect(component.data()).toEqual(data);
+      expect(component.totalRecords()).toBe(500);
+      expect(component.rows()).toBe(25);
       expect(component.paginator()).toBe(true);
+      expect(component.scrollable()).toBe(false);
     });
   });
 
-  describe('page signal', () => {
-    it('should update page signal value', () => {
-      expect(component.page()).toBe(1);
+  describe('page change event', () => {
+    it('should emit pageChange event when user changes page', () => {
+      let emittedEvent: PageChangeEvent | undefined;
 
-      component.page.set(5);
-
-      expect(component.page()).toBe(5);
-    });
-  });
-
-  describe('snapshot creation', () => {
-    it('should create snapshot with current signal values', () => {
-      fixture.componentRef.setInput('count', 200);
-      fixture.componentRef.setInput('pageSize', 20);
-      component.page.set(3);
-      fixture.detectChanges();
-
-      const snapshot = component['getSnapshot']();
-
-      expect(snapshot.count).toBe(200);
-      expect(snapshot.page).toBe(3);
-      expect(snapshot.pageSize).toBe(20);
-    });
-  });
-
-  describe('refresh event emission', () => {
-    it('should emit initial value on subscription', (done) => {
-      fixture.componentRef.setInput('count', 100);
-      fixture.componentRef.setInput('pageSize', 10);
-      fixture.detectChanges();
-
-      component.refresh.subscribe(data => {
-        expect(data.count).toBe(100);
-        expect(data.page).toBe(1);
-        expect(data.pageSize).toBe(10);
-        done();
-      });
-    });
-
-    it('should emit updated snapshot when refreshView is called', (done) => {
-      fixture.componentRef.setInput('count', 150);
-      fixture.componentRef.setInput('pageSize', 15);
-      component.page.set(3);
-      fixture.detectChanges();
-
-      let emissionCount = 0;
-      component.refresh.subscribe(data => {
-        emissionCount++;
-        // Skip the initial emission from BehaviorSubject
-        if (emissionCount === 2) {
-          expect(data.count).toBe(150);
-          expect(data.page).toBe(3);
-          expect(data.pageSize).toBe(15);
-          done();
-        }
+      // Subscribe to the output
+      component.pageChange.subscribe((event) => {
+        emittedEvent = event;
       });
 
-      component.refreshView();
+      // Simulate PrimeNG lazy load event (has 'first' instead of 'page')
+      // first = page * rows, so for page 2 with 25 rows: first = 50
+      const primeNgLazyEvent = { first: 50, rows: 25 };
+      component.onPageChange(primeNgLazyEvent);
+
+      expect(emittedEvent).toEqual({ page: 2, pageSize: 25 });
     });
 
-    it('should emit current page value when page changes and refreshView is called', (done) => {
-      fixture.detectChanges();
+    it('should emit correct page size when rows change', () => {
+      let emittedEvent: PageChangeEvent | undefined;
 
-      component.page.set(2);
-      component.refreshView();
-
-      component.refresh.subscribe(data => {
-        if (data.page === 2) {
-          expect(data.page).toBe(2);
-          done();
-        }
+      component.pageChange.subscribe((event) => {
+        emittedEvent = event;
       });
+
+      // first = 0 means page 0
+      const primeNgLazyEvent = { first: 0, rows: 50 };
+      component.onPageChange(primeNgLazyEvent);
+
+      expect(emittedEvent).toEqual({ page: 0, pageSize: 50 });
+    });
+
+    it('should handle first page correctly', () => {
+      let emittedEvent: PageChangeEvent | undefined;
+
+      component.pageChange.subscribe((event) => {
+        emittedEvent = event;
+      });
+
+      const primeNgLazyEvent = { first: 0, rows: 10 };
+      component.onPageChange(primeNgLazyEvent);
+
+      expect(emittedEvent).toEqual({ page: 0, pageSize: 10 });
     });
   });
 });

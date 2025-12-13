@@ -1,15 +1,27 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Store } from 'src/app/store/store.service';
 
 @Component({
   selector: 'app-spinner',
-  templateUrl: './spinner.component.html',
+  template: `
+    @if (loadingCounter$()) {
+      <div class="spinner-backdrop">
+        <p-progressSpinner
+          [style]="{ width: '70px', height: '70px' }"
+          strokeWidth="4"
+          fill="transparent"
+          animationDuration="1s"
+        />
+      </div>
+    }
+  `,
   styleUrls: ['./spinner.component.scss'],
   standalone: true,
-  imports: [CommonModule],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [CommonModule, ProgressSpinnerModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpinnerComponent {
-  loadingCounter$ = inject(Store).state.loadingCounter
+  loadingCounter$ = inject(Store).state.loadingCounter;
 }

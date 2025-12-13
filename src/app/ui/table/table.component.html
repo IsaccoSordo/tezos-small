@@ -1,34 +1,49 @@
-<table class="table table-striped">
-  <thead>
-    <tr>
-      @for (header of headers(); track header) {
-        <th scope="col">{{ header }}</th>
-      }
-    </tr>
-  </thead>
-  @if (show()) {
-    <tbody>
-      <ng-content></ng-content>
-    </tbody>
-  } @else {
-    <tbody>
+<div class="table-container">
+  <p-table
+    [value]="data()"
+    [scrollable]="scrollable()"
+    [scrollHeight]="scrollHeight()"
+    [paginator]="paginator()"
+    [rows]="rows()"
+    [first]="first()"
+    [totalRecords]="totalRecords()"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="paginator()"
+    [lazy]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    (onLazyLoad)="onPageChange($event)"
+  >
+    <ng-template pTemplate="header">
       <tr>
-        <td colspan="100%">
-          <p>No data found.</p>
+        @for (column of columns(); track column.field) {
+          <th>{{ column.header }}</th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData>
+      @if (rowTemplate()) {
+        <ng-container
+          *ngTemplateOutlet="rowTemplate()!; context: { $implicit: rowData }"
+        ></ng-container>
+      } @else {
+        <tr>
+          @for (column of columns(); track column.field) {
+            <td>{{ rowData[column.field] }}</td>
+          }
+        </tr>
+      }
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columns().length" class="empty-message">
+          <div class="no-data-container">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc"></i>
+            <p>No data found.</p>
+          </div>
         </td>
       </tr>
-    </tbody>
-  }
-</table>
-@if (paginator()) {
-  <div class="d-flex justify-content-between p-2">
-    <ngb-pagination
-      [collectionSize]="count()"
-      [pageSize]="pageSize()"
-      [maxSize]="maxSize()"
-      [(page)]="page"
-      (pageChange)="refreshView()"
-    >
-    </ngb-pagination>
-  </div>
-}
+    </ng-template>
+  </p-table>
+</div>
