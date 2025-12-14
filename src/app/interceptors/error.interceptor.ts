@@ -3,17 +3,17 @@ import { inject } from '@angular/core';
 import { catchError, EMPTY } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
+const getBackendErrorMessage = (error: HttpErrorResponse): string =>
+  error.error?.message ||
+  error.error?.error?.message ||
+  error.error?.reason ||
+  error.error?.error ||
+  (typeof error.error === 'string' ? error.error : null) ||
+  error.message ||
+  'Server error. Please try again later.';
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
-
-  const getBackendErrorMessage = (error: HttpErrorResponse): string =>
-    error.error?.message ||
-    error.error?.error?.message ||
-    error.error?.reason ||
-    error.error?.error ||
-    (typeof error.error === 'string' ? error.error : null) ||
-    error.message ||
-    'Server error. Please try again later.';
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
