@@ -2,6 +2,7 @@ import {
   Component,
   input,
   output,
+  contentChild,
   ChangeDetectionStrategy,
   TemplateRef,
 } from '@angular/core';
@@ -22,10 +23,12 @@ export interface PageChangeEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent<T = unknown> {
+  // Content projection - body template
+  bodyTemplate = contentChild<TemplateRef<unknown>>('body');
+
   // Inputs - data and configuration
   data = input<T[]>([]);
   columns = input<{ field: string; header: string }[]>([]);
-  rowTemplate = input<TemplateRef<unknown> | null>(null);
   totalRecords = input<number>(0);
   rows = input<number>(10);
   first = input<number>(0); // Starting row index for pagination

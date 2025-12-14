@@ -22,9 +22,9 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-rowData>
-      @if (rowTemplate()) {
+      @if (bodyTemplate()) {
         <ng-container
-          *ngTemplateOutlet="rowTemplate()!; context: { $implicit: rowData }"
+          *ngTemplateOutlet="bodyTemplate()!; context: { $implicit: rowData }"
         ></ng-container>
       } @else {
         <tr>

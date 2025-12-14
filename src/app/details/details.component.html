@@ -4,43 +4,38 @@
     <p class="subtitle">Transaction details for this block</p>
   </div>
 
-  <app-table
-    [data]="transactions()"
-    [columns]="columns"
-    [scrollable]="true"
-    [rowTemplate]="transactionRow"
-  ></app-table>
-
-  <ng-template #transactionRow let-transaction>
-    <tr class="data-row">
-      <td>
-        <span class="address-field">
-          <i
-            class="pi pi-user"
-            style="font-size: 0.8rem; margin-right: 0.3rem"
-          ></i>
-          {{ transaction.sender.address }}
-        </span>
-      </td>
-      <td>
-        <span class="address-field">
-          <i
-            class="pi pi-send"
-            style="font-size: 0.8rem; margin-right: 0.3rem"
-          ></i>
-          {{ transaction.target.address }}
-        </span>
-      </td>
-      <td>
-        <span class="amount">{{ transaction.amount }} ꜩ</span>
-      </td>
-      <td>
-        <span
-          [class]="'status-badge status-' + transaction.status.toLowerCase()"
-        >
-          {{ transaction.status }}
-        </span>
-      </td>
-    </tr>
-  </ng-template>
+  <app-table [data]="transactions()" [columns]="columns" [scrollable]="true">
+    <ng-template #body let-transaction>
+      <tr class="data-row">
+        <td>
+          <span class="address-field">
+            <i
+              class="pi pi-user"
+              style="font-size: 0.8rem; margin-right: 0.3rem"
+            ></i>
+            {{ transaction.sender.address }}
+          </span>
+        </td>
+        <td>
+          <span class="address-field">
+            <i
+              class="pi pi-send"
+              style="font-size: 0.8rem; margin-right: 0.3rem"
+            ></i>
+            {{ transaction.target.address }}
+          </span>
+        </td>
+        <td>
+          <span class="amount">{{ transaction.amount }} ꜩ</span>
+        </td>
+        <td>
+          <span
+            [class]="'status-badge status-' + transaction.status.toLowerCase()"
+          >
+            {{ transaction.status }}
+          </span>
+        </td>
+      </tr>
+    </ng-template>
+  </app-table>
 </div>
