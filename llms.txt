@@ -249,7 +249,6 @@ describe('ComponentName', () => {
 **State Management**
 - Centralized signal-based state in `StoreService`
 - Reactive updates using Angular Signals
-- No external state management library needed
 
 **Data Flow**
 1. Component calls service method
