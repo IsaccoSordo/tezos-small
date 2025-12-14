@@ -1,8 +1,9 @@
 # Tezos Small
 
 [![Angular](https://img.shields.io/badge/Angular-21.0-dd0031?logo=angular)](https://angular.io)
+[![NgRx](https://img.shields.io/badge/NgRx-21.0-a907a7?logo=ngrx)](https://ngrx.io/)
+[![PrimeNG](https://img.shields.io/badge/PrimeNG-21.0-black?logo=primeng)](https://primeng.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
-[![PrimeNG](https://img.shields.io/badge/PrimeNG-21.0.-007ad9?logo=primeng)](https://primeng.org)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](#license)
 
 An Angular application for exploring Tezos blockchain blocks and transactions through the [TZKT API](https://tzkt.io/api/).
