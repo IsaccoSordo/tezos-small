@@ -40,3 +40,30 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# LLM/AI config files
+CLAUDE.md
+.claude/
+.cursorrules
+.cursorignore
+.cursor/
+.aider*
+.copilot*
+.github/copilot-instructions.md
+.ai/
+.gpteng/
+.continue/
+.codeium/
+.tabnine/
+.windsurf/
+.windsurfrules
+.v0/
+.bolt/
+.amazonq/
+.cody/
+.sourcegraph/
+.codium/
+.qodo/
+.augment/
+.devinsrules
+rules.md
