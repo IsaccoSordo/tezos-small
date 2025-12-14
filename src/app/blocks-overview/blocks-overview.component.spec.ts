@@ -66,7 +66,7 @@ describe('BlocksOverviewComponent', () => {
   // Helper function to handle the initial blocks request
   const flushInitialBlocksRequest = (blocks: Block[] = []) => {
     const req = httpMock.expectOne(
-      (req) => req.url === 'https://api.tzkt.io/v1/blocks',
+      (req) => req.url === 'https://api.tzkt.io/v1/blocks'
     );
     req.flush(blocks);
   };
@@ -77,7 +77,7 @@ describe('BlocksOverviewComponent', () => {
       const req = httpMock.expectOne(
         (req) =>
           req.url === 'https://api.tzkt.io/v1/operations/transactions/count' &&
-          req.params.get('level') === block.level.toString(),
+          req.params.get('level') === block.level.toString()
       );
       req.flush(block.transactions);
     });
@@ -138,7 +138,7 @@ describe('BlocksOverviewComponent', () => {
       (req) =>
         req.url === 'https://api.tzkt.io/v1/blocks' &&
         req.params.get('limit') === '10' &&
-        req.params.get('offset.pg') === '0',
+        req.params.get('offset.pg') === '0'
     );
     expect(blocksReq.request.method).toBe('GET');
     blocksReq.flush(mockBlocks);
@@ -166,7 +166,7 @@ describe('BlocksOverviewComponent', () => {
       (req) =>
         req.url === 'https://api.tzkt.io/v1/blocks' &&
         req.params.get('limit') === '20' &&
-        req.params.get('offset.pg') === '1',
+        req.params.get('offset.pg') === '1'
     );
     req.flush([]);
 

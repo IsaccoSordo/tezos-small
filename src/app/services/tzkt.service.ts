@@ -22,11 +22,9 @@ export class TzktService {
   private readonly API_BASE = 'https://api.tzkt.io/v1';
 
   getBlocksCount(): Observable<number> {
-    return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
-      tap({
-        next: (count) => this.store.setCount(count),
-      }),
-    );
+    return this.http
+      .get<number>(`${this.API_BASE}/blocks/count`)
+      .pipe(tap((count) => this.store.setCount(count)));
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
@@ -55,15 +53,15 @@ export class TzktService {
             mergeMap(
               (block) =>
                 this.getTransactionsCount(block.level).pipe(
-                  tap({ next: (count) => (block.transactions = count) }),
+                  tap((count) => (block.transactions = count))
                 ),
-              5,
+              5
             ),
             toArray(),
             tap(() => this.store.setBlocks(blocks)),
-            map(() => blocks),
+            map(() => blocks)
           );
-        }),
+        })
       );
   }
 
@@ -72,7 +70,7 @@ export class TzktService {
       `${this.API_BASE}/operations/transactions/count`,
       {
         params: { level: level.toString() },
-      },
+      }
     );
   }
 
@@ -81,10 +79,6 @@ export class TzktService {
       .get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
         params: { level: level.toString() },
       })
-      .pipe(
-        tap({
-          next: (transactions) => this.store.setTransactions(transactions),
-        }),
-      );
+      .pipe(tap((transactions) => this.store.setTransactions(transactions)));
   }
 }

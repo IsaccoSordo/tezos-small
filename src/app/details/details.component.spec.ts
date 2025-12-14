@@ -85,7 +85,7 @@ describe('DetailsComponent', () => {
       const req = httpMock.expectOne(
         (req) =>
           req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
-          req.params.get('level') === '12345',
+          req.params.get('level') === '12345'
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockTransactions);
@@ -104,7 +104,7 @@ describe('DetailsComponent', () => {
       const req = httpMock.expectOne(
         (req) =>
           req.url === 'https://api.tzkt.io/v1/operations/transactions' &&
-          req.params.get('level') === '12345',
+          req.params.get('level') === '12345'
       );
       req.flush(mockTransactions);
 
@@ -120,7 +120,7 @@ describe('DetailsComponent', () => {
       expect(store.loadingCounter()).toBe(1);
 
       const req = httpMock.expectOne(
-        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
+        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions'
       );
       req.flush(mockTransactions);
 
@@ -159,7 +159,7 @@ describe('DetailsComponent', () => {
 
       // Should not make any HTTP requests
       httpMock.expectNone(
-        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
+        (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions'
       );
     });
   });

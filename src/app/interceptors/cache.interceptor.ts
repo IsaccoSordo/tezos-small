@@ -64,7 +64,7 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
     shareReplay({
       bufferSize: 1,
       refCount: true,
-    }),
+    })
   );
 
   cache.set(cacheKey, {

@@ -39,9 +39,9 @@
           {{ block.transactions }}
         </span>
       </td>
-      <td>{{ block.proposer?.alias ?? "\<none>" }}</td>
+      <td>{{ block.proposer?.alias ?? '\<none>' }}</td>
       <td class="timestamp">
-        {{ block.timestamp | date: "dd.MM.yyyy HH:mm" }}
+        {{ block.timestamp | date: 'dd.MM.yyyy HH:mm' }}
       </td>
     </tr>
   </ng-template>

@@ -60,5 +60,5 @@ export const Store = signalStore(
         loadingCounter: 0,
       });
     },
-  })),
+  }))
 );

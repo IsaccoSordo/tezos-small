@@ -19,11 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([
-        cacheInterceptor,
-        errorInterceptor,
-        loadingInterceptor,
-      ]),
+      withInterceptors([cacheInterceptor, errorInterceptor, loadingInterceptor])
     ),
     providePrimeNG({
       theme: {
