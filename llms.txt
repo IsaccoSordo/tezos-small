@@ -29,8 +29,7 @@ This is a single-page application featuring block browsing, transaction details,
 ## Services & State Management
 
 - [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
-- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using Angular Signals
-- [src/app/store/tzkt.state.ts](src/app/store/tzkt.state.ts): Reactive signal-based state definitions
+- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods` for scalable, maintainable state management
 
 ## HTTP Interceptors
 
@@ -64,7 +63,10 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Angular Conventions**
 - Use standalone components (no NgModules)
-- Prefer signals for reactive state management (see store.service.ts)
+- Use **NgRx SignalStore** for state management (installed: @ngrx/signals)
+- Organize state with `withState()` for initial state and `withMethods()` for state updates
+- Use `patchState()` for immutable state updates in SignalStore methods
+- State properties are automatically exposed as signals by SignalStore
 - Use functional HTTP interceptors with `withInterceptors()`
 - Enable zoneless change detection for better performance
 - Use `input()` and `output()` functions for component APIs
@@ -88,6 +90,8 @@ This is a single-page application featuring block browsing, transaction details,
 - Follow single responsibility principle
 - Return observables for async operations
 - Handle errors gracefully with proper error messages
+- For state management: use NgRx SignalStore with `withState()` and `withMethods()` patterns
+- Use `patchState()` for all state updates to ensure immutability
 
 **RxJS Patterns**
 - Use `tap` for side effects without transforming values

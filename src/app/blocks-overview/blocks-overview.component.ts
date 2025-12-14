@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { timer, switchMap } from 'rxjs';
+import { timer, switchMap, take } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/store.service';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
@@ -29,8 +29,8 @@ export class BlocksOverviewComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   store = inject(Store);
-  blocks = this.store.state.blocks;
-  count = this.store.state.count;
+  blocks = this.store.blocks;
+  count = this.store.count;
 
   // Pagination state
   currentPage = signal(0);
@@ -46,31 +46,28 @@ export class BlocksOverviewComponent implements OnInit {
 
   ngOnInit(): void {
     // Restore pagination state from query params
-    this.route.queryParamMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        const page = params.get('page');
-        const pageSize = params.get('pageSize');
+    this.route.queryParamMap.pipe(take(1)).subscribe((params) => {
+      const page = params.get('page');
+      const pageSize = params.get('pageSize');
 
-        if (page !== null) {
-          this.currentPage.set(Number(page));
-        }
-        if (pageSize !== null) {
-          this.pageSize.set(Number(pageSize));
-        }
-      });
+      if (page !== null) {
+        this.currentPage.set(Number(page));
+      }
+      if (pageSize !== null) {
+        this.pageSize.set(Number(pageSize));
+      }
+    });
 
     // Fetch blocks count immediately and then poll every 60 seconds
     timer(0, 60000)
       .pipe(
         switchMap(() => this.service.getBlocksCount()),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
   }
 
   onPageChange(event: PageChangeEvent): void {
-    // Ensure valid values with defaults
     const page = event.page;
     const pageSize = event.pageSize;
 

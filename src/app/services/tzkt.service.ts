@@ -24,7 +24,7 @@ export class TzktService {
   getBlocksCount(): Observable<number> {
     return this.http.get<number>(`${this.API_BASE}/blocks/count`).pipe(
       tap({
-        next: (count) => this.store.state.count.set(count),
+        next: (count) => this.store.setCount(count),
       }),
     );
   }
@@ -46,7 +46,7 @@ export class TzktService {
         switchMap((blocks) => {
           // Handle empty blocks case
           if (blocks.length === 0) {
-            this.store.state.blocks.set(blocks);
+            this.store.setBlocks(blocks);
             return of(blocks);
           }
 
@@ -60,7 +60,7 @@ export class TzktService {
               5,
             ),
             toArray(),
-            tap(() => this.store.state.blocks.set(blocks)),
+            tap(() => this.store.setBlocks(blocks)),
             map(() => blocks),
           );
         }),
@@ -83,8 +83,7 @@ export class TzktService {
       })
       .pipe(
         tap({
-          next: (transactions) =>
-            this.store.state.transactions.set(transactions),
+          next: (transactions) => this.store.setTransactions(transactions),
         }),
       );
   }

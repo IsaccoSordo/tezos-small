@@ -203,15 +203,50 @@ src/app/
 
 ### State Management
 
-Uses **Angular Signals** (Angular 21) for reactive state:
+Uses **NgRx SignalStore** for scalable, reactive state management:
 
 ```typescript
-// Centralized state in Store service
-blocks = signal<Block[]>([]);
-transactions = signal<Transaction[]>([]);
-loadingCounter = signal(0);
-errors = signal<Error[]>([]);
+// Store using NgRx SignalStore with withState and withMethods
+export const Store = signalStore(
+  { providedIn: 'root' },
+  withState<TZKTState>({
+    blocks: [],
+    count: 0,
+    errors: [],
+    loadingCounter: 0,
+    transactions: [],
+  }),
+  withMethods((store) => ({
+    setBlocks(blocks: Block[]): void {
+      patchState(store, { blocks });
+    },
+
+    setCount(count: number): void {
+      patchState(store, { count });
+    },
+
+    incrementLoadingCounter(): void {
+      patchState(store, (state) => ({
+        loadingCounter: state.loadingCounter + 1,
+      }));
+    },
+
+    decrementLoadingCounter(): void {
+      patchState(store, (state) => ({
+        loadingCounter: Math.max(0, state.loadingCounter - 1),
+      }));
+    },
+  })),
+);
 ```
+
+**Key Benefits:**
+- ✅ **NgRx SignalStore** - Industry-standard state management solution
+- ✅ **Immutable Updates** - `patchState()` ensures state immutability
+- ✅ **Auto-exposed Signals** - State properties automatically become signals
+- ✅ **Scalable Pattern** - `withState()` and `withMethods()` for organized code
+- ✅ **Type-Safe** - Full TypeScript support with proper inference
+- ✅ **No Boilerplate** - Cleaner than manual signal management
 
 ### HTTP Interceptors
 
@@ -273,6 +308,7 @@ ng generate directive|pipe|service|class|guard|interface|enum
 - **Standalone components** (no NgModules)
 - **TypeScript strict mode** enabled
 - **SCSS** for styling with BEM naming conventions
+- **NgRx SignalStore** - industry-standard state management with signals
 
 ### RxJS Operators
 
@@ -291,6 +327,7 @@ Key operators used in the application:
 ### Core
 
 - `@angular/*@21.0.5` - Angular framework
+- `@ngrx/signals@20.1.0` - NgRx SignalStore for state management
 - `rxjs@7.8.2` - Reactive programming
 - `typescript@5.9.3` - Type safety
 

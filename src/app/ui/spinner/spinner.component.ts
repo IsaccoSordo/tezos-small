@@ -23,5 +23,5 @@ import { Store } from 'src/app/store/store.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpinnerComponent {
-  loadingCounter$ = inject(Store).state.loadingCounter;
+  loadingCounter$ = inject(Store).loadingCounter;
 }

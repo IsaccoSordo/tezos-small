@@ -5,7 +5,7 @@ import { Store } from '../../store/store.service';
 describe('SpinnerComponent', () => {
   let component: SpinnerComponent;
   let fixture: ComponentFixture<SpinnerComponent>;
-  let store: Store;
+  let store: InstanceType<typeof Store>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -20,7 +20,7 @@ describe('SpinnerComponent', () => {
   });
 
   afterEach(() => {
-    store.state.loadingCounter.set(0);
+    store.setLoadingCounter(0);
   });
 
   it('should create', () => {
@@ -28,11 +28,11 @@ describe('SpinnerComponent', () => {
   });
 
   it('should have reference to store loadingCounter signal', () => {
-    expect(component.loadingCounter$).toBe(store.state.loadingCounter);
+    expect(component.loadingCounter$).toBe(store.loadingCounter);
   });
 
   it('should not display spinner when loading counter is 0', () => {
-    store.state.loadingCounter.set(0);
+    store.setLoadingCounter(0);
     fixture.detectChanges();
 
     const spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
@@ -40,7 +40,7 @@ describe('SpinnerComponent', () => {
   });
 
   it('should display spinner when loading counter is greater than 0', async () => {
-    store.state.loadingCounter.set(1);
+    store.setLoadingCounter(1);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -50,21 +50,21 @@ describe('SpinnerComponent', () => {
 
   it('should reactively update when loading counter changes', async () => {
     // Initially not loading
-    store.state.loadingCounter.set(0);
+    store.setLoadingCounter(0);
     fixture.detectChanges();
     await fixture.whenStable();
     let spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
     expect(spinner).toBeNull();
 
     // Start loading
-    store.state.loadingCounter.set(2);
+    store.setLoadingCounter(2);
     fixture.detectChanges();
     await fixture.whenStable();
     spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
     expect(spinner).toBeTruthy();
 
     // Stop loading
-    store.state.loadingCounter.set(0);
+    store.setLoadingCounter(0);
     fixture.detectChanges();
     await fixture.whenStable();
     spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
@@ -72,7 +72,7 @@ describe('SpinnerComponent', () => {
   });
 
   it('should handle multiple concurrent operations (counter > 1)', async () => {
-    store.state.loadingCounter.set(3);
+    store.setLoadingCounter(3);
     fixture.detectChanges();
     await fixture.whenStable();
 
