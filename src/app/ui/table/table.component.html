@@ -25,7 +25,7 @@
       @if (bodyTemplate()) {
         <ng-container
           *ngTemplateOutlet="bodyTemplate()!; context: { $implicit: rowData }"
-        ></ng-container>
+        />
       } @else {
         <tr>
           @for (column of columns(); track column.field) {
