@@ -4,6 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
 import { TzktService } from './tzkt.service';
 import { Store } from '../store/store.service';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
@@ -60,7 +61,10 @@ describe('TzktService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([loadingInterceptor])),
+        provideHttpCache(),
+        provideHttpClient(
+          withInterceptors([withHttpCacheInterceptor(), loadingInterceptor])
+        ),
         provideHttpClientTesting(),
         TzktService,
         Store,

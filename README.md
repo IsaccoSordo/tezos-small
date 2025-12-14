@@ -2,7 +2,7 @@
 
 [![Angular](https://img.shields.io/badge/Angular-21.0-dd0031?logo=angular)](https://angular.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
-[![PrimeNG](https://img.shields.io/badge/PrimeNG-Latest-007ad9?logo=prime)](https://primeng.org)
+[![PrimeNG](https://img.shields.io/badge/PrimeNG-21.0.-007ad9?logo=primeng)](https://primeng.org)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](#license)
 
 An Angular application for exploring Tezos blockchain blocks and transactions through the [TZKT API](https://tzkt.io/api/).
@@ -10,19 +10,23 @@ An Angular application for exploring Tezos blockchain blocks and transactions th
 ## Features
 
 **Block Explorer**
+
 - Browse Tezos blockchain blocks in a paginated table
 - View block details including hash, level, proposer, and timestamp
 - Display transaction counts per block
 
 **Transaction Details**
+
 - View individual block transactions
 - Display sender, receiver, amount, and transaction status
 - Responsive table layout
 
 **Technical Implementation**
+
 - Zoneless change detection (Angular 21)
 - Standalone components with signal-based reactivity
 - Reactive data flow with RxJS
+- HTTP response caching with [@ngneat/cashew](https://github.com/ngneat/cashew)
 - Loading states with PrimeNG ProgressSpinner
 - Toast notifications for error handling
 - PrimeNG Aura theme
@@ -82,6 +86,7 @@ npm test -- --code-coverage        # Generate coverage reports
 Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](https://jasmine.github.io).
 
 The test runner auto-detects your installed browsers:
+
 - macOS: Firefox → Chrome → Safari (in order of preference)
 - Windows: Chrome
 - Linux: ChromeHeadless
@@ -91,19 +96,23 @@ The test runner auto-detects your installed browsers:
 The test suite uses the following patterns:
 
 **Helper Functions**
+
 - Reusable functions for common mock patterns: `initializeComponent()`, `flushCountRequest()`, `flushInitialBlocksRequest()`
 
 **Single Responsibility**
+
 - Each test verifies one specific behavior
 - Tests use "should..." naming convention
 - Focused assertions for easier debugging
 
 **Test Organization**
+
 - Nested `describe` blocks group related tests
 - `beforeEach` sets up test fixtures
 - `afterEach` cleans up resources and verifies HTTP mocks
 
 **Async Testing**
+
 - `fakeAsync` with `tick()` for timer-based operations
 - `fixture.destroy()` for cleanup of subscriptions
 - `HttpTestingController` verifies HTTP interactions
@@ -168,13 +177,13 @@ src/app/
 
 ### Key Components
 
-| Component                    | Purpose                                 |
-| ---------------------------- | --------------------------------------- |
-| `BlocksOverviewComponent`    | Displays paginated list of blocks       |
-| `DetailsComponent`           | Shows transactions for a specific block |
-| `NavbarComponent`            | Navigation header with branding         |
-| `TableComponent`             | Reusable data table with pagination     |
-| `SpinnerComponent`           | Loading indicator                       |
+| Component                 | Purpose                                 |
+| ------------------------- | --------------------------------------- |
+| `BlocksOverviewComponent` | Displays paginated list of blocks       |
+| `DetailsComponent`        | Shows transactions for a specific block |
+| `NavbarComponent`         | Navigation header with branding         |
+| `TableComponent`          | Reusable data table with pagination     |
+| `SpinnerComponent`        | Loading indicator                       |
 
 ### State Management
 
@@ -211,11 +220,12 @@ export const Store = signalStore(
         loadingCounter: Math.max(0, state.loadingCounter - 1),
       }));
     },
-  })),
+  }))
 );
 ```
 
 **Key Characteristics:**
+
 - Immutable state updates via `patchState()`
 - State properties automatically exposed as signals
 - Organized using `withState()` and `withMethods()`
@@ -225,9 +235,19 @@ export const Store = signalStore(
 
 The application uses functional HTTP interceptors (Angular 21+):
 
+**Cache Interceptor** ([@ngneat/cashew](https://github.com/ngneat/cashew))
+
+Provides HTTP response caching:
+
+- Configurable TTL per request via `withCache({ ttl: ms })`
+- Automatic cache key generation from URL and params
+- Support for localStorage/sessionStorage persistence
+- Manual cache invalidation via `HttpCacheManager`
+
 **Error Interceptor**
 
 Provides centralized HTTP error handling:
+
 - Displays toast notifications via PrimeNG `MessageService`
 - Status-specific messages for common HTTP errors (404, 500, 503, etc.)
 - Logs errors to console
@@ -236,11 +256,12 @@ Provides centralized HTTP error handling:
 **Loading Interceptor**
 
 Manages loading state for HTTP requests:
+
 - Increments counter when requests start
 - Decrements counter when requests complete
 - Counter-based approach handles concurrent requests
 
-Both interceptors are registered globally in [app.config.ts](src/app/app.config.ts).
+All interceptors are registered globally in [app.config.ts](src/app/app.config.ts).
 
 ### API Integration
 
@@ -288,6 +309,7 @@ Key operators used in the application:
 
 - `@angular/*@21.0.5` - Angular framework
 - `@ngrx/signals@20.1.0` - NgRx SignalStore for state management
+- `@ngneat/cashew` - HTTP response caching
 - `rxjs@7.8.2` - Reactive programming
 - `typescript@5.9.3` - Type safety
 
@@ -380,7 +402,7 @@ providePrimeNG({
       cssLayer: false,
     },
   },
-})
+});
 ```
 
 You can change the theme preset by importing different presets from `@primeuix/themes`.
