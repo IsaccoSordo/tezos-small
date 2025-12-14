@@ -1,13 +1,5 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { Block, Transaction } from '../common';
-
-export type TZKTState = {
-  blocks: Block[];
-  count: number;
-  errors: Error[];
-  loadingCounter: number;
-  transactions: Transaction[];
-};
+import { Block, Transaction, TZKTState } from '../common';
 
 export const Store = signalStore(
   { providedIn: 'root' },

@@ -11,6 +11,7 @@ import {
   toArray,
 } from 'rxjs';
 import { Block, Transaction } from '../common';
+import { cacheContext } from '../config/cache.config';
 import { Store } from '../store/store.service';
 
 @Injectable({
@@ -23,7 +24,9 @@ export class TzktService {
 
   getBlocksCount(): Observable<number> {
     return this.http
-      .get<number>(`${this.API_BASE}/blocks/count`)
+      .get<number>(`${this.API_BASE}/blocks/count`, {
+        context: cacheContext,
+      })
       .pipe(tap((count) => this.store.setCount(count)));
   }
 
@@ -39,6 +42,7 @@ export class TzktService {
           'offset.pg': validOffset.toString(),
           'sort.desc': 'level',
         },
+        context: cacheContext,
       })
       .pipe(
         switchMap((blocks) => {
@@ -70,6 +74,7 @@ export class TzktService {
       `${this.API_BASE}/operations/transactions/count`,
       {
         params: { level: level.toString() },
+        context: cacheContext,
       }
     );
   }
@@ -78,6 +83,7 @@ export class TzktService {
     return this.http
       .get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
         params: { level: level.toString() },
+        context: cacheContext,
       })
       .pipe(tap((transactions) => this.store.setTransactions(transactions)));
   }

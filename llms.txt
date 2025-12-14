@@ -4,7 +4,7 @@
 
 This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
 
-**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals 21.0.0-beta.0, TZKT API
+**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @ngneat/cashew, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
 **Last Updated**: 2025-12-14
 **Dependencies**: All dependencies use exact versions (no wildcards like ^ or ~)
@@ -36,7 +36,7 @@ This is a single-page application featuring block browsing, transaction details,
 
 - [src/app/interceptors/loading.interceptor.ts](src/app/interceptors/loading.interceptor.ts): Functional interceptor for automatic loading state management using counter-based approach
 - [src/app/interceptors/error.interceptor.ts](src/app/interceptors/error.interceptor.ts): Centralized HTTP error handling with PrimeNG toast notifications
-- [src/app/interceptors/cache.interceptor.ts](src/app/interceptors/cache.interceptor.ts): HTTP response caching interceptor
+- **HTTP Caching**: Uses [@ngneat/cashew](https://github.com/ngneat/cashew) for response caching via `withCache()` context in service methods
 
 ## Error Handling
 
@@ -152,6 +152,7 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Integration Notes**
 - All HTTP calls go through interceptors (loading + error + cache)
+- Caching configured per-request using `withCache({ ttl: ms })` from @ngneat/cashew
 - No manual loading/error state management needed in services
 - Responses are mapped to TypeScript interfaces (Block, Transaction)
 - Counter-based loading ensures proper handling of concurrent requests
