@@ -25,7 +25,7 @@ export class DetailsComponent implements OnInit {
   private destroyRef = takeUntilDestroyed();
 
   store = inject(Store);
-  transactions = this.store.state.transactions;
+  transactions = this.store.transactions;
 
   columns = [
     { field: 'sender', header: 'Sender' },

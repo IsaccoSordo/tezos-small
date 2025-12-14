@@ -1,60 +1,40 @@
 # Tezos Small
 
-<div align="center">
-
 [![Angular](https://img.shields.io/badge/Angular-21.0-dd0031?logo=angular)](https://angular.io)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
 [![PrimeNG](https://img.shields.io/badge/PrimeNG-Latest-007ad9?logo=prime)](https://primeng.org)
-[![License](https://img.shields.io/badge/License-MIT-green)](#license)
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue)](#license)
 
-A sleek, modern Angular application for exploring **Tezos blockchain** blocks and transactions through the [TZKT API](https://tzkt.io/api/), built with **PrimeNG** UI components.
+An Angular application for exploring Tezos blockchain blocks and transactions through the [TZKT API](https://tzkt.io/api/).
 
-[Features](#features) • [Quick Start](#quick-start) • [Development](#development) • [Architecture](#architecture)
+## Features
 
-</div>
-
----
-
-## 🎯 Features
-
-✨ **Block Explorer**
-
+**Block Explorer**
 - Browse Tezos blockchain blocks in a paginated table
 - View block details including hash, level, proposer, and timestamp
-- Real-time transaction counts per block
+- Display transaction counts per block
 
-📊 **Transaction Details**
+**Transaction Details**
+- View individual block transactions
+- Display sender, receiver, amount, and transaction status
+- Responsive table layout
 
-- Deep-dive into individual block transactions
-- View sender, receiver, amount, and transaction status
-- Clean, responsive table layout
-
-⚡ **Performance & UX**
-
-- **Zoneless change detection** (Angular 21) - no Zone.js overhead
-- Standalone Angular components with signal-based reactivity
+**Technical Implementation**
+- Zoneless change detection (Angular 21)
+- Standalone components with signal-based reactivity
 - Reactive data flow with RxJS
-- Real-time block count updates
-- Smart loading states with PrimeNG ProgressSpinner
+- Loading states with PrimeNG ProgressSpinner
 - Toast notifications for error handling
-- PrimeNG Aura theme for modern, beautiful UI
-
-🎨 **Modern Stack**
-
-- Angular 21 with latest standalone APIs
-- **PrimeNG** - Enterprise-grade UI component library
+- PrimeNG Aura theme
 - TypeScript strict mode
-- SCSS styling with modular components
-- 90+ available PrimeNG components for future enhancements
+- SCSS styling
 
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- **Node.js**: v20.19+ or v22.12+
-- **npm**: v8.0.0 or higher
+- Node.js: v20.19+ or v22.12+
+- npm: v8.0.0 or higher
 
 ### Installation
 
@@ -83,15 +63,13 @@ npm run build
 
 Build artifacts will be stored in the `dist/tezos-small` directory.
 
----
+## Testing
 
-## 🧪 Testing
-
-This project follows comprehensive testing best practices with full test coverage for components, services, interceptors, and UI elements.
+The project includes unit tests for components, services, interceptors, and UI elements.
 
 ### Prerequisites
 
-Ensure you're using **Node.js v20.19+ or v22.12+** for running tests. The project uses Angular 21's testing infrastructure.
+Node.js v20.19+ or v22.12+ is required for running tests. The project uses Angular 21's testing infrastructure.
 
 ### Run Unit Tests
 
@@ -103,35 +81,34 @@ npm test -- --code-coverage        # Generate coverage reports
 
 Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](https://jasmine.github.io).
 
-**Note:** The test runner auto-detects your installed browsers:
-- **macOS**: Firefox → Chrome → Safari (in order of preference)
-- **Windows**: Chrome
-- **Linux**: ChromeHeadless
+The test runner auto-detects your installed browsers:
+- macOS: Firefox → Chrome → Safari (in order of preference)
+- Windows: Chrome
+- Linux: ChromeHeadless
 
-### Testing Best Practices
+### Testing Patterns
 
-Our test suite follows Angular community best practices:
+The test suite uses the following patterns:
 
-**🔧 Helper Functions**
-- Reusable helper functions reduce code duplication for common mock patterns
-- Examples: `initializeComponent()`, `flushCountRequest()`, `flushInitialBlocksRequest()`
+**Helper Functions**
+- Reusable functions for common mock patterns: `initializeComponent()`, `flushCountRequest()`, `flushInitialBlocksRequest()`
 
-**📋 Single Responsibility**
+**Single Responsibility**
 - Each test verifies one specific behavior
-- Tests are named clearly with "should..." statements
-- Focused assertions make failures easy to diagnose
+- Tests use "should..." naming convention
+- Focused assertions for easier debugging
 
-**🎯 Test Organization**
-- Nested `describe` blocks group related tests by feature/scenario
-- `beforeEach` sets up common test fixtures
+**Test Organization**
+- Nested `describe` blocks group related tests
+- `beforeEach` sets up test fixtures
 - `afterEach` cleans up resources and verifies HTTP mocks
 
-**⏱️ Async Testing**
+**Async Testing**
 - `fakeAsync` with `tick()` for timer-based operations
-- `fixture.destroy()` ensures proper cleanup of subscriptions
-- `HttpTestingController` verifies all HTTP interactions
+- `fixture.destroy()` for cleanup of subscriptions
+- `HttpTestingController` verifies HTTP interactions
 
-**Example Test Structure:**
+**Example:**
 
 ```typescript
 describe('MyComponent', () => {
@@ -160,11 +137,9 @@ describe('MyComponent', () => {
 });
 ```
 
-All test files include JSDoc headers documenting the patterns applied. See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts) for a complete example.
+See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts) for complete examples.
 
----
-
-## 📁 Architecture
+## Architecture
 
 ### Project Structure
 
@@ -203,45 +178,69 @@ src/app/
 
 ### State Management
 
-Uses **Angular Signals** (Angular 21) for reactive state:
+The application uses NgRx SignalStore for state management:
 
 ```typescript
-// Centralized state in Store service
-blocks = signal<Block[]>([]);
-transactions = signal<Transaction[]>([]);
-loadingCounter = signal(0);
-errors = signal<Error[]>([]);
+// Store using NgRx SignalStore with withState and withMethods
+export const Store = signalStore(
+  { providedIn: 'root' },
+  withState<TZKTState>({
+    blocks: [],
+    count: 0,
+    errors: [],
+    loadingCounter: 0,
+    transactions: [],
+  }),
+  withMethods((store) => ({
+    setBlocks(blocks: Block[]): void {
+      patchState(store, { blocks });
+    },
+
+    setCount(count: number): void {
+      patchState(store, { count });
+    },
+
+    incrementLoadingCounter(): void {
+      patchState(store, (state) => ({
+        loadingCounter: state.loadingCounter + 1,
+      }));
+    },
+
+    decrementLoadingCounter(): void {
+      patchState(store, (state) => ({
+        loadingCounter: Math.max(0, state.loadingCounter - 1),
+      }));
+    },
+  })),
+);
 ```
+
+**Key Characteristics:**
+- Immutable state updates via `patchState()`
+- State properties automatically exposed as signals
+- Organized using `withState()` and `withMethods()`
+- Full TypeScript support
 
 ### HTTP Interceptors
 
-The application uses **functional HTTP interceptors** (Angular 21+) for cross-cutting concerns:
+The application uses functional HTTP interceptors (Angular 21+):
 
-#### Error Interceptor
+**Error Interceptor**
 
-The `errorInterceptor` provides centralized HTTP error handling:
+Provides centralized HTTP error handling:
+- Displays toast notifications via PrimeNG `MessageService`
+- Status-specific messages for common HTTP errors (404, 500, 503, etc.)
+- Logs errors to console
+- Rethrows errors for component-level handling
 
-- **Intercepts all HTTP errors** and displays user-friendly toast notifications via PrimeNG `MessageService`
-- **Status-specific messages** for common HTTP errors (404, 500, 503, etc.)
-- **Automatic error logging** to console for debugging
-- **Rethrows errors** so components can handle them if needed
+**Loading Interceptor**
 
-#### Loading Interceptor
+Manages loading state for HTTP requests:
+- Increments counter when requests start
+- Decrements counter when requests complete
+- Counter-based approach handles concurrent requests
 
-The `loadingInterceptor` automatically manages the loading counter for all HTTP requests:
-
-- **Increments** the counter when any HTTP request starts
-- **Decrements** the counter when the request completes (success or error)
-- **Counter-based approach** ensures the loading indicator remains visible until all concurrent requests finish
-
-**Benefits:**
-
-- No manual error/loading state management in service methods
-- Handles concurrent requests correctly
-- Centralized cross-cutting concerns
-- Scalable and maintainable
-
-Both interceptors are registered globally in [app.config.ts](src/app/app.config.ts) using the modern `withInterceptors()` pattern.
+Both interceptors are registered globally in [app.config.ts](src/app/app.config.ts).
 
 ### API Integration
 
@@ -252,11 +251,9 @@ The `TzktService` handles all blockchain API calls:
 - `getTransactionsCount(level)` - Get transaction count for a block
 - `getTransactions(level)` - Fetch transactions for a block
 
-All loading and error states are automatically managed by HTTP interceptors.
+Loading and error states are managed by HTTP interceptors.
 
----
-
-## 🛠️ Development Guide
+## Development
 
 ### Code Scaffolding
 
@@ -269,10 +266,11 @@ ng generate directive|pipe|service|class|guard|interface|enum
 
 ### Code Style
 
-- Uses **OnPush change detection** for optimal performance
-- **Standalone components** (no NgModules)
-- **TypeScript strict mode** enabled
-- **SCSS** for styling with BEM naming conventions
+- OnPush change detection
+- Standalone components (no NgModules)
+- TypeScript strict mode enabled
+- SCSS with BEM naming conventions
+- NgRx SignalStore for state management
 
 ### RxJS Operators
 
@@ -284,21 +282,20 @@ Key operators used in the application:
 - `finalize` - Cleanup logic (e.g., loading state)
 - `forkJoin` - Combine multiple async operations
 
----
-
-## 📦 Dependencies
+## Dependencies
 
 ### Core
 
 - `@angular/*@21.0.5` - Angular framework
+- `@ngrx/signals@20.1.0` - NgRx SignalStore for state management
 - `rxjs@7.8.2` - Reactive programming
 - `typescript@5.9.3` - Type safety
 
 ### UI
 
-- `primeng@21.0.1` - Enterprise Angular UI component library
-- `@primeuix/themes@2.0.2` - Modern theming system
-- `primeicons@7.0.0` - Premium icon library
+- `primeng@21.0.1` - Angular UI component library
+- `@primeuix/themes@2.0.2` - Theming system
+- `primeicons@7.0.0` - Icon library
 
 ### Testing
 
@@ -306,11 +303,9 @@ Key operators used in the application:
 - `jasmine-core@5.5.0` - Testing framework
 - Multi-browser support (Chrome, Firefox, Safari)
 
----
+## API Reference
 
-## 🌐 API Reference
-
-This application uses the [TZKT API](https://tzkt.io/api/) - a free REST API for the Tezos blockchain.
+This application uses the [TZKT API](https://tzkt.io/api/) for Tezos blockchain data.
 
 ### Base URL
 
@@ -327,9 +322,7 @@ https://api.tzkt.io/v1
 | `/operations/transactions/count?level=X` | Transactions in block |
 | `/operations/transactions?level=X`       | Block transactions    |
 
----
-
-## 📋 Interfaces
+## Interfaces
 
 ### Block
 
@@ -363,9 +356,7 @@ interface Account {
 }
 ```
 
----
-
-## 🔧 Configuration
+## Configuration
 
 ### Environment Setup
 
@@ -378,7 +369,7 @@ Configuration can be found in:
 
 ### PrimeNG Theme
 
-The application uses **PrimeNG Aura** theme configured via TypeScript in [app.config.ts](src/app/app.config.ts):
+The application uses PrimeNG Aura theme configured in [app.config.ts](src/app/app.config.ts):
 
 ```typescript
 providePrimeNG({
@@ -398,37 +389,29 @@ You can change the theme preset by importing different presets from `@primeuix/t
 
 The application implements comprehensive error handling:
 
-- **GlobalErrorHandler** - Custom Angular ErrorHandler for catching unhandled errors
-- **Error Interceptor** - HTTP-specific error handling with toast notifications
-- **MessageService** - PrimeNG service for displaying user-friendly error messages
+- GlobalErrorHandler: Custom Angular ErrorHandler for unhandled errors
+- Error Interceptor: HTTP error handling with toast notifications
+- MessageService: PrimeNG service for error messages
 
 ### Browser Support
 
 The test runner automatically detects and uses your default installed browser:
 
-- **macOS**: Firefox > Chrome > Safari
-- **Windows**: Chrome
-- **Linux**: ChromeHeadless
+- macOS: Firefox > Chrome > Safari
+- Windows: Chrome
+- Linux: ChromeHeadless
 
----
+## License
 
-## 📝 License
+This project is licensed under the GNU General Public License v3.0. See the [LICENCE](./LICENCE) file for details.
 
-This project is licensed under the MIT License. See the [LICENCE](./LICENCE) file for details.
+## Contributing
 
----
+Contributions are welcome. Please submit issues and pull requests through the repository.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
----
-
-## 📚 Additional Resources
+## Additional Resources
 
 - [Angular Documentation](https://angular.io/docs)
 - [PrimeNG Documentation](https://primeng.org)
 - [TZKT API Documentation](https://tzkt.io/api/)
 - [RxJS Guide](https://rxjs.dev/)
-
----

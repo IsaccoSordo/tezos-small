@@ -1,8 +1,8 @@
 # Tezos Small
 
-> A modern Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API, built with PrimeNG UI components and signal-based reactive state management.
+> An Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API.
 
-This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and comprehensive HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
+This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
 
 **Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
@@ -29,8 +29,7 @@ This is a single-page application featuring block browsing, transaction details,
 ## Services & State Management
 
 - [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
-- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using Angular Signals
-- [src/app/store/tzkt.state.ts](src/app/store/tzkt.state.ts): Reactive signal-based state definitions
+- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods` for scalable, maintainable state management
 
 ## HTTP Interceptors
 
@@ -54,6 +53,40 @@ This is a single-page application featuring block browsing, transaction details,
 - [src/app/ui/table/table.component.ts](src/app/ui/table/table.component.ts): Generic data table with pagination, sorting, and customizable columns using PrimeNG Table
 - [src/app/ui/spinner/spinner.component.ts](src/app/ui/spinner/spinner.component.ts): Loading indicator using PrimeNG ProgressSpinner
 
+## Documentation Style Guidelines
+
+**IMPORTANT: When writing or updating documentation (README, comments, commit messages, etc.), follow these principles:**
+
+**Language Standards**
+- Use neutral, objective language - avoid subjective adjectives
+- Avoid marketing terms: "enterprise-grade", "premium", "cutting-edge", "sleek", "modern", "beautiful", "powerful", "robust"
+- Avoid promotional phrases: "deep-dive", "smart", "comprehensive", "industry-standard"
+- Do NOT use emojis in documentation unless explicitly requested
+- State facts, not opinions - describe what the code does, not how good it is
+- Use technical terminology appropriately without exaggeration
+
+**Writing Style**
+- Be concise and direct
+- Focus on functionality, not aesthetics
+- Use active voice when describing what the code does
+- Avoid superlatives and excessive enthusiasm
+- Keep descriptions factual and verifiable
+
+**Examples of Neutral vs. Grandiose Language**
+- ❌ "A sleek, modern Angular application" → ✅ "An Angular application"
+- ❌ "Enterprise-grade UI components" → ✅ "Angular UI component library"
+- ❌ "Beautiful, premium icons" → ✅ "Icon library"
+- ❌ "Smart loading states" → ✅ "Loading states"
+- ❌ "Comprehensive testing best practices" → ✅ "Unit tests for components and services"
+- ❌ "Industry-standard state management" → ✅ "NgRx SignalStore for state management"
+
+**What IS Acceptable**
+- Technical specifications and version numbers
+- Factual descriptions of features
+- Neutral descriptions of architecture patterns
+- Clear installation and usage instructions
+- Objective comparisons when necessary
+
 ## Angular 21 Best Practices
 
 **TypeScript Standards**
@@ -64,7 +97,10 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Angular Conventions**
 - Use standalone components (no NgModules)
-- Prefer signals for reactive state management (see store.service.ts)
+- Use **NgRx SignalStore** for state management (installed: @ngrx/signals)
+- Organize state with `withState()` for initial state and `withMethods()` for state updates
+- Use `patchState()` for immutable state updates in SignalStore methods
+- State properties are automatically exposed as signals by SignalStore
 - Use functional HTTP interceptors with `withInterceptors()`
 - Enable zoneless change detection for better performance
 - Use `input()` and `output()` functions for component APIs
@@ -88,6 +124,8 @@ This is a single-page application featuring block browsing, transaction details,
 - Follow single responsibility principle
 - Return observables for async operations
 - Handle errors gracefully with proper error messages
+- For state management: use NgRx SignalStore with `withState()` and `withMethods()` patterns
+- Use `patchState()` for all state updates to ensure immutability
 
 **RxJS Patterns**
 - Use `tap` for side effects without transforming values
@@ -231,7 +269,6 @@ describe('ComponentName', () => {
 - `p-progressSpinner`: Loading indicators
 - `p-toast`: Toast notifications for errors and messages
 - `p-button`: Styled buttons
-- Available: 90+ additional PrimeNG components for future enhancements
 
 ## Development Commands
 

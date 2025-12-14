@@ -23,7 +23,7 @@ describe('DetailsComponent', () => {
   let component: DetailsComponent;
   let fixture: ComponentFixture<DetailsComponent>;
   let httpMock: HttpTestingController;
-  let store: Store;
+  let store: InstanceType<typeof Store>;
 
   const mockTransactions = [
     {
@@ -76,7 +76,7 @@ describe('DetailsComponent', () => {
     });
 
     it('should have references to store signals', () => {
-      expect(component.transactions).toBe(store.state.transactions);
+      expect(component.transactions).toBe(store.transactions);
     });
 
     it('should fetch transactions for the given block level on init', () => {
@@ -90,12 +90,12 @@ describe('DetailsComponent', () => {
       expect(req.request.method).toBe('GET');
       req.flush(mockTransactions);
 
-      expect(store.state.transactions().length).toBe(2);
-      expect(store.state.transactions()[0].sender.address).toBe('addr1');
+      expect(store.transactions().length).toBe(2);
+      expect(store.transactions()[0].sender.address).toBe('addr1');
     });
 
     it('should display transactions in template when data is available', async () => {
-      store.state.transactions.set(mockTransactions);
+      store.setTransactions(mockTransactions);
 
       fixture.detectChanges();
       await fixture.whenStable();
@@ -113,18 +113,18 @@ describe('DetailsComponent', () => {
     });
 
     it('should manage loading state correctly', () => {
-      expect(store.state.loadingCounter()).toBe(0);
+      expect(store.loadingCounter()).toBe(0);
 
       fixture.detectChanges();
 
-      expect(store.state.loadingCounter()).toBe(1);
+      expect(store.loadingCounter()).toBe(1);
 
       const req = httpMock.expectOne(
         (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions',
       );
       req.flush(mockTransactions);
 
-      expect(store.state.loadingCounter()).toBe(0);
+      expect(store.loadingCounter()).toBe(0);
     });
   });
 

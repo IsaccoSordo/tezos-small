@@ -31,7 +31,7 @@ describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
   let fixture: ComponentFixture<BlocksOverviewComponent>;
   let httpMock: HttpTestingController;
-  let store: Store;
+  let store: InstanceType<typeof Store>;
 
   const mockBlocks = [
     {
@@ -110,8 +110,8 @@ describe('BlocksOverviewComponent', () => {
   });
 
   it('should have references to store signals', () => {
-    expect(component.blocks).toBe(store.state.blocks);
-    expect(component.count).toBe(store.state.count);
+    expect(component.blocks).toBe(store.blocks);
+    expect(component.count).toBe(store.count);
   });
 
   it('should initialize and fetch block count', fakeAsync(() => {
@@ -119,7 +119,7 @@ describe('BlocksOverviewComponent', () => {
     flushCountRequest(5000);
     flushInitialBlocksRequest();
 
-    expect(store.state.count()).toBe(5000);
+    expect(store.count()).toBe(5000);
 
     fixture.destroy();
   }));
@@ -145,8 +145,8 @@ describe('BlocksOverviewComponent', () => {
 
     flushTransactionCountRequests();
 
-    expect(store.state.blocks().length).toBe(2);
-    expect(store.state.blocks()[0].hash).toBe('abc123');
+    expect(store.blocks().length).toBe(2);
+    expect(store.blocks()[0].hash).toBe('abc123');
 
     fixture.destroy();
   }));
@@ -189,18 +189,18 @@ describe('BlocksOverviewComponent', () => {
   }));
 
   it('should manage loading state during concurrent requests', fakeAsync(() => {
-    expect(store.state.loadingCounter()).toBe(0);
+    expect(store.loadingCounter()).toBe(0);
 
     initializeComponent();
 
     // Two concurrent requests: count + initial blocks
-    expect(store.state.loadingCounter()).toBe(2);
+    expect(store.loadingCounter()).toBe(2);
 
     flushCountRequest();
-    expect(store.state.loadingCounter()).toBe(1);
+    expect(store.loadingCounter()).toBe(1);
 
     flushInitialBlocksRequest();
-    expect(store.state.loadingCounter()).toBe(0);
+    expect(store.loadingCounter()).toBe(0);
 
     fixture.destroy();
   }));
