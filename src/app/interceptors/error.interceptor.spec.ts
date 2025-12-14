@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import {
   HttpClient,
-  HttpErrorResponse,
   provideHttpClient,
   withInterceptors,
 } from '@angular/common/http';

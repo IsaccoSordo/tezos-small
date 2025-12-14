@@ -40,8 +40,8 @@ export function skipGlobalErrorHandler(): HttpHeaders {
  * }
  * ```
  */
-export function wasHandledByInterceptor(error: any): boolean {
-  return (error as HandledHttpError)?.__wasHandledByInterceptor === true;
+export function wasHandledByInterceptor(error: HandledHttpError): boolean {
+  return error?.__wasHandledByInterceptor === true;
 }
 
 /**
@@ -87,7 +87,7 @@ export function handleErrorSilently<T>() {
  * ```
  */
 export function handleErrorWith<T>(
-  callback: (error: any) => void,
+  callback: (error: unknown) => void,
   returnValue?: T
 ) {
   return (source: Observable<T>) =>
