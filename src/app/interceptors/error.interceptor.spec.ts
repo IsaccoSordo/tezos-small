@@ -9,7 +9,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { MessageService } from 'primeng/api';
-import { errorInterceptor, HandledHttpError } from './error.interceptor';
+import { errorInterceptor } from './error.interceptor';
 
 /**
  * Error Interceptor Test Suite
@@ -225,38 +225,6 @@ describe('errorInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.error(errorEvent);
-    });
-  });
-
-  describe('Skip Error Interceptor', () => {
-    it('should skip interceptor when X-Skip-Error-Interceptor header is present', (done) => {
-      const headers = { 'X-Skip-Error-Interceptor': 'true' };
-
-      httpClient.get(TEST_URL, { headers }).subscribe({
-        next: () => fail('Should not succeed'),
-        error: (error: HandledHttpError) => {
-          expect(messageService.add).not.toHaveBeenCalled();
-          expect(error.__wasHandledByInterceptor).toBe(false);
-          done();
-        },
-      });
-
-      const req = httpMock.expectOne(TEST_URL);
-      req.flush('Error', { status: 500, statusText: 'Internal Server Error' });
-    });
-
-    it('should handle error normally when skip header is not present', (done) => {
-      httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
-        complete: () => {
-          expect(messageService.add).toHaveBeenCalled();
-          done();
-        },
-      });
-
-      const req = httpMock.expectOne(TEST_URL);
-      req.flush('Error', { status: 500, statusText: 'Internal Server Error' });
     });
   });
 

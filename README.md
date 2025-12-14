@@ -250,9 +250,9 @@ Provides HTTP response caching:
 Provides centralized HTTP error handling:
 
 - Displays toast notifications via PrimeNG `MessageService`
-- Status-specific messages for common HTTP errors (404, 500, 503, etc.)
+- Extracts error messages from various backend response formats
 - Logs errors to console
-- Rethrows errors for component-level handling
+- Returns EMPTY observable to prevent error propagation to components
 
 **Loading Interceptor**
 
@@ -410,11 +410,10 @@ You can change the theme preset by importing different presets from `@primeuix/t
 
 ### Error Handling
 
-The application implements comprehensive error handling:
+The application implements error handling at two levels:
 
-- GlobalErrorHandler: Custom Angular ErrorHandler for unhandled errors
-- Error Interceptor: HTTP error handling with toast notifications
-- MessageService: PrimeNG service for error messages
+- GlobalErrorHandler: Custom Angular ErrorHandler for unhandled exceptions
+- Error Interceptor: HTTP error handling that displays toast notifications, logs errors, and returns EMPTY to prevent error propagation
 
 ### Browser Support
 

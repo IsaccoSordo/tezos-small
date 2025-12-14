@@ -35,7 +35,7 @@ This is a single-page application featuring block browsing, transaction details,
 ## HTTP Interceptors
 
 - [src/app/interceptors/loading.interceptor.ts](src/app/interceptors/loading.interceptor.ts): Functional interceptor for automatic loading state management using counter-based approach
-- [src/app/interceptors/error.interceptor.ts](src/app/interceptors/error.interceptor.ts): Centralized HTTP error handling with PrimeNG toast notifications
+- [src/app/interceptors/error.interceptor.ts](src/app/interceptors/error.interceptor.ts): Centralized HTTP error handling - displays PrimeNG toast notifications, logs errors, and returns EMPTY observable to prevent error propagation
 - **HTTP Caching**: Uses [@ngneat/cashew](https://github.com/ngneat/cashew) for response caching via `withCache()` context in service methods
 
 ## Error Handling
