@@ -4,9 +4,10 @@
 
 This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
 
-**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, TZKT API
+**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals 21.0.0-beta.0, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
-**Last Updated**: 2025-12-13
+**Last Updated**: 2025-12-14
+**Dependencies**: All dependencies use exact versions (no wildcards like ^ or ~)
 
 ## Core Documentation
 
@@ -272,11 +273,17 @@ describe('ComponentName', () => {
 
 ## Development Commands
 
+- `npm install`: Install dependencies (no --legacy-peer-deps or --force flags needed)
 - `npm start`: Start development server on http://localhost:4200
 - `npm run build`: Production build to dist/tezos-small
 - `npm run watch`: Build in watch mode
 - `npm test`: Run tests
 - `npm run lint`: Run ESLint
+
+**Dependency Management**
+- All package versions are pinned to exact versions (no ^ or ~ wildcards)
+- Use `npm install` without --legacy-peer-deps or --force flags
+- No manual dependency resolution needed
 
 ## Optional
 
