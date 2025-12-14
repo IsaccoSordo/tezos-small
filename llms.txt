@@ -1,8 +1,8 @@
 # Tezos Small
 
-> A modern Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API, built with PrimeNG UI components and signal-based reactive state management.
+> An Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API.
 
-This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and comprehensive HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
+This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
 
 **Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
@@ -52,6 +52,40 @@ This is a single-page application featuring block browsing, transaction details,
 
 - [src/app/ui/table/table.component.ts](src/app/ui/table/table.component.ts): Generic data table with pagination, sorting, and customizable columns using PrimeNG Table
 - [src/app/ui/spinner/spinner.component.ts](src/app/ui/spinner/spinner.component.ts): Loading indicator using PrimeNG ProgressSpinner
+
+## Documentation Style Guidelines
+
+**IMPORTANT: When writing or updating documentation (README, comments, commit messages, etc.), follow these principles:**
+
+**Language Standards**
+- Use neutral, objective language - avoid subjective adjectives
+- Avoid marketing terms: "enterprise-grade", "premium", "cutting-edge", "sleek", "modern", "beautiful", "powerful", "robust"
+- Avoid promotional phrases: "deep-dive", "smart", "comprehensive", "industry-standard"
+- Do NOT use emojis in documentation unless explicitly requested
+- State facts, not opinions - describe what the code does, not how good it is
+- Use technical terminology appropriately without exaggeration
+
+**Writing Style**
+- Be concise and direct
+- Focus on functionality, not aesthetics
+- Use active voice when describing what the code does
+- Avoid superlatives and excessive enthusiasm
+- Keep descriptions factual and verifiable
+
+**Examples of Neutral vs. Grandiose Language**
+- ❌ "A sleek, modern Angular application" → ✅ "An Angular application"
+- ❌ "Enterprise-grade UI components" → ✅ "Angular UI component library"
+- ❌ "Beautiful, premium icons" → ✅ "Icon library"
+- ❌ "Smart loading states" → ✅ "Loading states"
+- ❌ "Comprehensive testing best practices" → ✅ "Unit tests for components and services"
+- ❌ "Industry-standard state management" → ✅ "NgRx SignalStore for state management"
+
+**What IS Acceptable**
+- Technical specifications and version numbers
+- Factual descriptions of features
+- Neutral descriptions of architecture patterns
+- Clear installation and usage instructions
+- Objective comparisons when necessary
 
 ## Angular 21 Best Practices
 
@@ -235,7 +269,6 @@ describe('ComponentName', () => {
 - `p-progressSpinner`: Loading indicators
 - `p-toast`: Toast notifications for errors and messages
 - `p-button`: Styled buttons
-- Available: 90+ additional PrimeNG components for future enhancements
 
 ## Development Commands
 
