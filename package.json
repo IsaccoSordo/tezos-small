@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:noWatch": "ng test --watch=false",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\""
   },
   "private": true,
   "dependencies": {
@@ -44,6 +45,7 @@
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.1.0",
     "karma-safari-launcher": "1.0.0",
+    "prettier": "3.7.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.47.0"
   }
