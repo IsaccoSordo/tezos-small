@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BlocksOverviewComponent } from './blocks-overview.component';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
@@ -23,7 +18,7 @@ import { Block } from '../common';
  * Testing Best Practices Applied:
  * - Helper functions reduce code duplication for common mock patterns
  * - Each test has a single, focused responsibility
- * - fakeAsync with tick() handles async timer operations
+ * - vi.useFakeTimers() handles async timer operations
  * - fixture.destroy() ensures proper cleanup of timer subscriptions
  * - Tests are organized logically: basic → initialization → behavior → integration
  */
@@ -50,10 +45,10 @@ describe('BlocksOverviewComponent', () => {
     },
   ];
 
-  // Helper function to handle initial component setup in fakeAsync tests
+  // Helper function to handle initial component setup
   const initializeComponent = () => {
     fixture.detectChanges();
-    tick(); // Trigger the timer(0, 60000) to fire immediately
+    vi.advanceTimersByTime(0); // Trigger the timer(0, 60000) to fire immediately
   };
 
   // Helper function to handle the count request
@@ -84,6 +79,8 @@ describe('BlocksOverviewComponent', () => {
   };
 
   beforeEach(async () => {
+    vi.useFakeTimers();
+
     await TestBed.configureTestingModule({
       imports: [BlocksOverviewComponent],
       providers: [
@@ -102,7 +99,9 @@ describe('BlocksOverviewComponent', () => {
   });
 
   afterEach(() => {
+    fixture.destroy();
     httpMock.verify();
+    vi.useRealTimers();
   });
 
   it('should create', () => {
@@ -114,17 +113,15 @@ describe('BlocksOverviewComponent', () => {
     expect(component.count).toBe(store.count);
   });
 
-  it('should initialize and fetch block count', fakeAsync(() => {
+  it('should initialize and fetch block count', () => {
     initializeComponent();
     flushCountRequest(5000);
     flushInitialBlocksRequest();
 
     expect(store.count()).toBe(5000);
+  });
 
-    fixture.destroy();
-  }));
-
-  it('should handle page change and update store with blocks', fakeAsync(() => {
+  it('should handle page change and update store with blocks', () => {
     initializeComponent();
     flushCountRequest();
     flushInitialBlocksRequest();
@@ -147,11 +144,9 @@ describe('BlocksOverviewComponent', () => {
 
     expect(store.blocks().length).toBe(2);
     expect(store.blocks()[0].hash).toBe('abc123');
+  });
 
-    fixture.destroy();
-  }));
-
-  it('should update pagination state and query params on page change', fakeAsync(() => {
+  it('should update pagination state and query params on page change', () => {
     initializeComponent();
     flushCountRequest();
     flushInitialBlocksRequest();
@@ -169,11 +164,9 @@ describe('BlocksOverviewComponent', () => {
         req.params.get('offset.pg') === '1'
     );
     req.flush([]);
+  });
 
-    fixture.destroy();
-  }));
-
-  it('should display blocks in template when data is available', fakeAsync(() => {
+  it('should display blocks in template when data is available', () => {
     initializeComponent();
     flushCountRequest();
     flushInitialBlocksRequest(mockBlocks);
@@ -184,11 +177,9 @@ describe('BlocksOverviewComponent', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.textContent).toContain('abc123');
     expect(compiled.textContent).toContain('Baker1');
+  });
 
-    fixture.destroy();
-  }));
-
-  it('should manage loading state during concurrent requests', fakeAsync(() => {
+  it('should manage loading state during concurrent requests', () => {
     expect(store.loadingCounter()).toBe(0);
 
     initializeComponent();
@@ -201,7 +192,5 @@ describe('BlocksOverviewComponent', () => {
 
     flushInitialBlocksRequest();
     expect(store.loadingCounter()).toBe(0);
-
-    fixture.destroy();
-  }));
+  });
 });

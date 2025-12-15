@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import {
   HttpClient,
   provideHttpClient,
@@ -15,7 +15,6 @@ import { Store } from '../store/store.service';
  * Loading Interceptor Test Suite
  *
  * Testing Best Practices Applied:
- * - Uses fakeAsync/tick for proper async handling
  * - Each test has single responsibility
  * - Tests verify counter-based loading state
  * - Proper cleanup with httpMock.verify()
@@ -59,7 +58,7 @@ describe('loadingInterceptor', () => {
       req.flush(TEST_DATA);
     });
 
-    it('should decrement loading counter when request completes successfully', fakeAsync(() => {
+    it('should decrement loading counter when request completes successfully', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.get(TEST_URL).subscribe();
@@ -68,16 +67,15 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should decrement loading counter when request fails', fakeAsync(() => {
+    it('should decrement loading counter when request fails', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
+        next: () => expect.fail('Should not succeed'),
         error: () => {
           // Error handled
         },
@@ -87,14 +85,13 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush('Error', { status: 500, statusText: 'Internal Server Error' });
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
   });
 
   describe('Concurrent Requests', () => {
-    it('should handle multiple concurrent requests correctly', fakeAsync(() => {
+    it('should handle multiple concurrent requests correctly', () => {
       expect(store.loadingCounter()).toBe(0);
 
       // Start 3 requests
@@ -108,26 +105,23 @@ describe('loadingInterceptor', () => {
       // Complete first request
       const req1 = httpMock.expectOne('/api/test1');
       req1.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(2);
 
       // Complete second request
       const req2 = httpMock.expectOne('/api/test2');
       req2.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(1);
 
       // Complete third request
       const req3 = httpMock.expectOne('/api/test3');
       req3.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should maintain correct counter with mixed success and error responses', fakeAsync(() => {
+    it('should maintain correct counter with mixed success and error responses', () => {
       expect(store.loadingCounter()).toBe(0);
 
       // Start 3 requests
@@ -145,22 +139,19 @@ describe('loadingInterceptor', () => {
       // Complete all requests (2 success, 1 error)
       const req1 = httpMock.expectOne('/api/success1');
       req1.flush(TEST_DATA);
-      tick();
 
       const req2 = httpMock.expectOne('/api/error');
       req2.flush('Error', { status: 500, statusText: 'Internal Server Error' });
-      tick();
 
       const req3 = httpMock.expectOne('/api/success2');
       req3.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
   });
 
   describe('Request Types', () => {
-    it('should increment/decrement counter for GET requests', fakeAsync(() => {
+    it('should increment/decrement counter for GET requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.get(TEST_URL).subscribe();
@@ -169,12 +160,11 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should increment/decrement counter for POST requests', fakeAsync(() => {
+    it('should increment/decrement counter for POST requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.post(TEST_URL, { data: 'test' }).subscribe();
@@ -183,12 +173,11 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should increment/decrement counter for PUT requests', fakeAsync(() => {
+    it('should increment/decrement counter for PUT requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.put(TEST_URL, { data: 'test' }).subscribe();
@@ -197,12 +186,11 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should increment/decrement counter for DELETE requests', fakeAsync(() => {
+    it('should increment/decrement counter for DELETE requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.delete(TEST_URL).subscribe();
@@ -211,14 +199,13 @@ describe('loadingInterceptor', () => {
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
   });
 
   describe('Edge Cases', () => {
-    it('should handle rapid sequential requests', fakeAsync(() => {
+    it('should handle rapid sequential requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
       // Make 5 rapid requests
@@ -233,27 +220,25 @@ describe('loadingInterceptor', () => {
       for (let i = 0; i < 5; i++) {
         const req = httpMock.expectOne(`${TEST_URL}/${i}`);
         req.flush(TEST_DATA);
-        tick();
       }
 
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should never have negative loading counter', fakeAsync(() => {
+    it('should never have negative loading counter', () => {
       expect(store.loadingCounter()).toBe(0);
 
       httpClient.get(TEST_URL).subscribe();
 
       const req = httpMock.expectOne(TEST_URL);
       req.flush(TEST_DATA);
-      tick();
 
       expect(store.loadingCounter()).toBeGreaterThanOrEqual(0);
-    }));
+    });
   });
 
   describe('Integration with finalize', () => {
-    it('should decrement counter when subscriber unsubscribes', fakeAsync(() => {
+    it('should decrement counter when subscriber unsubscribes', () => {
       expect(store.loadingCounter()).toBe(0);
 
       const subscription = httpClient.get(TEST_URL).subscribe();
@@ -265,13 +250,12 @@ describe('loadingInterceptor', () => {
 
       // Unsubscribe before response - finalize should still run
       subscription.unsubscribe();
-      tick();
 
       // Counter should be decremented when unsubscribed
       expect(store.loadingCounter()).toBe(0);
 
       // Expect no open requests after unsubscribe cancels it
       expect(req.cancelled).toBe(true);
-    }));
+    });
   });
 });

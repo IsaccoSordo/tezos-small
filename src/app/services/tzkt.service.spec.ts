@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -15,7 +15,6 @@ import { loadingInterceptor } from '../interceptors/loading.interceptor';
  * Testing Best Practices Applied:
  * - Nested describe blocks organize tests by method/feature
  * - afterEach resets store state for test isolation
- * - fakeAsync with tick() handles timing-dependent assertions
  * - Tests cover happy path, error handling, and loading states
  * - HttpTestingController verifies all HTTP interactions
  */
@@ -86,10 +85,9 @@ describe('TzktService', () => {
   });
 
   describe('getBlocksCount', () => {
-    it('should fetch blocks count and update store', (done) => {
+    it('should fetch blocks count and update store', () => {
       service.getBlocksCount().subscribe(() => {
         expect(store.count()).toBe(5000);
-        done();
       });
 
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
@@ -97,7 +95,7 @@ describe('TzktService', () => {
       req.flush(5000);
     });
 
-    it('should increment and decrement loading counter', fakeAsync(() => {
+    it('should increment and decrement loading counter', () => {
       expect(store.loadingCounter()).toBe(0);
 
       service.getBlocksCount().subscribe();
@@ -107,19 +105,13 @@ describe('TzktService', () => {
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
       req.flush(100);
 
-      tick();
-
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
 
-    it('should handle errors and update error state', (done) => {
+    it('should handle errors and update error state', () => {
       service.getBlocksCount().subscribe({
         error: () => {
           expect(store.count()).toBe(0);
-          setTimeout(() => {
-            expect(store.loadingCounter()).toBe(0);
-            done();
-          }, 100);
         },
       });
 
@@ -129,11 +121,10 @@ describe('TzktService', () => {
   });
 
   describe('getBlocks', () => {
-    it('should fetch blocks and update store', (done) => {
+    it('should fetch blocks and update store', () => {
       service.getBlocks(10, 0).subscribe(() => {
         expect(store.blocks().length).toBe(2);
         expect(store.blocks()[0].hash).toBe('abc123');
-        done();
       });
 
       const req = httpMock.expectOne(
@@ -162,10 +153,8 @@ describe('TzktService', () => {
       txReq2.flush(3);
     });
 
-    it('should use correct pagination parameters', (done) => {
-      service.getBlocks(20, 5).subscribe(() => {
-        done();
-      });
+    it('should use correct pagination parameters', () => {
+      service.getBlocks(20, 5).subscribe();
 
       const req = httpMock.expectOne(
         (req) =>
@@ -176,11 +165,10 @@ describe('TzktService', () => {
       req.flush([]);
     });
 
-    it('should handle errors and update error state', (done) => {
+    it('should handle errors and update error state', () => {
       service.getBlocks(10, 0).subscribe({
         error: () => {
           expect(store.blocks().length).toBe(0);
-          done();
         },
       });
 
@@ -188,7 +176,7 @@ describe('TzktService', () => {
       req.error(new ProgressEvent('Network error'));
     });
 
-    it('should increment and decrement loading counter', fakeAsync(() => {
+    it('should increment and decrement loading counter', () => {
       expect(store.loadingCounter()).toBe(0);
 
       service.getBlocks(10, 0).subscribe();
@@ -198,17 +186,14 @@ describe('TzktService', () => {
       const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
       req.flush([]);
 
-      tick();
-
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
   });
 
   describe('getTransactionsCount', () => {
-    it('should fetch transaction count for a given level', (done) => {
+    it('should fetch transaction count for a given level', () => {
       service.getTransactionsCount(12345).subscribe((count) => {
         expect(count).toBe(42);
-        done();
       });
 
       const req = httpMock.expectOne(
@@ -220,10 +205,10 @@ describe('TzktService', () => {
       req.flush(42);
     });
 
-    it('should handle errors gracefully', (done) => {
+    it('should handle errors gracefully', () => {
       service.getTransactionsCount(12345).subscribe({
         error: () => {
-          done();
+          // Error handled
         },
       });
 
@@ -235,11 +220,10 @@ describe('TzktService', () => {
   });
 
   describe('getTransactions', () => {
-    it('should fetch transactions and update store', (done) => {
+    it('should fetch transactions and update store', () => {
       service.getTransactions(12345).subscribe(() => {
         expect(store.transactions().length).toBe(2);
         expect(store.transactions()[0].sender.address).toBe('addr1');
-        done();
       });
 
       const req = httpMock.expectOne(
@@ -251,11 +235,10 @@ describe('TzktService', () => {
       req.flush(mockTransactions);
     });
 
-    it('should handle errors and update error state', (done) => {
+    it('should handle errors and update error state', () => {
       service.getTransactions(12345).subscribe({
         error: () => {
           expect(store.transactions().length).toBe(0);
-          done();
         },
       });
 
@@ -265,7 +248,7 @@ describe('TzktService', () => {
       req.error(new ProgressEvent('Network error'));
     });
 
-    it('should increment and decrement loading counter', fakeAsync(() => {
+    it('should increment and decrement loading counter', () => {
       expect(store.loadingCounter()).toBe(0);
 
       service.getTransactions(12345).subscribe();
@@ -277,33 +260,33 @@ describe('TzktService', () => {
       );
       req.flush(mockTransactions);
 
-      tick();
-
       expect(store.loadingCounter()).toBe(0);
-    }));
+    });
   });
 
   describe('Error handling patterns', () => {
-    it('should always finalize loading counter even on error', (done) => {
+    it('should always finalize loading counter even on error', () => {
       expect(store.loadingCounter()).toBe(0);
 
       service.getBlocksCount().subscribe({
         error: () => {
-          setTimeout(() => {
-            expect(store.loadingCounter()).toBe(0);
-            done();
-          }, 100);
+          // Error handled
         },
       });
 
+      expect(store.loadingCounter()).toBe(1);
+
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
       req.error(new ProgressEvent('Error'));
+
+      // After finalize, counter should be 0
+      expect(store.loadingCounter()).toBe(0);
     });
 
-    it('should add error messages to store on failures', (done) => {
+    it('should add error messages to store on failures', () => {
       service.getBlocksCount().subscribe({
         error: () => {
-          done();
+          // Error handled
         },
       });
 

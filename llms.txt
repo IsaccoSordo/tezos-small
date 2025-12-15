@@ -15,7 +15,7 @@ This is a single-page application featuring block browsing, transaction details,
 - [package.json](package.json): Dependencies, scripts, and project metadata
 - [tsconfig.json](tsconfig.json): TypeScript strict mode configuration
 - [angular.json](angular.json): Angular CLI and build configuration
-- [karma.conf.js](karma.conf.js): Multi-browser test runner configuration
+- [vitest.config.ts](vitest.config.ts): Vitest test runner configuration
 
 ## Application Configuration
 
@@ -169,14 +169,13 @@ This is a single-page application featuring block browsing, transaction details,
 - [src/app/navbar/navbar.component.spec.ts](src/app/navbar/navbar.component.spec.ts): Navbar tests
 
 **Testing Commands**
-- `npm test`: Run tests in watch mode with browser auto-detection
-- `npm test -- --watch=false`: Run tests once without watch mode (use this for CI/automated testing)
-- `npm test:headless`: Run tests in ChromeHeadless without watch
-- `npm test -- --code-coverage`: Generate coverage reports
+- `npm test`: Run tests in watch mode
+- `npm run test:ci`: Run tests once (for CI/automated testing)
+- `npm test -- --coverage`: Generate coverage reports
 
 **Testing Best Practices**
-- Use Jasmine for test framework (describe, it, expect)
-- Use Karma for test runner with multi-browser support
+- Use Vitest for test framework (describe, it, expect, vi)
+- Uses jsdom for DOM emulation (no browser needed)
 - Mock HTTP calls with HttpClientTestingModule and HttpTestingController
 - Test component inputs, outputs, and user interactions
 - Verify error handling and edge cases
@@ -190,11 +189,11 @@ This is a single-page application featuring block browsing, transaction details,
 - Add JSDoc headers to test suites documenting best practices applied
 
 **Async Testing Patterns**
-- Use `fakeAsync` with `tick()` for timer-based operations (e.g., `timer(0, 60000)`)
-- Always call `fixture.destroy()` in fakeAsync tests to cleanup subscriptions
+- Use `vi.useFakeTimers()` with `vi.advanceTimersByTime()` for timer-based operations
+- Always call `fixture.destroy()` in afterEach to cleanup subscriptions
 - Use `httpMock.verify()` in afterEach to ensure no pending HTTP requests
-- For observable-based async: use `done` callback or `fakeAsync` with `tick()`
-- Handle `takeUntilDestroyed()` by destroying fixture before test ends
+- Call `vi.useRealTimers()` in afterEach to restore real timers
+- Use `vi.spyOn()` for spying on methods
 
 **Example Test Pattern**
 ```typescript
@@ -204,7 +203,7 @@ This is a single-page application featuring block browsing, transaction details,
  * Testing Best Practices Applied:
  * - Helper functions reduce code duplication
  * - Each test has single responsibility
- * - fakeAsync with tick() for async operations
+ * - vi.useFakeTimers() for async operations
  * - fixture.destroy() ensures cleanup
  */
 describe('ComponentName', () => {
@@ -213,7 +212,7 @@ describe('ComponentName', () => {
   // Helper functions
   const initializeComponent = () => {
     fixture.detectChanges();
-    tick(); // Trigger timers
+    vi.advanceTimersByTime(0); // Trigger timers
   };
 
   const flushMockRequest = () => {
@@ -222,21 +221,22 @@ describe('ComponentName', () => {
   };
 
   beforeEach(async () => {
+    vi.useFakeTimers();
     // Setup test fixtures
   });
 
   afterEach(() => {
+    fixture.destroy();
     httpMock.verify();
+    vi.useRealTimers();
   });
 
-  it('should do something specific', fakeAsync(() => {
+  it('should do something specific', () => {
     initializeComponent();
     flushMockRequest();
 
     expect(component.data()).toBeTruthy();
-
-    fixture.destroy(); // Critical for cleanup
-  }));
+  });
 });
 ```
 
@@ -303,7 +303,7 @@ describe('ComponentName', () => {
 
 **Browser Support**
 - Modern browsers (Chrome, Firefox, Safari, Edge)
-- Test runner auto-detects installed browsers
+- Tests use jsdom for DOM emulation
 
 **Code Style**
 - OnPush change detection for performance
