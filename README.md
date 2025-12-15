@@ -74,23 +74,17 @@ The project includes unit tests for components, services, interceptors, and UI e
 
 ### Prerequisites
 
-Node.js v20.19+ or v22.12+ is required for running tests. The project uses Angular 21's testing infrastructure.
+Node.js v20.19+ or v22.12+ is required for running tests.
 
 ### Run Unit Tests
 
 ```bash
 npm test                           # Watch mode with auto-reload
-npm test -- --watch=false          # Run once (for CI/automated testing)
-npm test -- --code-coverage        # Generate coverage reports
+npm run test:ci                    # Run once (for CI/automated testing)
+npm test -- --coverage             # Generate coverage reports
 ```
 
-Tests are executed via [Karma](https://karma-runner.github.io) using [Jasmine](https://jasmine.github.io).
-
-The test runner auto-detects your installed browsers:
-
-- macOS: Firefox → Chrome → Safari (in order of preference)
-- Windows: Chrome
-- Linux: ChromeHeadless
+Tests are executed via [Vitest](https://vitest.dev) with jsdom for DOM emulation.
 
 ### Testing Patterns
 
@@ -114,7 +108,7 @@ The test suite uses the following patterns:
 
 **Async Testing**
 
-- `fakeAsync` with `tick()` for timer-based operations
+- `vi.useFakeTimers()` with `vi.advanceTimersByTime()` for timer-based operations
 - `fixture.destroy()` for cleanup of subscriptions
 - `HttpTestingController` verifies HTTP interactions
 
@@ -125,25 +119,26 @@ describe('MyComponent', () => {
   // Helper functions for common patterns
   const initializeComponent = () => {
     fixture.detectChanges();
-    tick(); // Handle async timers
+    vi.advanceTimersByTime(0); // Handle async timers
   };
 
   beforeEach(async () => {
+    vi.useFakeTimers();
     // Setup common test fixtures
   });
 
   afterEach(() => {
+    fixture.destroy();
     httpMock.verify(); // Ensure no pending requests
+    vi.useRealTimers();
   });
 
-  it('should initialize and fetch data', fakeAsync(() => {
+  it('should initialize and fetch data', () => {
     initializeComponent();
     flushMockRequests();
 
     expect(component.data()).toBeTruthy();
-
-    fixture.destroy(); // Cleanup
-  }));
+  });
 });
 ```
 
@@ -322,9 +317,8 @@ Key operators used in the application:
 
 ### Testing
 
-- `karma@6.4.4` - Test runner
-- `jasmine-core@5.5.0` - Testing framework
-- Multi-browser support (Chrome, Firefox, Safari)
+- `vitest@4.0.15` - Test runner
+- `jsdom@27.3.0` - DOM emulation for tests
 
 ## API Reference
 
@@ -387,7 +381,7 @@ Configuration can be found in:
 
 - [tsconfig.json](tsconfig.json) - TypeScript configuration
 - [angular.json](angular.json) - Angular CLI configuration
-- [karma.conf.js](karma.conf.js) - Test runner configuration
+- [vitest.config.ts](vitest.config.ts) - Test runner configuration
 - [app.config.ts](src/app/app.config.ts) - Application providers and PrimeNG theme configuration
 
 ### PrimeNG Theme
@@ -414,14 +408,6 @@ The application implements error handling at two levels:
 
 - GlobalErrorHandler: Custom Angular ErrorHandler for unhandled exceptions
 - Error Interceptor: HTTP error handling that displays toast notifications, logs errors, and returns EMPTY to prevent error propagation
-
-### Browser Support
-
-The test runner automatically detects and uses your default installed browser:
-
-- macOS: Firefox > Chrome > Safari
-- Windows: Chrome
-- Linux: ChromeHeadless
 
 ## License
 

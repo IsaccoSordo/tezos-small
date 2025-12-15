@@ -40,8 +40,8 @@ describe('errorInterceptor', () => {
     httpMock = TestBed.inject(HttpTestingController);
     messageService = TestBed.inject(MessageService);
 
-    spyOn(messageService, 'add');
-    spyOn(console, 'error');
+    vi.spyOn(messageService, 'add');
+    vi.spyOn(console, 'error');
   });
 
   afterEach(() => {
@@ -49,10 +49,10 @@ describe('errorInterceptor', () => {
   });
 
   describe('Server-Side Errors', () => {
-    it('should handle 404 errors and show toast', (done) => {
+    it('should handle 404 errors and show toast', async () => {
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -61,7 +61,6 @@ describe('errorInterceptor', () => {
             life: 5000,
           });
           expect(console.error).toHaveBeenCalled();
-          done();
         },
       });
 
@@ -69,10 +68,10 @@ describe('errorInterceptor', () => {
       req.flush('Not Found', { status: 404, statusText: 'Not Found' });
     });
 
-    it('should handle 500 errors and show toast', (done) => {
+    it('should handle 500 errors and show toast', async () => {
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -80,7 +79,6 @@ describe('errorInterceptor', () => {
             detail: 'Internal Server Error',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -91,12 +89,12 @@ describe('errorInterceptor', () => {
       });
     });
 
-    it('should extract backend error message from error.message', (done) => {
+    it('should extract backend error message from error.message', async () => {
       const backendError = { message: 'Custom backend error message' };
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -104,7 +102,6 @@ describe('errorInterceptor', () => {
             detail: 'Custom backend error message',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -112,14 +109,14 @@ describe('errorInterceptor', () => {
       req.flush(backendError, { status: 400, statusText: 'Bad Request' });
     });
 
-    it('should extract backend error message from error.error.message', (done) => {
+    it('should extract backend error message from error.error.message', async () => {
       const backendError = {
         error: { message: 'Nested backend error message' },
       };
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -127,7 +124,6 @@ describe('errorInterceptor', () => {
             detail: 'Nested backend error message',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -135,12 +131,12 @@ describe('errorInterceptor', () => {
       req.flush(backendError, { status: 400, statusText: 'Bad Request' });
     });
 
-    it('should extract backend error message from error.reason', (done) => {
+    it('should extract backend error message from error.reason', async () => {
       const backendError = { reason: 'Invalid input' };
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -148,7 +144,6 @@ describe('errorInterceptor', () => {
             detail: 'Invalid input',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -159,10 +154,10 @@ describe('errorInterceptor', () => {
       });
     });
 
-    it('should handle string error messages', (done) => {
+    it('should handle string error messages', async () => {
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -170,7 +165,6 @@ describe('errorInterceptor', () => {
             detail: 'String error message',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -183,14 +177,14 @@ describe('errorInterceptor', () => {
   });
 
   describe('Client-Side Errors', () => {
-    it('should handle client-side ErrorEvent', (done) => {
+    it('should handle client-side ErrorEvent', async () => {
       const errorEvent = new ErrorEvent('Network error', {
         message: 'Failed to fetch',
       });
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -198,7 +192,6 @@ describe('errorInterceptor', () => {
             detail: 'Failed to fetch',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -206,12 +199,12 @@ describe('errorInterceptor', () => {
       req.error(errorEvent);
     });
 
-    it('should handle client-side error without message', (done) => {
+    it('should handle client-side error without message', async () => {
       const errorEvent = new ErrorEvent('Network error');
 
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(messageService.add).toHaveBeenCalledWith({
             severity: 'error',
@@ -219,7 +212,6 @@ describe('errorInterceptor', () => {
             detail: 'A client error occurred',
             life: 5000,
           });
-          done();
         },
       });
 
@@ -229,7 +221,7 @@ describe('errorInterceptor', () => {
   });
 
   describe('Error Handling Flow', () => {
-    it('should return EMPTY observable after handling error', (done) => {
+    it('should return EMPTY observable after handling error', async () => {
       let nextCalled = false;
       let errorCalled = false;
 
@@ -245,7 +237,6 @@ describe('errorInterceptor', () => {
           expect(nextCalled).toBe(false);
           expect(errorCalled).toBe(false);
           expect(messageService.add).toHaveBeenCalled();
-          done();
         },
       });
 
@@ -255,19 +246,18 @@ describe('errorInterceptor', () => {
   });
 
   describe('Console Logging', () => {
-    it('should log error details to console', (done) => {
+    it('should log error details to console', async () => {
       httpClient.get(TEST_URL).subscribe({
-        next: () => fail('Should not succeed'),
-        error: () => fail('Error should be handled by interceptor'),
+        next: () => expect.fail('Should not succeed'),
+        error: () => expect.fail('Error should be handled by interceptor'),
         complete: () => {
           expect(console.error).toHaveBeenCalledWith(
             'HTTP Error:',
-            jasmine.objectContaining({
+            expect.objectContaining({
               status: 404,
               url: TEST_URL,
             })
           );
-          done();
         },
       });
 

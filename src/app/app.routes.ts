@@ -1,9 +1,17 @@
 import { Routes } from '@angular/router';
-import { BlocksOverviewComponent } from './blocks-overview/blocks-overview.component';
-import { DetailsComponent } from './details/details.component';
 
 export const routes: Routes = [
-  { path: '', component: BlocksOverviewComponent },
-  { path: 'details/:level', component: DetailsComponent },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./blocks-overview/blocks-overview.component').then(
+        (m) => m.BlocksOverviewComponent
+      ),
+  },
+  {
+    path: 'details/:level',
+    loadComponent: () =>
+      import('./details/details.component').then((m) => m.DetailsComponent),
+  },
   { path: '**', redirectTo: '' },
 ];
