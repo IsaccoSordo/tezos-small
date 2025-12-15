@@ -11,9 +11,3 @@
   justify-content: center;
   backdrop-filter: blur(2px);
 }
-
-::ng-deep {
-  .spinner-container .p-progress-spinner-circle {
-    stroke: #0d6efd !important;
-  }
-}
