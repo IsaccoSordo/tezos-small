@@ -38,7 +38,6 @@ This is a single-page application featuring block browsing, transaction details,
 - [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Route guards for authentication (authGuard, guestGuard)
 - [src/app/resolvers/tzkt.resolvers.ts](src/app/resolvers/tzkt.resolvers.ts): Functional resolvers for preloading route data (blocks, count, transactions)
 - [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Authentication service for login/logout operations
-- [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page component
 
 ## HTTP Interceptors
 
@@ -50,14 +49,15 @@ This is a single-page application featuring block browsing, transaction details,
 
 - [src/app/core/global-error.handler.ts](src/app/core/global-error.handler.ts): Custom Angular ErrorHandler for unhandled exceptions
 
-## Components
+## Smart/Container Components
 
 - [src/app/app.component.ts](src/app/app.component.ts): Root application component
-- [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with branding
-- [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Main blocks listing page with pagination and real-time counts
+- [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with authentication logic (login/logout)
+- [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Main blocks listing page with pagination and polling
 - [src/app/details/details.component.ts](src/app/details/details.component.ts): Transaction details page for individual blocks
+- [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page with OAuth provider selection
 
-## Reusable UI Components
+## Presentational Components
 
 - [src/app/ui/table/table.component.ts](src/app/ui/table/table.component.ts): Generic data table with pagination, sorting, and customizable columns using PrimeNG Table
 - [src/app/ui/spinner/spinner.component.ts](src/app/ui/spinner/spinner.component.ts): Loading indicator using PrimeNG ProgressSpinner
@@ -118,9 +118,15 @@ This is a single-page application featuring block browsing, transaction details,
 **Component Patterns**
 - Keep components small and focused (single responsibility)
 - Use smart/container components for data management
-- Use presentational/dumb components for UI rendering
+- Use presentational components for UI rendering
 - Implement proper lifecycle hooks
 - Unsubscribe from observables to prevent memory leaks
+
+**Template Organization**
+- Use inline `template` for simple/presentational components with no complex logic
+- Use `templateUrl` with separate HTML file for smart/container components with logic
+- Smart components: have services, subscriptions, Subject patterns, or business logic
+- Presentational components: receive inputs, emit outputs, no service injection
 
 **Template Guidance**
 - Use native control flow (`@if`, `@for`, `@switch`) instead of structural directives

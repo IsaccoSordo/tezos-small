@@ -1,0 +1,39 @@
+<div class="navbar-container">
+  <p-menubar>
+    <ng-template pTemplate="start">
+      <a routerLink="" class="brand-link">
+        <i
+          class="pi pi-box"
+          style="font-size: 1.5rem; margin-right: 0.5rem"
+        ></i>
+        <span class="brand-text">TezosSmall</span>
+      </a>
+    </ng-template>
+    <ng-template pTemplate="end">
+      @if (authService.isAuthenticated()) {
+        <div class="user-section">
+          <p-avatar
+            [image]="authService.user()?.avatar"
+            shape="circle"
+            size="normal"
+          />
+          <span class="user-name">{{ authService.user()?.name }}</span>
+          <p-button
+            icon="pi pi-sign-out"
+            [text]="true"
+            severity="secondary"
+            (onClick)="logout()"
+            pTooltip="Sign out"
+          />
+        </div>
+      } @else {
+        <p-button
+          label="Sign In"
+          icon="pi pi-sign-in"
+          [text]="true"
+          (onClick)="navigateToLogin()"
+        />
+      }
+    </ng-template>
+  </p-menubar>
+</div>
