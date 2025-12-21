@@ -50,12 +50,8 @@ export class BlocksOverviewComponent implements OnInit {
       const page = params.get('page');
       const pageSize = params.get('pageSize');
 
-      if (page !== null) {
-        this.currentPage.set(Number(page));
-      }
-      if (pageSize !== null) {
-        this.pageSize.set(Number(pageSize));
-      }
+      page && this.currentPage.set(+page);
+      pageSize && this.pageSize.set(+pageSize);
     });
 
     // Fetch blocks count immediately and then poll every 60 seconds
