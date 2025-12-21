@@ -45,7 +45,6 @@ export class BlocksOverviewComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // Initialize pagination state from query params (resolver already loaded data)
     const params = this.route.snapshot.queryParamMap;
     const page = params.get('page');
     const pageSize = params.get('pageSize');
