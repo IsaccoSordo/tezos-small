@@ -9,7 +9,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { loadingInterceptor } from './loading.interceptor';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 
 /**
  * Loading Interceptor Test Suite

@@ -1,4 +1,4 @@
-import { OAuthProvider } from '../auth/auth.interfaces';
+import { OAuthProvider } from '../common';
 
 /** Storage keys for auth data */
 export const AUTH_STORAGE_KEYS = {

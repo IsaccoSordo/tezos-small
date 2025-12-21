@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { timer, switchMap, take } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
 
 @Component({

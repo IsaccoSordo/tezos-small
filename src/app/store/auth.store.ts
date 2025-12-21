@@ -1,5 +1,5 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { AuthState, User } from './auth.interfaces';
+import { AuthState, User } from '../common';
 import { AUTH_STORAGE_KEYS } from '../config/auth.config';
 
 function loadInitialState(): AuthState {

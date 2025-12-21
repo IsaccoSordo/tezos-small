@@ -12,7 +12,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',

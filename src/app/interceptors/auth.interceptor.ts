@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthStore } from '../auth/auth.store';
+import { AuthStore } from '../store/auth.store';
 import { PROTECTED_API_PATTERNS } from '../config/auth.config';
 
 /**

@@ -7,7 +7,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { TzktService } from '../services/tzkt.service';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
 /**

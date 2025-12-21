@@ -10,8 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { AuthService } from '../auth.service';
-import { OAUTH_PROVIDERS } from '../../config/auth.config';
+import { AuthService } from '../services/auth.service';
+import { OAUTH_PROVIDERS } from '../config/auth.config';
 
 @Component({
   selector: 'app-login',

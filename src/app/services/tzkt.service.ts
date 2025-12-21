@@ -12,7 +12,7 @@ import {
 } from 'rxjs';
 import { Block, Transaction } from '../common';
 import { cacheContext } from '../config/cache.config';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 
 @Injectable({
   providedIn: 'root',

@@ -8,7 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TzktService } from '../services/tzkt.service';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 import { TableComponent } from '../ui/table/table.component';
 
 @Component({

@@ -25,12 +25,19 @@ This is a single-page application featuring block browsing, transaction details,
 
 ## TypeScript Interfaces
 
-- [src/app/common.ts](src/app/common.ts): Shared TypeScript interfaces (Block, Transaction, Account, Column, TableConfig)
+- [src/app/common.ts](src/app/common.ts): All shared TypeScript interfaces
 
 ## Services & State Management
 
 - [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
-- [src/app/store/store.service.ts](src/app/store/store.service.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods` for scalable, maintainable state management
+- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods` for scalable, maintainable state management
+- [src/app/store/auth.store.ts](src/app/store/auth.store.ts): Authentication state management using **NgRx SignalStore**
+
+## Routing & Authentication
+
+- [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Route guards for authentication (authGuard, guestGuard)
+- [src/app/auth/auth.service.ts](src/app/auth/auth.service.ts): Authentication service for login/logout operations
+- [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page component
 
 ## HTTP Interceptors
 
@@ -311,3 +318,23 @@ describe('ComponentName', () => {
 - TypeScript strict mode enabled
 - SCSS styling with modular components
 - BEM naming conventions
+
+## Project Structure Rules
+
+**Directory Organization**
+- All guards go in `src/app/guards/` folder (e.g., auth.guard.ts, admin.guard.ts)
+- All interfaces go in `src/app/common.ts` file (consolidated in one file)
+- All stores go in `src/app/store/` folder (e.g., tzkt.store.ts, auth.store.ts)
+- State files follow naming pattern: `<domain>.store.ts` (not `store.service.ts`)
+- Login components go in `src/app/login/` folder (moved from auth subfolder)
+- Services go in `src/app/services/` folder (e.g., tzkt.service.ts, auth.service.ts)
+- HTTP interceptors go in `src/app/interceptors/` folder
+- UI components go in `src/app/ui/` folder with subdirectories per component
+- Feature components (pages) go directly in `src/app/` with their own directories
+
+**Import Path Conventions**
+- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`
+- Use absolute imports for deeply nested components: `src/app/store/` from UI components
+- Guard imports in routes: `'./guards/auth.guard'`
+- Store imports: `'../store/tzkt.store'`, `'../store/auth.store'`
+- Interface imports: `'../common'` (all interfaces in single file)

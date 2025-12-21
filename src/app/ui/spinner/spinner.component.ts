@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Store } from 'src/app/store/store.service';
+import { Store } from 'src/app/store/tzkt.store';
 
 @Component({
   selector: 'app-spinner',
