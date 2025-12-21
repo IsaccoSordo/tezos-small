@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { timer, switchMap, take } from 'rxjs';
+import { interval, switchMap } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/tzkt.store';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
@@ -32,7 +32,7 @@ export class BlocksOverviewComponent implements OnInit {
   blocks = this.store.blocks;
   count = this.store.count;
 
-  // Pagination state
+  // Pagination state from query params
   currentPage = signal(0);
   pageSize = signal(10);
 
@@ -45,17 +45,16 @@ export class BlocksOverviewComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // Restore pagination state from query params
-    this.route.queryParamMap.pipe(take(1)).subscribe((params) => {
-      const page = params.get('page');
-      const pageSize = params.get('pageSize');
+    // Initialize pagination state from query params (resolver already loaded data)
+    const params = this.route.snapshot.queryParamMap;
+    const page = params.get('page');
+    const pageSize = params.get('pageSize');
 
-      page && this.currentPage.set(+page);
-      pageSize && this.pageSize.set(+pageSize);
-    });
+    page && this.currentPage.set(+page);
+    pageSize && this.pageSize.set(+pageSize);
 
-    // Fetch blocks count immediately and then poll every 60 seconds
-    timer(0, 60000)
+    // Poll for block count every 60 seconds to keep data fresh
+    interval(60000)
       .pipe(
         switchMap(() => this.service.getBlocksCount()),
         takeUntilDestroyed(this.destroyRef)
@@ -70,23 +69,11 @@ export class BlocksOverviewComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(pageSize);
 
-    // Update query params to preserve pagination state
+    // Navigate with new query params - resolver will fetch new data
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { page, pageSize },
       queryParamsHandling: 'merge',
     });
-
-    this.fetchBlocks();
-  }
-
-  private fetchBlocks(): void {
-    const limit = this.pageSize();
-    const offset = this.currentPage();
-
-    this.service
-      .getBlocks(limit, offset)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
   }
 }

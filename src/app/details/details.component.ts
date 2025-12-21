@@ -1,13 +1,5 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  ChangeDetectionStrategy,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/tzkt.store';
 import { TableComponent } from '../ui/table/table.component';
 
@@ -19,11 +11,7 @@ import { TableComponent } from '../ui/table/table.component';
   imports: [CommonModule, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DetailsComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private service = inject(TzktService);
-  private destroyRef = takeUntilDestroyed();
-
+export class DetailsComponent {
   store = inject(Store);
   transactions = this.store.transactions;
 
@@ -33,14 +21,4 @@ export class DetailsComponent implements OnInit {
     { field: 'amount', header: 'Amount' },
     { field: 'status', header: 'Status' },
   ];
-
-  ngOnInit(): void {
-    const level: number = +(
-      this.route.snapshot.paramMap.get('level') ?? 'error'
-    );
-
-    if (!isNaN(level)) {
-      this.service.getTransactions(level).pipe(this.destroyRef).subscribe();
-    }
-  }
 }

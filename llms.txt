@@ -36,7 +36,8 @@ This is a single-page application featuring block browsing, transaction details,
 ## Routing & Authentication
 
 - [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Route guards for authentication (authGuard, guestGuard)
-- [src/app/auth/auth.service.ts](src/app/auth/auth.service.ts): Authentication service for login/logout operations
+- [src/app/resolvers/tzkt.resolvers.ts](src/app/resolvers/tzkt.resolvers.ts): Functional resolvers for preloading route data (blocks, count, transactions)
+- [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Authentication service for login/logout operations
 - [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page component
 
 ## HTTP Interceptors
@@ -135,12 +136,89 @@ This is a single-page application featuring block browsing, transaction details,
 - For state management: use NgRx SignalStore with `withState()` and `withMethods()` patterns
 - Use `patchState()` for all state updates to ensure immutability
 
+**Subscription Patterns (CRITICAL)**
+- NEVER subscribe inside method functions - use Subject pattern instead
+- NEVER subscribe in constructors - always use ngOnInit for subscriptions
+- Always use `takeUntilDestroyed(this.destroyRef)` to automatically unsubscribe
+- For user actions: use Subject to trigger, switchMap to handle async, subscribe in ngOnInit
+- Services return observables; components manage subscriptions in ngOnInit only
+
+**Subject Pattern for User Actions**
+```typescript
+private actionTrigger$ = new Subject<string>();
+
+ngOnInit(): void {
+  this.actionTrigger$
+    .pipe(
+      switchMap((param) => this.service.doSomething(param)),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe(() => {
+      // handle result
+    });
+}
+
+onUserAction(param: string): void {
+  this.actionTrigger$.next(param);  // just trigger, no subscribe
+}
+```
+
+**Zoneless Architecture**
+- Project uses zoneless change detection - NEVER use NgZone
+- Signals automatically trigger change detection
+- No need for manual change detection calls
+
+**Centralized Loading State**
+- Loading state is handled by the loading interceptor via Store.loadingCounter
+- NEVER create component-level isLoading properties
+- Use Store.incrementLoadingCounter() / decrementLoadingCounter() for non-HTTP async operations
+- Global SpinnerComponent shows when loadingCounter > 0
+
+**Centralized Error Handling**
+- Errors are handled by the error interceptor - shows toast notifications
+- NEVER handle errors in components or use catchError in component subscriptions
+- Error interceptor returns EMPTY, so component subscriptions complete safely
+
 **RxJS Patterns**
 - Use `tap` for side effects without transforming values
 - Use `map` for value transformations
 - Use `catchError` for error handling
 - Use `finalize` for cleanup operations
 - Use `forkJoin` for combining parallel requests
+
+**Route Resolvers (CRITICAL)**
+- Use functional resolvers (class-based resolvers are deprecated since Angular 16)
+- Resolvers preload data before component renders - no loading states needed in resolved components
+- Use `inject()` function to access services within resolver functions
+- Resolvers block navigation until data is loaded - use sparingly for critical data only
+- Secondary/non-critical data should still be loaded in ngOnInit
+- Configure `withComponentInputBinding()` in router for type-safe resolved data access
+- Use `runGuardsAndResolvers: 'paramsOrQueryParamsChange'` for routes with pagination
+
+**Functional Resolver Pattern**
+```typescript
+import { inject } from '@angular/core';
+import { ResolveFn, ActivatedRouteSnapshot } from '@angular/router';
+
+export const dataResolver: ResolveFn<DataType[]> = (
+  route: ActivatedRouteSnapshot
+) => {
+  const service = inject(DataService);
+  const id = route.paramMap.get('id');
+  return service.getData(id);
+};
+```
+
+**Route Configuration with Resolver**
+```typescript
+{
+  path: 'details/:id',
+  loadComponent: () => import('./details.component').then(m => m.DetailsComponent),
+  resolve: {
+    data: dataResolver,
+  },
+}
+```
 
 **Accessibility**
 - Ensure WCAG AA compliance
@@ -323,6 +401,7 @@ describe('ComponentName', () => {
 
 **Directory Organization**
 - All guards go in `src/app/guards/` folder (e.g., auth.guard.ts, admin.guard.ts)
+- All resolvers go in `src/app/resolvers/` folder (e.g., tzkt.resolvers.ts)
 - All interfaces go in `src/app/common.ts` file (consolidated in one file)
 - All stores go in `src/app/store/` folder (e.g., tzkt.store.ts, auth.store.ts)
 - State files follow naming pattern: `<domain>.store.ts` (not `store.service.ts`)
@@ -333,8 +412,9 @@ describe('ComponentName', () => {
 - Feature components (pages) go directly in `src/app/` with their own directories
 
 **Import Path Conventions**
-- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`
+- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`, `../resolvers/`
 - Use absolute imports for deeply nested components: `src/app/store/` from UI components
 - Guard imports in routes: `'./guards/auth.guard'`
+- Resolver imports in routes: `'./resolvers/tzkt.resolvers'`
 - Store imports: `'../store/tzkt.store'`, `'../store/auth.store'`
 - Interface imports: `'../common'` (all interfaces in single file)

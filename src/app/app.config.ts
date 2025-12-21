@@ -3,7 +3,7 @@ import {
   provideZonelessChangeDetection,
   ErrorHandler,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
@@ -18,7 +18,7 @@ import { GlobalErrorHandler } from './core/global-error.handler';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpCache(),
     provideHttpClient(
       withInterceptors([

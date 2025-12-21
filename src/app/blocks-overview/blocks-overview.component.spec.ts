@@ -10,17 +10,16 @@ import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/tzkt.store';
 import { PageChangeEvent } from '../ui/table/table.component';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import { Block } from '../common';
 
 /**
  * BlocksOverviewComponent Test Suite
  *
  * Testing Best Practices Applied:
- * - Helper functions reduce code duplication for common mock patterns
- * - Each test has a single, focused responsibility
+ * - Component relies on resolver for initial data preloading
+ * - Timer starts at 60 seconds (not 0) since resolver preloaded initial count
  * - vi.useFakeTimers() handles async timer operations
  * - fixture.destroy() ensures proper cleanup of timer subscriptions
- * - Tests are organized logically: basic → initialization → behavior → integration
+ * - Tests are organized logically: basic → initialization → behavior → polling
  */
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
@@ -48,34 +47,13 @@ describe('BlocksOverviewComponent', () => {
   // Helper function to handle initial component setup
   const initializeComponent = () => {
     fixture.detectChanges();
-    vi.advanceTimersByTime(0); // Trigger the timer(0, 60000) to fire immediately
   };
 
-  // Helper function to handle the count request
+  // Helper function to handle the count request (for polling)
   const flushCountRequest = (count = 100) => {
     const req = httpMock.expectOne('https://api.tzkt.io/v1/blocks/count');
     expect(req.request.method).toBe('GET');
     req.flush(count);
-  };
-
-  // Helper function to handle the initial blocks request
-  const flushInitialBlocksRequest = (blocks: Block[] = []) => {
-    const req = httpMock.expectOne(
-      (req) => req.url === 'https://api.tzkt.io/v1/blocks'
-    );
-    req.flush(blocks);
-  };
-
-  // Helper function to handle transaction count requests
-  const flushTransactionCountRequests = () => {
-    mockBlocks.forEach((block) => {
-      const req = httpMock.expectOne(
-        (req) =>
-          req.url === 'https://api.tzkt.io/v1/operations/transactions/count' &&
-          req.params.get('level') === block.level.toString()
-      );
-      req.flush(block.transactions);
-    });
   };
 
   beforeEach(async () => {
@@ -113,84 +91,69 @@ describe('BlocksOverviewComponent', () => {
     expect(component.count).toBe(store.count);
   });
 
-  it('should initialize and fetch block count', () => {
+  it('should not make HTTP requests on init (resolver preloads data)', () => {
     initializeComponent();
-    flushCountRequest(5000);
-    flushInitialBlocksRequest();
 
+    // No immediate HTTP requests - resolver handles initial data loading
+    httpMock.expectNone('https://api.tzkt.io/v1/blocks/count');
+    httpMock.expectNone((req) => req.url === 'https://api.tzkt.io/v1/blocks');
+  });
+
+  it('should poll for block count after 60 seconds', () => {
+    initializeComponent();
+
+    // No request at initialization
+    httpMock.expectNone('https://api.tzkt.io/v1/blocks/count');
+
+    // Advance timer by 60 seconds to trigger first poll
+    vi.advanceTimersByTime(60000);
+
+    flushCountRequest(5000);
     expect(store.count()).toBe(5000);
   });
 
-  it('should handle page change and update store with blocks', () => {
+  it('should poll for block count every 60 seconds', () => {
     initializeComponent();
-    flushCountRequest();
-    flushInitialBlocksRequest();
 
-    // Trigger page change to fetch different data
-    const pageEvent: PageChangeEvent = { page: 0, pageSize: 10 };
-    component.onPageChange(pageEvent);
+    // First poll at 60 seconds
+    vi.advanceTimersByTime(60000);
+    flushCountRequest(5000);
+    expect(store.count()).toBe(5000);
 
-    // Expect blocks request with correct pagination parameters
-    const blocksReq = httpMock.expectOne(
-      (req) =>
-        req.url === 'https://api.tzkt.io/v1/blocks' &&
-        req.params.get('limit') === '10' &&
-        req.params.get('offset.pg') === '0'
-    );
-    expect(blocksReq.request.method).toBe('GET');
-    blocksReq.flush(mockBlocks);
-
-    flushTransactionCountRequests();
-
-    expect(store.blocks().length).toBe(2);
-    expect(store.blocks()[0].hash).toBe('abc123');
+    // Second poll at 120 seconds
+    vi.advanceTimersByTime(60000);
+    flushCountRequest(5100);
+    expect(store.count()).toBe(5100);
   });
 
-  it('should update pagination state and query params on page change', () => {
+  it('should update pagination state on page change', () => {
     initializeComponent();
-    flushCountRequest();
-    flushInitialBlocksRequest();
 
     const pageEvent: PageChangeEvent = { page: 1, pageSize: 20 };
     component.onPageChange(pageEvent);
 
     expect(component.currentPage()).toBe(1);
     expect(component.pageSize()).toBe(20);
-
-    const req = httpMock.expectOne(
-      (req) =>
-        req.url === 'https://api.tzkt.io/v1/blocks' &&
-        req.params.get('limit') === '20' &&
-        req.params.get('offset.pg') === '1'
-    );
-    req.flush([]);
   });
 
-  it('should display blocks in template when data is available', () => {
-    initializeComponent();
-    flushCountRequest();
-    flushInitialBlocksRequest(mockBlocks);
-    flushTransactionCountRequests();
+  it('should display blocks in template when store has data', () => {
+    // Simulate resolver having preloaded data into store
+    store.setBlocks(mockBlocks);
+    store.setCount(1000);
 
-    fixture.detectChanges();
+    initializeComponent();
 
     const compiled = fixture.nativeElement;
     expect(compiled.textContent).toContain('abc123');
     expect(compiled.textContent).toContain('Baker1');
   });
 
-  it('should manage loading state during concurrent requests', () => {
-    expect(store.loadingCounter()).toBe(0);
-
+  it('should display correct number of blocks from store', () => {
+    store.setBlocks(mockBlocks);
     initializeComponent();
 
-    // Two concurrent requests: count + initial blocks
-    expect(store.loadingCounter()).toBe(2);
-
-    flushCountRequest();
-    expect(store.loadingCounter()).toBe(1);
-
-    flushInitialBlocksRequest();
-    expect(store.loadingCounter()).toBe(0);
+    expect(component.blocks().length).toBe(2);
+    expect(component.blocks()[0].hash).toBe('abc123');
+    expect(component.blocks()[1].level).toBe(101);
   });
 });
