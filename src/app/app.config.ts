@@ -12,6 +12,7 @@ import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
 import { routes } from './app.routes';
 import { loadingInterceptor } from './interceptors/loading.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
+import { authInterceptor } from './interceptors/auth.interceptor';
 import { GlobalErrorHandler } from './core/global-error.handler';
 
 export const appConfig: ApplicationConfig = {
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpCache(),
     provideHttpClient(
       withInterceptors([
+        authInterceptor,
         withHttpCacheInterceptor(),
         errorInterceptor,
         loadingInterceptor,
