@@ -22,6 +22,3 @@ export const OAUTH_PROVIDERS: Record<string, OAuthProvider> = {
     color: '#333',
   },
 } as const;
-
-/** Mock delay for simulating OAuth flow (ms) */
-export const MOCK_AUTH_DELAY = 1000;
