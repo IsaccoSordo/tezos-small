@@ -53,7 +53,7 @@ export class AuthService {
     this.authStore.setAuth(user, token);
   }
 
-  login(provider: string = 'google'): Observable<User> {
+  login(provider = 'google'): Observable<User> {
     const authProvider =
       provider === 'github' ? githubProvider : googleProvider;
 

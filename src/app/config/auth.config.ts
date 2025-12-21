@@ -7,9 +7,7 @@ export const AUTH_STORAGE_KEYS = {
 } as const;
 
 /** API endpoints that require authentication */
-export const PROTECTED_API_PATTERNS = [
-  '/operations/transactions',
-] as const;
+export const PROTECTED_API_PATTERNS = ['/operations/transactions'] as const;
 
 /** OAuth providers configuration */
 export const OAUTH_PROVIDERS: Record<string, OAuthProvider> = {
