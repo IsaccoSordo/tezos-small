@@ -81,17 +81,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate environment files
-        run: npm run set-env
+      - name: Build production
+        run: npm run build:prod
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
-
-      - name: Build production
-        run: npm run build:prod
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
