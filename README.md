@@ -8,8 +8,6 @@
 
 An Angular application for exploring Tezos blockchain blocks and transactions through the [TZKT API](https://tzkt.io/api/).
 
-**Live Demo**: [https://isaccosordo.github.io/tezos-small/](https://isaccosordo.github.io/tezos-small/)
-
 ## Features
 
 **Block Explorer**
