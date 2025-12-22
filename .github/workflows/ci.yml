@@ -91,7 +91,7 @@ jobs:
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
 
       - name: Build production
-        run: ng build --configuration production
+        run: npm run build:prod
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
