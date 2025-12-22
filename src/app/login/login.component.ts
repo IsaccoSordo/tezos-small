@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, switchMap, catchError, EMPTY } from 'rxjs';
+import { Subject, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
@@ -39,17 +39,7 @@ export class LoginComponent implements OnInit {
     // Handle regular login
     this.loginTrigger$
       .pipe(
-        switchMap((provider) =>
-          this.authService.login(provider).pipe(
-            catchError((err) => {
-              // If linking is required, the error is caught but pendingLink is set
-              if (err?.code === 'auth/linking-required') {
-                return EMPTY;
-              }
-              throw err;
-            })
-          )
-        ),
+        switchMap((provider) => this.authService.login(provider)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
