@@ -33,6 +33,7 @@ interface FirebaseConfig {
   storageBucket: string;
   messagingSenderId: string;
   appId: string;
+  measurementId?: string;
 }
 
 interface Environment {
@@ -69,9 +70,10 @@ function createFirebaseConfig(): FirebaseConfig {
     apiKey: getEnvVar('FIREBASE_API_KEY', 'YOUR_API_KEY'),
     authDomain: `${projectId}.firebaseapp.com`,
     projectId: projectId,
-    storageBucket: `${projectId}.appspot.com`,
+    storageBucket: `${projectId}.firebasestorage.com`,
     messagingSenderId: getEnvVar('FIREBASE_SENDER_ID', 'YOUR_SENDER_ID'),
     appId: getEnvVar('FIREBASE_APP_ID', 'YOUR_APP_ID'),
+    measurementId: getEnvVar('FIREBASE_MEASUREMENT_ID', 'YOUR_MEASUREMENT_ID'),
   };
 }
 
@@ -112,8 +114,7 @@ function main(): void {
 
   // Validate that real values are set (warn if placeholders detected)
   const hasPlaceholders = Object.values(firebaseConfig).some(
-    (value) =>
-      value.includes('YOUR_') || value === '' || value === 'undefined'
+    (value) => value.includes('YOUR_') || value === '' || value === 'undefined'
   );
 
   if (hasPlaceholders) {
@@ -125,6 +126,7 @@ function main(): void {
     console.warn('  - FIREBASE_PROJECT_ID');
     console.warn('  - FIREBASE_APP_ID');
     console.warn('  - FIREBASE_SENDER_ID');
+    console.warn('  - FIREBASE_MEASUREMENT_ID');
   }
 }
 
