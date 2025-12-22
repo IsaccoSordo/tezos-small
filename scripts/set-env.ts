@@ -2,7 +2,7 @@
  * Environment File Generator
  *
  * Generates Angular environment files from environment variables.
- * Used in CI/CD pipelines (GitHub Actions) to inject secrets at build time.
+ * Loads .env file for local development, uses system env vars in CI/CD.
  *
  * Usage:
  *   npx ts-node scripts/set-env.ts          # Generates both environment files
@@ -15,8 +15,16 @@
  *   FIREBASE_SENDER_ID
  */
 
+import { config } from 'dotenv';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+
+// Load .env file if it exists (for local development)
+const envPath = join(__dirname, '..', '.env');
+if (existsSync(envPath)) {
+  config({ path: envPath });
+  console.log('Loaded .env file');
+}
 
 interface FirebaseConfig {
   apiKey: string;
