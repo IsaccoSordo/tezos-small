@@ -34,8 +34,7 @@ export class LoginComponent implements OnInit {
   private linkTrigger$ = new Subject<void>();
 
   ngOnInit(): void {
-    this.returnUrl =
-      this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
 
     // Handle regular login
     this.loginTrigger$

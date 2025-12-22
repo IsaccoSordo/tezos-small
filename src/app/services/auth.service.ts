@@ -71,9 +71,7 @@ export class AuthService {
 
     return from(signInWithPopup(this.auth, authProvider)).pipe(
       map((result) => this.mapFirebaseUser(result.user)),
-      catchError((error) =>
-        this.handleAuthError(error, provider)
-      )
+      catchError((error) => this.handleAuthError(error, provider))
     );
   }
 
@@ -161,8 +159,7 @@ export class AuthService {
     error: { customData?: { _tokenResponse?: { oauthAccessToken?: string } } },
     provider: string
   ): AuthCredential | null {
-    const oauthAccessToken =
-      error.customData?._tokenResponse?.oauthAccessToken;
+    const oauthAccessToken = error.customData?._tokenResponse?.oauthAccessToken;
     if (!oauthAccessToken) return null;
 
     if (provider === 'github') {
