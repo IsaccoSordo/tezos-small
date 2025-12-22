@@ -2,12 +2,13 @@
 
 > An Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API.
 
-This is a single-page application featuring block browsing, transaction details, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
+This is a single-page application featuring block browsing, transaction details, Firebase authentication with OAuth providers, zoneless change detection, standalone components, and HTTP interceptors for error handling and loading states. The project uses TypeScript strict mode, RxJS for reactive patterns, and PrimeNG Aura theme for UI.
 
-**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @ngneat/cashew, TZKT API
+**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @angular/fire, @ngneat/cashew, Firebase Auth, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
-**Last Updated**: 2025-12-14
+**Last Updated**: 2025-12-22
 **Dependencies**: All dependencies use exact versions (no wildcards like ^ or ~)
+**Live Demo**: https://isaccosordo.github.io/tezos-small/
 
 ## Core Documentation
 
@@ -20,8 +21,8 @@ This is a single-page application featuring block browsing, transaction details,
 ## Application Configuration
 
 - [src/main.ts](src/main.ts): Application bootstrap with zoneless change detection
-- [src/app/app.config.ts](src/app/app.config.ts): Global providers, HTTP interceptors registration, PrimeNG theme configuration (Aura preset)
-- [src/app/app.routes.ts](src/app/app.routes.ts): Application routing configuration with lazy loading
+- [src/app/app.config.ts](src/app/app.config.ts): Global providers including Firebase (`provideFirebaseApp`, `provideAuth`), HTTP interceptors, and PrimeNG theme (Aura preset)
+- [src/app/app.routes.ts](src/app/app.routes.ts): Application routing configuration with lazy loading and auth guards
 
 ## Environment Configuration
 
@@ -37,6 +38,7 @@ Environment files are **generated at build time** from environment variables - t
 - `FIREBASE_PROJECT_ID`: Firebase project ID
 - `FIREBASE_APP_ID`: Firebase app ID
 - `FIREBASE_SENDER_ID`: Firebase messaging sender ID
+- `FIREBASE_MEASUREMENT_ID`: Firebase Analytics measurement ID
 
 **Local Development Setup**
 1. Copy `.env.example` to `.env`
@@ -45,8 +47,9 @@ Environment files are **generated at build time** from environment variables - t
 
 **CI/CD Integration**
 - GitHub Actions workflow injects secrets at build time
-- Secrets are configured in repository settings: Settings > Secrets and variables > Actions
-- All build scripts automatically run `set-env` before building
+- Secrets are configured in repository settings: Settings > Secrets and variables > Actions > Environments > production
+- Build and deploy only run on push to main (not on pull requests)
+- Deployed to GitHub Pages at https://isaccosordo.github.io/tezos-small/
 
 ## TypeScript Models
 
@@ -54,23 +57,53 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 
 - [src/app/models/index.ts](src/app/models/index.ts): Barrel file - re-exports all interfaces for simplified imports
 - [src/app/models/tzkt.model.ts](src/app/models/tzkt.model.ts): TZKT domain models (Block, Transaction, Account, TZKTState)
-- [src/app/models/auth.model.ts](src/app/models/auth.model.ts): Authentication models (User, AuthState, OAuthProvider, OAuthCallbackResponse)
+- [src/app/models/auth.model.ts](src/app/models/auth.model.ts): Authentication models (User)
 - [src/app/models/ui.model.ts](src/app/models/ui.model.ts): UI component models (Column, TableData)
 
 ## Services & State Management
 
 - [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
-- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods` for scalable, maintainable state management
-- [src/app/store/auth.store.ts](src/app/store/auth.store.ts): Authentication state management using **NgRx SignalStore**
+- [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Firebase Authentication service using `@angular/fire` and `toSignal()` pattern - NO subscriptions, NO constructor needed
+- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods`
 
-## Routing & Authentication
+## Authentication (Firebase via @angular/fire)
 
-- [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Route guards for authentication (authGuard, guestGuard)
+The application uses `@angular/fire` for Firebase integration with signal-based state:
+
+- [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Core auth service using `toSignal()` pattern
+  - `user()` signal: Current Firebase user (automatically updates on auth state changes)
+  - `token()` signal: ID token (automatically refreshes)
+  - `isAuthenticated()` computed signal: Boolean auth status
+  - `pendingLink()` signal: For account linking flow
+  - `login(provider)`: Google/GitHub OAuth via popup
+  - `completeAccountLinking()`: Links accounts with same email
+- [src/app/config/auth.config.ts](src/app/config/auth.config.ts): Protected API patterns for auth interceptor
+- [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Route guards (authGuard, guestGuard)
+
+**Key Pattern - toSignal for Auth State:**
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private auth = inject(Auth);
+
+  // Firebase observables converted to signals - no subscriptions needed
+  private firebaseUser = toSignal(user(this.auth));
+  readonly token = toSignal(idToken(this.auth));
+
+  // Computed signals for derived state
+  readonly user = computed(() => this.mapFirebaseUser(this.firebaseUser()));
+  readonly isAuthenticated = computed(() => !!this.firebaseUser());
+}
+```
+
+## Routing & Guards
+
+- [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Functional route guards using `inject(AuthService)`
 - [src/app/resolvers/tzkt.resolvers.ts](src/app/resolvers/tzkt.resolvers.ts): Functional resolvers for preloading route data (blocks, count, transactions)
-- [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Authentication service for login/logout operations
 
 ## HTTP Interceptors
 
+- [src/app/interceptors/auth.interceptor.ts](src/app/interceptors/auth.interceptor.ts): Attaches Bearer token to protected API requests using `AuthService.token()` signal
 - [src/app/interceptors/loading.interceptor.ts](src/app/interceptors/loading.interceptor.ts): Functional interceptor for automatic loading state management using counter-based approach
 - [src/app/interceptors/error.interceptor.ts](src/app/interceptors/error.interceptor.ts): Centralized HTTP error handling - displays PrimeNG toast notifications, logs errors, and returns EMPTY observable to prevent error propagation
 - **HTTP Caching**: Uses [@ngneat/cashew](https://github.com/ngneat/cashew) for response caching via `withCache()` context in service methods
@@ -82,10 +115,10 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 ## Smart/Container Components
 
 - [src/app/app.component.ts](src/app/app.component.ts): Root application component
-- [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with authentication logic (login/logout)
+- [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with authentication status display
 - [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Main blocks listing page with pagination and polling
 - [src/app/details/details.component.ts](src/app/details/details.component.ts): Transaction details page for individual blocks
-- [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page with OAuth provider selection
+- [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page with OAuth provider selection (Google, GitHub) and account linking UI
 
 ## Presentational Components
 
@@ -112,12 +145,12 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 - Keep descriptions factual and verifiable
 
 **Examples of Neutral vs. Grandiose Language**
-- ❌ "A sleek, modern Angular application" → ✅ "An Angular application"
-- ❌ "Enterprise-grade UI components" → ✅ "Angular UI component library"
-- ❌ "Beautiful, premium icons" → ✅ "Icon library"
-- ❌ "Smart loading states" → ✅ "Loading states"
-- ❌ "Comprehensive testing best practices" → ✅ "Unit tests for components and services"
-- ❌ "Industry-standard state management" → ✅ "NgRx SignalStore for state management"
+- "A sleek, modern Angular application" -> "An Angular application"
+- "Enterprise-grade UI components" -> "Angular UI component library"
+- "Beautiful, premium icons" -> "Icon library"
+- "Smart loading states" -> "Loading states"
+- "Comprehensive testing best practices" -> "Unit tests for components and services"
+- "Industry-standard state management" -> "NgRx SignalStore for state management"
 
 **What IS Acceptable**
 - Technical specifications and version numbers
@@ -138,7 +171,7 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 - Use domain-based organization: group interfaces by business domain, not by type
 - File naming: use `<domain>.model.ts` suffix (e.g., tzkt.model.ts, auth.model.ts)
 - Keep related interfaces together: Account, Block, Transaction all in tzkt.model.ts
-- State interfaces stay with their domain: TZKTState in tzkt.model.ts, AuthState in auth.model.ts
+- State interfaces stay with their domain: TZKTState in tzkt.model.ts
 - Use barrel files (index.ts) for clean imports: `import { Block, User } from '../models'`
 - Re-export using `export type { ... }` for type-only exports
 - Component-specific types can be co-located with components for encapsulation
@@ -148,13 +181,14 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 ```typescript
 // src/app/models/index.ts
 export type { Account, Block, Transaction, TZKTState } from './tzkt.model';
-export type { User, AuthState, OAuthProvider } from './auth.model';
+export type { User } from './auth.model';
 export type { Column, TableData } from './ui.model';
 ```
 
 **Angular Conventions**
 - Use standalone components (no NgModules)
-- Use **NgRx SignalStore** for state management (installed: @ngrx/signals)
+- Use **NgRx SignalStore** for TZKT state management (installed: @ngrx/signals)
+- Use **@angular/fire** with `toSignal()` pattern for Firebase auth state
 - Organize state with `withState()` for initial state and `withMethods()` for state updates
 - Use `patchState()` for immutable state updates in SignalStore methods
 - State properties are automatically exposed as signals by SignalStore
@@ -187,7 +221,8 @@ export type { Column, TableData } from './ui.model';
 - Follow single responsibility principle
 - Return observables for async operations
 - Handle errors gracefully with proper error messages
-- For state management: use NgRx SignalStore with `withState()` and `withMethods()` patterns
+- For TZKT state: use NgRx SignalStore with `withState()` and `withMethods()` patterns
+- For Firebase auth: use `toSignal()` pattern with `@angular/fire` observables
 - Use `patchState()` for all state updates to ensure immutability
 
 **Subscription Patterns (CRITICAL)**
@@ -196,6 +231,7 @@ export type { Column, TableData } from './ui.model';
 - Always use `takeUntilDestroyed(this.destroyRef)` to automatically unsubscribe
 - For user actions: use Subject to trigger, switchMap to handle async, subscribe in ngOnInit
 - Services return observables; components manage subscriptions in ngOnInit only
+- For Firebase auth state: use `toSignal()` - NO subscriptions needed
 
 **Subject Pattern for User Actions**
 ```typescript
@@ -290,7 +326,8 @@ export const dataResolver: ResolveFn<DataType[]> = (
 - `/operations/transactions?level=X`: Block transactions
 
 **Integration Notes**
-- All HTTP calls go through interceptors (loading + error + cache)
+- All HTTP calls go through interceptors (auth + loading + error + cache)
+- Auth interceptor adds Bearer token for protected API patterns
 - Caching configured per-request using `withCache({ ttl: ms })` from @ngneat/cashew
 - No manual loading/error state management needed in services
 - Responses are mapped to TypeScript interfaces (Block, Transaction)
@@ -316,9 +353,23 @@ export const dataResolver: ResolveFn<DataType[]> = (
 - Use Vitest for test framework (describe, it, expect, vi)
 - Uses jsdom for DOM emulation (no browser needed)
 - Mock HTTP calls with HttpClientTestingModule and HttpTestingController
+- Mock AuthService with signals for components that inject it
 - Test component inputs, outputs, and user interactions
 - Verify error handling and edge cases
 - Aim for high code coverage
+
+**Mocking AuthService in Tests**
+```typescript
+const mockAuthService = {
+  user: signal(null),
+  token: signal(null),
+  isAuthenticated: signal(false),
+  pendingLink: signal(null),
+};
+
+// In TestBed providers:
+{ provide: AuthService, useValue: mockAuthService }
+```
 
 **Test Organization Patterns**
 - Create helper functions to reduce duplication (e.g., `initializeComponent()`, `flushCountRequest()`)
@@ -386,16 +437,33 @@ describe('ComponentName', () => {
 ## Architecture Patterns
 
 **State Management**
-- Centralized signal-based state in `StoreService`
+- TZKT state: Centralized signal-based state in NgRx SignalStore (`tzkt.store.ts`)
+- Auth state: Signal-based state in AuthService using `toSignal()` from `@angular/fire` observables
 - Reactive updates using Angular Signals
 
 **Data Flow**
 1. Component calls service method
 2. Service makes HTTP request to TZKT API
-3. Loading interceptor increments counter
-4. Response/error handled by interceptors
-5. Service updates store with new data
+3. Auth interceptor adds token if needed
+4. Loading interceptor increments counter
+5. Response/error handled by interceptors
+6. Service updates store with new data
+7. Components react to signal changes
+
+**Authentication Flow**
+1. User clicks login button
+2. `AuthService.login(provider)` opens OAuth popup
+3. Firebase handles OAuth and returns user
+4. `toSignal(user(this.auth))` automatically updates `firebaseUser` signal
+5. `computed()` signals (`user`, `isAuthenticated`) update automatically
 6. Components react to signal changes
+
+**Account Linking Flow**
+1. User tries to login with provider B but email exists with provider A
+2. Error caught, credential stored in `pendingLink` signal
+3. UI shows message asking user to sign in with existing provider
+4. User clicks, triggering user-initiated popup (avoids popup blocker)
+5. After login, `linkWithCredential` links the accounts
 
 **Error Handling Flow**
 1. HTTP errors caught by error interceptor
@@ -409,6 +477,7 @@ describe('ComponentName', () => {
 - `p-progressSpinner`: Loading indicators
 - `p-toast`: Toast notifications for errors and messages
 - `p-button`: Styled buttons
+- `p-message`: Info/warning messages (for account linking UI)
 
 ## Development Commands
 
@@ -426,11 +495,21 @@ describe('ComponentName', () => {
 - Use `npm install` without --legacy-peer-deps or --force flags
 - No manual dependency resolution needed
 
+## CI/CD (GitHub Actions)
+
+- [.github/workflows/ci.yml](.github/workflows/ci.yml): CI/CD workflow
+- **On Pull Request**: Runs lint, format, and test jobs
+- **On Push to Main**: Runs lint, format, test, build, and deploy to GitHub Pages
+- Environment secrets stored in `production` environment in GitHub repo settings
+- Uses `actions/deploy-pages@v4` for GitHub Pages deployment
+
 ## Optional
 
 **Additional Resources**
 - [Angular Documentation](https://angular.io/docs): Official Angular framework docs
 - [Angular AI Development Guide](https://angular.dev/ai/develop-with-ai): Guidelines for using LLMs with Angular projects
+- [AngularFire Documentation](https://github.com/angular/angularfire): Firebase + Angular integration
+- [Firebase Authentication](https://firebase.google.com/docs/auth): Firebase Auth documentation
 - [PrimeNG Documentation](https://primeng.org): UI component library documentation
 - [TZKT API Documentation](https://tzkt.io/api/): Tezos blockchain API reference
 - [RxJS Documentation](https://rxjs.dev/): Reactive programming library docs
@@ -456,13 +535,14 @@ describe('ComponentName', () => {
 ## Project Structure Rules
 
 **Directory Organization**
-- All guards go in `src/app/guards/` folder (e.g., auth.guard.ts, admin.guard.ts)
+- All guards go in `src/app/guards/` folder (e.g., auth.guard.ts)
 - All resolvers go in `src/app/resolvers/` folder (e.g., tzkt.resolvers.ts)
 - All interfaces go in `src/app/models/` folder with domain-based organization
-- All stores go in `src/app/store/` folder (e.g., tzkt.store.ts, auth.store.ts)
-- State files follow naming pattern: `<domain>.store.ts` (not `store.service.ts`)
-- Login components go in `src/app/login/` folder (moved from auth subfolder)
+- All stores go in `src/app/store/` folder (e.g., tzkt.store.ts)
+- State files follow naming pattern: `<domain>.store.ts`
+- Login components go in `src/app/login/` folder
 - Services go in `src/app/services/` folder (e.g., tzkt.service.ts, auth.service.ts)
+- Config files go in `src/app/config/` folder (e.g., auth.config.ts, cache.config.ts)
 - HTTP interceptors go in `src/app/interceptors/` folder
 - UI components go in `src/app/ui/` folder with subdirectories per component
 - Feature components (pages) go directly in `src/app/` with their own directories
@@ -480,5 +560,6 @@ describe('ComponentName', () => {
 - Use absolute imports for deeply nested components: `src/app/store/` from UI components
 - Guard imports in routes: `'./guards/auth.guard'`
 - Resolver imports in routes: `'./resolvers/tzkt.resolvers'`
-- Store imports: `'../store/tzkt.store'`, `'../store/auth.store'`
+- Store imports: `'../store/tzkt.store'`
 - Model imports: `'../models'` (imports from barrel file, not individual domain files)
+- Config imports: `'../config/auth.config'`, `'../config/cache.config'`
