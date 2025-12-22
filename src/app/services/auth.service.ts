@@ -1,20 +1,20 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, from, of, throwError } from 'rxjs';
-import { tap, map, catchError, switchMap } from 'rxjs/operators';
-import { AuthStore } from '../store/auth.store';
-import { User } from '../models';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import {
-  getFirebaseAuth,
-  googleProvider,
-  githubProvider,
+  Auth,
+  user,
+  idToken,
   signInWithPopup,
   signOut,
-  onAuthStateChanged,
   linkWithCredential,
-  FirebaseUser,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  User as FirebaseUser,
   AuthCredential,
-} from '../config/firebase.config';
-import { GithubAuthProvider, GoogleAuthProvider } from 'firebase/auth';
+} from '@angular/fire/auth';
+import { User } from '../models';
 
 export interface PendingLinkCredential {
   credential: AuthCredential;
@@ -22,48 +22,33 @@ export interface PendingLinkCredential {
   existingProviderName: string;
 }
 
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private authStore = inject(AuthStore);
-  private auth = getFirebaseAuth();
+  private auth = inject(Auth);
 
-  readonly user = this.authStore.user;
-  readonly token = this.authStore.token;
-  readonly isAuthenticated = this.authStore.isAuthenticated;
+  /** Firebase user as a signal - automatically updates on auth state changes */
+  private firebaseUser = toSignal(user(this.auth));
+
+  /** ID token as a signal - automatically refreshes */
+  readonly token = toSignal(idToken(this.auth));
+
+  /** Mapped user for the application */
+  readonly user = computed(() => {
+    const fbUser = this.firebaseUser();
+    if (!fbUser) return null;
+    return this.mapFirebaseUser(fbUser);
+  });
+
+  /** Whether the user is authenticated */
+  readonly isAuthenticated = computed(() => !!this.firebaseUser());
 
   /** Pending credential for account linking (when popup-safe flow is needed) */
   readonly pendingLink = signal<PendingLinkCredential | null>(null);
-
-  constructor() {
-    this.initAuthStateListener();
-  }
-
-  private initAuthStateListener(): void {
-    onAuthStateChanged(this.auth, (firebaseUser) => {
-      if (firebaseUser) {
-        this.updateUserFromFirebase(firebaseUser);
-      } else {
-        this.authStore.clearAuth();
-      }
-    });
-  }
-
-  private async updateUserFromFirebase(
-    firebaseUser: FirebaseUser
-  ): Promise<void> {
-    const token = await firebaseUser.getIdToken();
-    const user: User = {
-      id: firebaseUser.uid,
-      name: firebaseUser.displayName || 'User',
-      email: firebaseUser.email || '',
-      avatar:
-        firebaseUser.photoURL ||
-        `https://api.dicebear.com/7.x/avataaars/svg?seed=${firebaseUser.uid}`,
-    };
-    this.authStore.setAuth(user, token);
-  }
 
   login(provider = 'google'): Observable<User> {
     const authProvider =
@@ -180,11 +165,7 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return from(signOut(this.auth)).pipe(
-      tap(() => {
-        this.authStore.clearAuth();
-      })
-    );
+    return from(signOut(this.auth));
   }
 
   validateSession(): Observable<boolean> {

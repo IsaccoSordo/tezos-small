@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthStore } from '../store/auth.store';
+import { AuthService } from '../services/auth.service';
 import { PROTECTED_API_PATTERNS } from '../config/auth.config';
 
 /**
@@ -10,8 +10,8 @@ import { PROTECTED_API_PATTERNS } from '../config/auth.config';
  * defined in PROTECTED_API_PATTERNS.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authStore = inject(AuthStore);
-  const token = authStore.token();
+  const authService = inject(AuthService);
+  const token = authService.token();
 
   const requiresAuth = PROTECTED_API_PATTERNS.some((pattern) =>
     req.url.includes(pattern)
