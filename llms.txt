@@ -23,6 +23,31 @@ This is a single-page application featuring block browsing, transaction details,
 - [src/app/app.config.ts](src/app/app.config.ts): Global providers, HTTP interceptors registration, PrimeNG theme configuration (Aura preset)
 - [src/app/app.routes.ts](src/app/app.routes.ts): Application routing configuration with lazy loading
 
+## Environment Configuration
+
+Environment files are **generated at build time** from environment variables - they are NOT committed to the repository.
+
+- [scripts/set-env.ts](scripts/set-env.ts): Script to generate environment files from environment variables
+- [.env.example](.env.example): Template for local environment variables
+- `src/environments/environment.ts`: Generated development config (gitignored)
+- `src/environments/environment.prod.ts`: Generated production config (gitignored)
+
+**Environment Variables (GitHub Secrets)**
+- `FIREBASE_API_KEY`: Firebase API key
+- `FIREBASE_PROJECT_ID`: Firebase project ID
+- `FIREBASE_APP_ID`: Firebase app ID
+- `FIREBASE_SENDER_ID`: Firebase messaging sender ID
+
+**Local Development Setup**
+1. Copy `.env.example` to `.env`
+2. Fill in your Firebase credentials
+3. Run `npm start` (automatically generates environment files)
+
+**CI/CD Integration**
+- GitHub Actions workflow injects secrets at build time
+- Secrets are configured in repository settings: Settings > Secrets and variables > Actions
+- All build scripts automatically run `set-env` before building
+
 ## TypeScript Models
 
 Interfaces are organized in a `models/` directory using domain-based organization with a barrel file for clean imports.
@@ -389,7 +414,9 @@ describe('ComponentName', () => {
 
 - `npm install`: Install dependencies (no --legacy-peer-deps or --force flags needed)
 - `npm start`: Start development server on http://localhost:4200
-- `npm run build`: Production build to dist/tezos-small
+- `npm run build`: Development build to dist/tezos-small
+- `npm run build:prod`: Generate env files and build for production
+- `npm run set-env`: Generate environment files from environment variables
 - `npm run watch`: Build in watch mode
 - `npm test`: Run tests
 - `npm run lint`: Run ESLint
