@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot } from '@angular/router';
-import { Transaction, Block } from '../common';
+import { Transaction, Block } from '../models';
 import { TzktService } from '../services/tzkt.service';
 
 /**

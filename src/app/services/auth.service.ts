@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, from, of } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { AuthStore } from '../store/auth.store';
-import { User } from '../common';
+import { User } from '../models';
 import {
   getFirebaseAuth,
   googleProvider,

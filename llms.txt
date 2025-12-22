@@ -23,9 +23,14 @@ This is a single-page application featuring block browsing, transaction details,
 - [src/app/app.config.ts](src/app/app.config.ts): Global providers, HTTP interceptors registration, PrimeNG theme configuration (Aura preset)
 - [src/app/app.routes.ts](src/app/app.routes.ts): Application routing configuration with lazy loading
 
-## TypeScript Interfaces
+## TypeScript Models
 
-- [src/app/common.ts](src/app/common.ts): All shared TypeScript interfaces
+Interfaces are organized in a `models/` directory using domain-based organization with a barrel file for clean imports.
+
+- [src/app/models/index.ts](src/app/models/index.ts): Barrel file - re-exports all interfaces for simplified imports
+- [src/app/models/tzkt.model.ts](src/app/models/tzkt.model.ts): TZKT domain models (Block, Transaction, Account, TZKTState)
+- [src/app/models/auth.model.ts](src/app/models/auth.model.ts): Authentication models (User, AuthState, OAuthProvider, OAuthCallbackResponse)
+- [src/app/models/ui.model.ts](src/app/models/ui.model.ts): UI component models (Column, TableData)
 
 ## Services & State Management
 
@@ -103,6 +108,24 @@ This is a single-page application featuring block browsing, transaction details,
 - Avoid `any` types; prefer explicit interfaces
 - Leverage type inference where appropriate
 - Define interfaces for all API responses and data models
+
+**Interface Organization (SCALABLE)**
+- Use domain-based organization: group interfaces by business domain, not by type
+- File naming: use `<domain>.model.ts` suffix (e.g., tzkt.model.ts, auth.model.ts)
+- Keep related interfaces together: Account, Block, Transaction all in tzkt.model.ts
+- State interfaces stay with their domain: TZKTState in tzkt.model.ts, AuthState in auth.model.ts
+- Use barrel files (index.ts) for clean imports: `import { Block, User } from '../models'`
+- Re-export using `export type { ... }` for type-only exports
+- Component-specific types can be co-located with components for encapsulation
+- NEVER create separate folders by type (e.g., /interfaces/, /types/, /enums/)
+
+**Barrel File Pattern**
+```typescript
+// src/app/models/index.ts
+export type { Account, Block, Transaction, TZKTState } from './tzkt.model';
+export type { User, AuthState, OAuthProvider } from './auth.model';
+export type { Column, TableData } from './ui.model';
+```
 
 **Angular Conventions**
 - Use standalone components (no NgModules)
@@ -408,7 +431,7 @@ describe('ComponentName', () => {
 **Directory Organization**
 - All guards go in `src/app/guards/` folder (e.g., auth.guard.ts, admin.guard.ts)
 - All resolvers go in `src/app/resolvers/` folder (e.g., tzkt.resolvers.ts)
-- All interfaces go in `src/app/common.ts` file (consolidated in one file)
+- All interfaces go in `src/app/models/` folder with domain-based organization
 - All stores go in `src/app/store/` folder (e.g., tzkt.store.ts, auth.store.ts)
 - State files follow naming pattern: `<domain>.store.ts` (not `store.service.ts`)
 - Login components go in `src/app/login/` folder (moved from auth subfolder)
@@ -417,10 +440,18 @@ describe('ComponentName', () => {
 - UI components go in `src/app/ui/` folder with subdirectories per component
 - Feature components (pages) go directly in `src/app/` with their own directories
 
+**Models Directory Organization**
+- Use domain-based file organization (e.g., tzkt.model.ts, auth.model.ts, ui.model.ts)
+- Each domain file groups related interfaces together
+- Use barrel file (index.ts) to re-export all interfaces for simplified imports
+- Use `.model.ts` suffix for interface files
+- Keep state interfaces with their domain (e.g., TZKTState in tzkt.model.ts)
+- Component-specific types can remain co-located with components (e.g., PageChangeEvent in table.component.ts)
+
 **Import Path Conventions**
-- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`, `../resolvers/`
+- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`, `../resolvers/`, `../models/`
 - Use absolute imports for deeply nested components: `src/app/store/` from UI components
 - Guard imports in routes: `'./guards/auth.guard'`
 - Resolver imports in routes: `'./resolvers/tzkt.resolvers'`
 - Store imports: `'../store/tzkt.store'`, `'../store/auth.store'`
-- Interface imports: `'../common'` (all interfaces in single file)
+- Model imports: `'../models'` (imports from barrel file, not individual domain files)

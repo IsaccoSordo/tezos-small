@@ -10,7 +10,7 @@ import {
   mergeMap,
   toArray,
 } from 'rxjs';
-import { Block, Transaction } from '../common';
+import { Block, Transaction } from '../models';
 import { cacheContext } from '../config/cache.config';
 import { Store } from '../store/tzkt.store';
 
