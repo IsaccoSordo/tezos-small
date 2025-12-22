@@ -1,0 +1,47 @@
+<div class="login-container">
+  <p-card header="Sign In" class="login-card">
+    @if (authService.pendingLink(); as pending) {
+      <p-message severity="info"
+        >An account with this email already exists with
+        {{ pending.existingProviderName }}.</p-message
+      >
+      <p class="login-subtitle">
+        Click below to sign in with {{ pending.existingProviderName }} and link
+        your accounts.
+      </p>
+      <div class="providers">
+        <p-button
+          [label]="'Sign in with ' + pending.existingProviderName"
+          [icon]="providers[pending.existingProvider].icon"
+          styleClass="p-button-lg w-full"
+          (onClick)="completeLinking()"
+        />
+        <p-button
+          label="Cancel"
+          styleClass="p-button-lg w-full"
+          severity="secondary"
+          [text]="true"
+          (onClick)="cancelLinking()"
+        />
+      </div>
+    } @else {
+      <p class="login-subtitle">Sign in to access transaction details</p>
+      <div class="providers">
+        <p-button
+          [label]="'Sign in with ' + providers['google'].name"
+          [icon]="providers['google'].icon"
+          styleClass="p-button-lg w-full"
+          (onClick)="loginWithProvider('google')"
+        />
+        <p-button
+          [label]="'Sign in with ' + providers['github'].name"
+          [icon]="providers['github'].icon"
+          styleClass="p-button-lg w-full"
+          severity="secondary"
+          (onClick)="loginWithProvider('github')"
+        />
+      </div>
+      <p class="login-note">Sign in with your Google or GitHub account.</p>
+    }
+  </p-card>
+</div>

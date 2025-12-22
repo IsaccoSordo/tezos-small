@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SpinnerComponent } from './spinner.component';
-import { Store } from '../../store/store.service';
+import { Store } from '../../store/tzkt.store';
 
 describe('SpinnerComponent', () => {
   let component: SpinnerComponent;

@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { finalize } from 'rxjs';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 
 /**
  * HTTP Interceptor that automatically manages the loading counter.

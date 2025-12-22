@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
 import { TzktService } from './tzkt.service';
-import { Store } from '../store/store.service';
+import { Store } from '../store/tzkt.store';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 
 /**

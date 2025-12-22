@@ -1,5 +1,5 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { Block, Transaction, TZKTState } from '../common';
+import { Block, Transaction, TZKTState } from '../models';
 
 export const Store = signalStore(
   { providedIn: 'root' },

@@ -41,6 +41,15 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Environment files with secrets (keep .env.example)
+.env
+.env.local
+.env.*.local
+
+# Generated environment files (created by npm run set-env)
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
 # LLM/AI config files
 CLAUDE.md
 .claude/
