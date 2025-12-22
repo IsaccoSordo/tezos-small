@@ -7,6 +7,8 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
+  linkWithCredential,
+  AuthCredential,
   User as FirebaseUser,
 } from 'firebase/auth';
 import { environment } from '../../environments/environment';
@@ -31,5 +33,5 @@ export function getFirebaseAuth(): Auth {
 export const googleProvider = new GoogleAuthProvider();
 export const githubProvider = new GithubAuthProvider();
 
-export { signInWithPopup, signOut, onAuthStateChanged };
-export type { FirebaseUser };
+export { signInWithPopup, signOut, onAuthStateChanged, linkWithCredential };
+export type { FirebaseUser, AuthCredential };

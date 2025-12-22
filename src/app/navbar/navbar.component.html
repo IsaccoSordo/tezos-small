@@ -12,10 +12,11 @@
     <ng-template pTemplate="end">
       @if (authService.isAuthenticated()) {
         <div class="user-section">
-          <p-avatar
-            [image]="authService.user()?.avatar"
-            shape="circle"
-            size="normal"
+          <img
+            [src]="authService.user()?.avatar"
+            [alt]="authService.user()?.name"
+            class="user-avatar"
+            referrerpolicy="no-referrer"
           />
           <span class="user-name">{{ authService.user()?.name }}</span>
           <p-button
