@@ -2,32 +2,28 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   Observable,
-  tap,
   switchMap,
   map,
   of,
   from,
   mergeMap,
+  tap,
   toArray,
 } from 'rxjs';
 import { Block, Transaction } from '../models';
 import { cacheContext } from '../config/cache.config';
-import { Store } from '../store/tzkt.store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TzktService {
   private http = inject(HttpClient);
-  private store = inject(Store);
   private readonly API_BASE = 'https://api.tzkt.io/v1';
 
   getBlocksCount(): Observable<number> {
-    return this.http
-      .get<number>(`${this.API_BASE}/blocks/count`, {
-        context: cacheContext,
-      })
-      .pipe(tap((count) => this.store.setCount(count)));
+    return this.http.get<number>(`${this.API_BASE}/blocks/count`, {
+      context: cacheContext,
+    });
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
@@ -48,7 +44,6 @@ export class TzktService {
         switchMap((blocks) => {
           // Handle empty blocks case
           if (blocks.length === 0) {
-            this.store.setBlocks(blocks);
             return of(blocks);
           }
 
@@ -62,7 +57,6 @@ export class TzktService {
               5
             ),
             toArray(),
-            tap(() => this.store.setBlocks(blocks)),
             map(() => blocks)
           );
         })
@@ -80,11 +74,12 @@ export class TzktService {
   }
 
   getTransactions(level: number): Observable<Transaction[]> {
-    return this.http
-      .get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
+    return this.http.get<Transaction[]>(
+      `${this.API_BASE}/operations/transactions`,
+      {
         params: { level: level.toString() },
         context: cacheContext,
-      })
-      .pipe(tap((transactions) => this.store.setTransactions(transactions)));
+      }
+    );
   }
 }

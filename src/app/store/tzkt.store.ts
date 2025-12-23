@@ -1,5 +1,10 @@
+import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { pipe, switchMap, interval, startWith } from 'rxjs';
 import { Block, Transaction, TZKTState } from '../models';
+import { TzktService } from '../services/tzkt.service';
 
 export const Store = signalStore(
   { providedIn: 'root' },
@@ -10,7 +15,7 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withMethods((store) => ({
+  withMethods((store, service = inject(TzktService)) => ({
     setBlocks(blocks: Block[]): void {
       patchState(store, { blocks });
     },
@@ -52,5 +57,63 @@ export const Store = signalStore(
         loadingCounter: 0,
       });
     },
+
+    // Error handling is done by the error interceptor globally
+    loadBlocks: rxMethod<{ pageSize: number; page: number }>(
+      pipe(
+        switchMap(({ pageSize, page }) =>
+          service.getBlocks(pageSize, page).pipe(
+            tapResponse({
+              next: (blocks) => patchState(store, { blocks }),
+              error: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+            })
+          )
+        )
+      )
+    ),
+
+    loadBlocksCount: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          service.getBlocksCount().pipe(
+            tapResponse({
+              next: (count) => patchState(store, { count }),
+              error: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+            })
+          )
+        )
+      )
+    ),
+
+    pollBlocksCount: rxMethod<number>(
+      pipe(
+        switchMap((intervalMs) =>
+          interval(intervalMs).pipe(
+            startWith(0),
+            switchMap(() =>
+              service.getBlocksCount().pipe(
+                tapResponse({
+                  next: (count) => patchState(store, { count }),
+                  error: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+                })
+              )
+            )
+          )
+        )
+      )
+    ),
+
+    loadTransactions: rxMethod<number>(
+      pipe(
+        switchMap((level) =>
+          service.getTransactions(level).pipe(
+            tapResponse({
+              next: (transactions) => patchState(store, { transactions }),
+              error: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+            })
+          )
+        )
+      )
+    ),
   }))
 );

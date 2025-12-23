@@ -3,14 +3,10 @@ import {
   inject,
   ChangeDetectionStrategy,
   OnInit,
-  DestroyRef,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { interval, switchMap } from 'rxjs';
-import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/tzkt.store';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
 
@@ -23,8 +19,6 @@ import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlocksOverviewComponent implements OnInit {
-  private service = inject(TzktService);
-  private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -53,12 +47,7 @@ export class BlocksOverviewComponent implements OnInit {
     if (pageSize) this.pageSize.set(+pageSize);
 
     // Poll for block count every 60 seconds to keep data fresh
-    interval(60000)
-      .pipe(
-        switchMap(() => this.service.getBlocksCount()),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe();
+    this.store.pollBlocksCount(60000);
   }
 
   onPageChange(event: PageChangeEvent): void {
@@ -68,7 +57,10 @@ export class BlocksOverviewComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(pageSize);
 
-    // Navigate with new query params - resolver will fetch new data
+    // Load new blocks for the page
+    this.store.loadBlocks({ pageSize, page });
+
+    // Update URL with new query params
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { page, pageSize },
