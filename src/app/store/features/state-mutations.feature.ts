@@ -1,4 +1,9 @@
-import { signalStoreFeature, withMethods, patchState, type } from '@ngrx/signals';
+import {
+  signalStoreFeature,
+  withMethods,
+  patchState,
+  type,
+} from '@ngrx/signals';
 import { Block, Transaction, TZKTState } from '../../models';
 
 /**

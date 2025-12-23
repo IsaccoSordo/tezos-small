@@ -22,7 +22,7 @@ export const getRouteType = (url: string): RouteType => {
 
 export const getPaginationParams = (url: string) => {
   const { params } = parseUrl(url);
-    return {
+  return {
     pageSize: +(params.get('pageSize') ?? 10),
     page: +(params.get('page') ?? 0),
   };

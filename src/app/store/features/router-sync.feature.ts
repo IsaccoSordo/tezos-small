@@ -1,26 +1,21 @@
 import { inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { signalStoreFeature, withHooks, type } from '@ngrx/signals';
 import {
-  signalStoreFeature,
-  withMethods,
-  withHooks,
-  patchState,
-  type,
-} from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import {
-  pipe,
   filter,
   map,
   distinctUntilChanged,
-  tap,
   merge,
   take,
   of,
   Observable,
 } from 'rxjs';
 import { TZKTState } from '../../models';
-import { RouteType, getRouteType, getPaginationParams, getDetailsLevel } from './url-utils';
+import {
+  getRouteType,
+  getPaginationParams,
+  getDetailsLevel,
+} from './url-utils';
 
 /**
  * Interface for the methods required from other features.
@@ -42,33 +37,6 @@ interface DataLoadingMethods {
 export function withRouterSync() {
   return signalStoreFeature(
     { state: type<TZKTState>(), methods: type<DataLoadingMethods>() },
-    withMethods((store) => ({
-      /**
-       * Handles route changes - resets state appropriately.
-       * No manual .subscribe() - fully reactive via rxMethod.
-       */
-      handleRouteChange: rxMethod<RouteType>(
-        pipe(
-          distinctUntilChanged(),
-          tap((route) => {
-            if (route === 'overview') {
-              patchState(store, { transactions: [], errors: [] });
-            } else if (route === 'details') {
-              patchState(store, { blocks: [], errors: [] });
-            } else {
-              // Full reset for other routes (like login)
-              patchState(store, {
-                blocks: [],
-                count: 0,
-                transactions: [],
-                errors: [],
-                loadingCounter: 0,
-              });
-            }
-          })
-        )
-      ),
-    })),
     withHooks((store) => {
       const router = inject(Router);
 
@@ -76,7 +44,9 @@ export function withRouterSync() {
         onInit() {
           // NavigationEnd stream for all navigations
           const navigationEnd$ = router.events.pipe(
-            filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+            filter(
+              (event): event is NavigationEnd => event instanceof NavigationEnd
+            ),
             map((event) => event.urlAfterRedirects)
           );
 
@@ -93,31 +63,27 @@ export function withRouterSync() {
           );
 
           // Load blocks when on overview page
-          store['loadBlocks'](
+          store.loadBlocks(
             currentUrl$.pipe(
               filter((url) => getRouteType(url) === 'overview'),
               map((url) => getPaginationParams(url)),
               distinctUntilChanged(
-                (prev, curr) => prev.pageSize === curr.pageSize && prev.page === curr.page
+                (prev, curr) =>
+                  prev.pageSize === curr.pageSize && prev.page === curr.page
               )
             )
           );
 
           // Poll for block count only while on overview page
-          store['pollBlocksCount'](currentUrl$);
+          store.pollBlocksCount(currentUrl$);
 
           // Load transactions when on details page
-          store['loadTransactions'](
+          store.loadTransactions(
             currentUrl$.pipe(
               map((url) => getDetailsLevel(url)),
               filter((level): level is number => level !== null),
               distinctUntilChanged()
             )
-          );
-
-          // Handle route changes (reset state) - no manual .subscribe()
-          store['handleRouteChange'](
-            currentUrl$.pipe(map((url) => getRouteType(url)))
           );
         },
       };

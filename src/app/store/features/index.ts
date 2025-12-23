@@ -3,4 +3,8 @@ export { withBlocksData } from './blocks-data.feature';
 export { withTransactionsData } from './transactions-data.feature';
 export { withRouterSync } from './router-sync.feature';
 export type { RouteType } from './url-utils';
-export { getRouteType, getPaginationParams, getDetailsLevel } from './url-utils';
+export {
+  getRouteType,
+  getPaginationParams,
+  getDetailsLevel,
+} from './url-utils';
