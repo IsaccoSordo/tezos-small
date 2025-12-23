@@ -2,7 +2,16 @@ import { inject } from '@angular/core';
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap, interval, startWith } from 'rxjs';
+import {
+  pipe,
+  switchMap,
+  interval,
+  startWith,
+  from,
+  mergeMap,
+  map,
+  toArray,
+} from 'rxjs';
 import { Block, Transaction, TZKTState } from '../models';
 import { TzktService } from '../services/tzkt.service';
 
@@ -58,11 +67,24 @@ export const Store = signalStore(
       });
     },
 
-    // Error handling is done by the error interceptor globally
     loadBlocks: rxMethod<{ pageSize: number; page: number }>(
       pipe(
         switchMap(({ pageSize, page }) =>
           service.getBlocks(pageSize, page).pipe(
+            switchMap((blocks) =>
+              from(blocks).pipe(
+                mergeMap(
+                  (block) =>
+                    service
+                      .getTransactionsCount(block.level)
+                      .pipe(
+                        map((count) => ({ ...block, transactions: count }))
+                      ),
+                  4 // Concurrency limit to avoid rate limiting
+                ),
+                toArray()
+              )
+            ),
             tapResponse({
               next: (blocks) => patchState(store, { blocks }),
               error: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function

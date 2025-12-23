@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './guards/auth.guard';
 import {
-  blocksDataResolver,
+  blocksResolver,
   transactionsResolver,
 } from './resolvers/tzkt.resolvers';
 
@@ -12,7 +12,7 @@ export const routes: Routes = [
       import('./blocks-overview/blocks-overview.component').then(
         (m) => m.BlocksOverviewComponent
       ),
-    resolve: { data: blocksDataResolver },
+    resolve: { data: blocksResolver },
   },
   {
     path: 'login',

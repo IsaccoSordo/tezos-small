@@ -9,12 +9,7 @@ import { Observable } from 'rxjs';
 import { TzktService } from '../services/tzkt.service';
 import { Store } from '../store/tzkt.store';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import {
-  blocksResolver,
-  blocksCountResolver,
-  blocksDataResolver,
-  transactionsResolver,
-} from './tzkt.resolvers';
+import { blocksResolver, transactionsResolver } from './tzkt.resolvers';
 import { Block, Transaction } from '../models';
 
 /**

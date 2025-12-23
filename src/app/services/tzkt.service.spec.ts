@@ -129,7 +129,7 @@ describe('TzktService', () => {
   });
 
   describe('getBlocks', () => {
-    it('should fetch blocks and return them with transaction counts', () => {
+    it('should fetch blocks and return them (thin HTTP layer)', () => {
       let result: Block[] | undefined;
       service.getBlocks(10, 0).subscribe((blocks) => {
         result = blocks;
@@ -145,25 +145,10 @@ describe('TzktService', () => {
       expect(req.request.method).toBe('GET');
       req.flush(mockBlocks);
 
-      // Expect transaction count requests for each block
-      const txReq1 = httpMock.expectOne(
-        (req) =>
-          req.url === `${API_BASE}/operations/transactions/count` &&
-          req.params.get('level') === '100'
-      );
-      txReq1.flush(5);
-
-      const txReq2 = httpMock.expectOne(
-        (req) =>
-          req.url === `${API_BASE}/operations/transactions/count` &&
-          req.params.get('level') === '101'
-      );
-      txReq2.flush(3);
-
       expect(result).toBeDefined();
       expect(result!.length).toBe(2);
-      expect(result![0].transactions).toBe(5);
-      expect(result![1].transactions).toBe(3);
+      expect(result![0].hash).toBe('abc123');
+      expect(result![1].hash).toBe('def456');
     });
 
     it('should use correct pagination parameters', () => {
