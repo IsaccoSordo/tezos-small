@@ -64,7 +64,13 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 
 - [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts) - thin HTTP layer only
 - [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Firebase Authentication service using `@angular/fire` and `toSignal()` pattern - NO subscriptions, NO constructor needed
-- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `rxMethod` for reactive data loading. Store subscribes to Router events via `withHooks` - components are purely presentational
+- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Orchestrator store using composable `signalStoreFeature` functions
+- [src/app/store/features/](src/app/store/features/): Composable store features:
+  - `state-mutations.feature.ts`: withStateMutations - basic setters and resetState
+  - `blocks-data.feature.ts`: withBlocksData - loadBlocks, loadBlocksCount, pollBlocksCount rxMethods
+  - `transactions-data.feature.ts`: withTransactionsData - loadTransactions rxMethod
+  - `router-sync.feature.ts`: withRouterSync - handleRouteChange + Router event subscription in onInit
+  - `url-utils.ts`: URL parsing utilities (getRouteType, getPaginationParams, getDetailsLevel)
 
 ## Authentication (Firebase via @angular/fire)
 
@@ -193,6 +199,7 @@ export type { Column, TableData } from './ui.model';
 - Use **@angular/fire** with `toSignal()` pattern for Firebase auth state
 - Organize state with `withState()` for initial state, `withMethods()` for state updates, and `withHooks()` for initialization
 - Use `rxMethod` from `@ngrx/signals/rxjs-interop` for reactive data loading - accepts Observable, Signal, or static value
+- Use `signalStoreFeature` for composable, reusable store slices (plugin architecture)
 - Use `patchState()` for immutable state updates in SignalStore methods
 - State properties are automatically exposed as signals by SignalStore
 - Use functional HTTP interceptors with `withInterceptors()`
@@ -285,66 +292,77 @@ onUserAction(param: string): void {
 - Use `rxMethod` to react to URL changes - no manual `.subscribe()` calls
 - Components are purely presentational: read from store signals, navigate on user actions
 - URL is the single source of truth for pagination (queryParams) and detail views (route params)
+- URL pagination is 1-indexed for UX (`?page=1` is first page), converted to 0-indexed for API/PrimeNG
 
-**rxMethod Pattern for Route-Driven Loading**
+**signalStoreFeature Pattern (Plugin Architecture)**
+
+Use `signalStoreFeature` to split large stores into composable, testable slices:
+
 ```typescript
+// blocks-data.feature.ts - Reusable feature slice
+export function withBlocksData() {
+  return signalStoreFeature(
+    { state: type<TZKTState>() }, // State requirements
+    withMethods((store, service = inject(TzktService)) => ({
+      loadBlocks: rxMethod<{ pageSize: number; page: number }>(
+        pipe(
+          switchMap(({ pageSize, page }) =>
+            service.getBlocks(pageSize, page).pipe(
+              tapResponse({
+                next: (blocks) => patchState(store, { blocks }),
+                error: (error) => patchState(store, (state) => ({
+                  errors: [...state.errors, error],
+                })),
+              })
+            )
+          )
+        )
+      ),
+    }))
+  );
+}
+
+// router-sync.feature.ts - Router integration feature
+export function withRouterSync() {
+  return signalStoreFeature(
+    { state: type<TZKTState>(), methods: type<DataLoadingMethods>() },
+    withHooks((store) => {
+      const router = inject(Router);
+      return {
+        onInit() {
+          const navigationEnd$ = router.events.pipe(
+            filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+            map((e) => e.urlAfterRedirects)
+          );
+          const initialUrl$ = router.navigated
+            ? of(router.url)
+            : navigationEnd$.pipe(take(1));
+          const currentUrl$ = merge(initialUrl$, navigationEnd$).pipe(distinctUntilChanged());
+
+          store.loadBlocks(currentUrl$.pipe(/* filter & map */));
+        },
+      };
+    })
+  );
+}
+
+// tzkt.store.ts - Clean orchestrator
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({ blocks: [], count: 0, transactions: [], errors: [], loadingCounter: 0 }),
-  withMethods((store, service = inject(TzktService)) => ({
-    // rxMethod accepts Observable, Signal, or static value
-    loadBlocks: rxMethod<{ pageSize: number; page: number }>(
-      pipe(
-        switchMap(({ pageSize, page }) =>
-          service.getBlocks(pageSize, page).pipe(
-            // Enrich blocks with transaction counts (concatMap preserves order)
-            switchMap((blocks) =>
-              from(blocks).pipe(
-                concatMap((block) =>
-                  service.getTransactionsCount(block.level).pipe(
-                    map((count) => ({ ...block, transactions: count }))
-                  )
-                ),
-                toArray()
-              )
-            ),
-            tapResponse({
-              next: (blocks) => patchState(store, { blocks }),
-              error: (error) => patchState(store, (state) => ({
-                errors: [...state.errors, error],
-              })),
-            })
-          )
-        )
-      )
-    ),
-  })),
-  withHooks((store) => {
-    const router = inject(Router);
-    return {
-      onInit() {
-        // Store subscribes to Router events - components are purely presentational
-        const navigationEnd$ = router.events.pipe(
-          filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-          map((event) => event.urlAfterRedirects)
-        );
-        // Handle initial load (page refresh vs navigation)
-        const initialUrl$ = router.navigated
-          ? of(router.url)
-          : navigationEnd$.pipe(take(1));
-        const currentUrl$ = merge(initialUrl$, navigationEnd$).pipe(distinctUntilChanged());
-
-        // Pipe URL stream into rxMethods
-        store.loadBlocks(currentUrl$.pipe(
-          filter((url) => getRouteType(url) === 'overview'),
-          map((url) => getPaginationParams(url)),
-          distinctUntilChanged((prev, curr) => prev.pageSize === curr.pageSize && prev.page === curr.page)
-        ));
-      },
-    };
-  })
+  withStateMutations(),    // Basic setters and resetState
+  withBlocksData(),        // Block loading rxMethods
+  withTransactionsData(),  // Transaction loading rxMethods
+  withRouterSync()         // Must be last - needs access to all methods
 );
 ```
+
+**signalStoreFeature Benefits:**
+- Readability: Main store goes from 200+ lines to 20 lines
+- Testability: Test each feature slice in isolation
+- Reusability: Share features across stores (e.g., `withPolling()`, `withPagination()`)
+- Collaboration: Fewer git merge conflicts with separate files
+- Naming convention: Use `withX` prefix for feature functions
 
 **Accessibility**
 - Ensure WCAG AA compliance
@@ -600,6 +618,8 @@ describe('ComponentName', () => {
 - All guards go in `src/app/guards/` folder (e.g., auth.guard.ts)
 - All interfaces go in `src/app/models/` folder with domain-based organization
 - All stores go in `src/app/store/` folder (e.g., tzkt.store.ts)
+- Store features go in `src/app/store/features/` folder (e.g., blocks-data.feature.ts)
+- Feature files follow naming pattern: `<name>.feature.ts` with `withX` function export
 - State files follow naming pattern: `<domain>.store.ts`
 - Login components go in `src/app/login/` folder
 - Services go in `src/app/services/` folder (e.g., tzkt.service.ts, auth.service.ts)
@@ -621,5 +641,6 @@ describe('ComponentName', () => {
 - Use absolute imports for deeply nested components: `src/app/store/` from UI components
 - Guard imports in routes: `'./guards/auth.guard'`
 - Store imports: `'../store/tzkt.store'`
+- Store feature imports: `'./features'` (imports from barrel file)
 - Model imports: `'../models'` (imports from barrel file, not individual domain files)
 - Config imports: `'../config/auth.config'`, `'../config/cache.config'`

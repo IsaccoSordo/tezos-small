@@ -112,12 +112,12 @@ describe('BlocksOverviewComponent', () => {
     expect(component.blocks()[1].level).toBe(101);
   });
 
-  it('should derive pageSize and currentPage from queryParams', () => {
-    queryParamsSubject.next({ page: '2', pageSize: '20' });
+  it('should derive pageSize and currentPage from queryParams (1-indexed URL to 0-indexed)', () => {
+    queryParamsSubject.next({ page: '1', pageSize: '20' });
     fixture.detectChanges();
 
     expect(component.pageSize()).toBe(20);
-    expect(component.currentPage()).toBe(2);
+    expect(component.currentPage()).toBe(1);
   });
 
   it('should use default pagination values when queryParams are empty', () => {
@@ -128,16 +128,16 @@ describe('BlocksOverviewComponent', () => {
     expect(component.currentPage()).toBe(0);
   });
 
-  it('should navigate to new URL on page change (URL-driven)', () => {
+  it('should navigate to new URL on page change (0-indexed to 1-indexed URL)', () => {
     fixture.detectChanges();
 
     const navigateSpy = vi.spyOn(router, 'navigate');
-    const pageEvent: PageChangeEvent = { page: 1, pageSize: 20 };
+    const pageEvent: PageChangeEvent = { page: 2, pageSize: 20 };
     component.onPageChange(pageEvent);
 
     expect(navigateSpy).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
-      queryParams: { page: 1, pageSize: 20 },
+      queryParams: { page: 2, pageSize: 20 },
       queryParamsHandling: 'merge',
     });
   });

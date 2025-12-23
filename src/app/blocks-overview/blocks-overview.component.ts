@@ -24,18 +24,20 @@ export class BlocksOverviewComponent {
   count = this.store.count;
 
   // Pagination state derived from URL (source of truth) - purely for display
+  // URL uses 1-indexed pages for UX, internally convert to 0-indexed for PrimeNG
   private queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
         pageSize: +(params['pageSize'] ?? 10),
-        page: +(params['page'] ?? 0),
+        urlPage: +(params['page'] ?? 0),
       }))
     ),
-    { initialValue: { pageSize: 10, page: 0 } }
+    { initialValue: { pageSize: 10, urlPage: 0 } }
   );
 
   pageSize = computed(() => this.queryParams().pageSize);
-  currentPage = computed(() => this.queryParams().page);
+  // Convert 1-indexed URL page to 0-indexed for PrimeNG's first calculation
+  currentPage = computed(() => Math.max(0, this.queryParams().urlPage));
 
   columns = [
     { field: 'hash', header: 'Hash' },
@@ -47,11 +49,12 @@ export class BlocksOverviewComponent {
 
   /**
    * URL-driven pagination: only update URL, store reacts to Router events
+   * Convert 0-indexed PrimeNG page to 1-indexed URL page
    */
   onPageChange(event: PageChangeEvent): void {
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { page: event.page, pageSize: event.pageSize },
+      queryParams: { page: event.page, pageSize: event.pageSize }, // 1-indexed for URL
       queryParamsHandling: 'merge',
     });
   }
