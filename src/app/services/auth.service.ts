@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import {
   Auth,
@@ -38,11 +38,9 @@ export class AuthService {
   readonly token = toSignal(idToken(this.auth));
 
   /** Mapped user for the application */
-  readonly user = computed(() => {
-    const fbUser = this.firebaseUser();
-    if (!fbUser) return null;
-    return this.mapFirebaseUser(fbUser);
-  });
+  readonly user = computed(() =>
+    this.firebaseUser() ? this.mapFirebaseUser(this.firebaseUser()!) : null
+  );
 
   /** Whether the user is authenticated */
   readonly isAuthenticated = computed(() => !!this.firebaseUser());
@@ -166,19 +164,5 @@ export class AuthService {
 
   logout(): Observable<void> {
     return from(signOut(this.auth));
-  }
-
-  validateSession(): Observable<boolean> {
-    const currentUser = this.auth.currentUser;
-    return of(!!currentUser);
-  }
-
-  refreshToken(): Observable<string> {
-    const currentUser = this.auth.currentUser;
-    if (!currentUser) {
-      return of('');
-    }
-
-    return from(currentUser.getIdToken(true));
   }
 }
