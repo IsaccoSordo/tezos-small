@@ -1,12 +1,8 @@
-import {
-  Component,
-  inject,
-  ChangeDetectionStrategy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { Store } from '../store/tzkt.store';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
 
@@ -18,17 +14,28 @@ import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
   imports: [CommonModule, RouterLink, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlocksOverviewComponent implements OnInit {
+export class BlocksOverviewComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  // Store handles all data loading via Router events
   store = inject(Store);
   blocks = this.store.blocks;
   count = this.store.count;
 
-  // Pagination state from query params
-  currentPage = signal(0);
-  pageSize = signal(10);
+  // Pagination state derived from URL (source of truth) - purely for display
+  private queryParams = toSignal(
+    this.route.queryParams.pipe(
+      map((params) => ({
+        pageSize: +(params['pageSize'] ?? 10),
+        page: +(params['page'] ?? 0),
+      }))
+    ),
+    { initialValue: { pageSize: 10, page: 0 } }
+  );
+
+  pageSize = computed(() => this.queryParams().pageSize);
+  currentPage = computed(() => this.queryParams().page);
 
   columns = [
     { field: 'hash', header: 'Hash' },
@@ -38,32 +45,13 @@ export class BlocksOverviewComponent implements OnInit {
     { field: 'timestamp', header: 'Timestamp' },
   ];
 
-  ngOnInit(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const page = params.get('page');
-    const pageSize = params.get('pageSize');
-
-    if (page) this.currentPage.set(+page);
-    if (pageSize) this.pageSize.set(+pageSize);
-
-    // Poll for block count every 60 seconds to keep data fresh
-    this.store.pollBlocksCount(60000);
-  }
-
+  /**
+   * URL-driven pagination: only update URL, store reacts to Router events
+   */
   onPageChange(event: PageChangeEvent): void {
-    const page = event.page;
-    const pageSize = event.pageSize;
-
-    this.currentPage.set(page);
-    this.pageSize.set(pageSize);
-
-    // Load new blocks for the page
-    this.store.loadBlocks({ pageSize, page });
-
-    // Update URL with new query params
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { page, pageSize },
+      queryParams: { page: event.page, pageSize: event.pageSize },
       queryParamsHandling: 'merge',
     });
   }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { DetailsComponent } from './details.component';
 import { Store } from '../store/tzkt.store';
 import { Transaction } from '../models';
@@ -7,16 +8,14 @@ import { Transaction } from '../models';
  * DetailsComponent Test Suite
  *
  * Testing Best Practices Applied:
- * - Transactions are loaded by resolver (not tested here)
- * - Component reads from store signals
- * - Store is pre-populated for display tests
- * - Tests verify component reads from store correctly
- * - Tests verify template rendering with loaded data
+ * - Component is purely presentational - reads from store
+ * - Store is mocked with signals for isolated unit testing
+ * - Tests verify component displays data from store correctly
+ * - Store handles all data loading via Router events
  */
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
   let fixture: ComponentFixture<DetailsComponent>;
-  let store: InstanceType<typeof Store>;
 
   const mockTransactions: Transaction[] = [
     {
@@ -33,20 +32,35 @@ describe('DetailsComponent', () => {
     },
   ];
 
-  // Helper function to handle initial component setup
-  const initializeComponent = () => {
-    fixture.detectChanges();
+  // Mock store with signals
+  const mockStore = {
+    blocks: signal([]),
+    count: signal(0),
+    transactions: signal<Transaction[]>([]),
+    errors: signal<Error[]>([]),
+    loadingCounter: signal(0),
+    loadBlocks: vi.fn(),
+    pollBlocksCount: vi.fn(),
+    loadTransactions: vi.fn(),
+    resetState: vi.fn(),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DetailsComponent],
-      providers: [Store],
+      providers: [{ provide: Store, useValue: mockStore }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DetailsComponent);
     component = fixture.componentInstance;
-    store = TestBed.inject(Store);
+
+    // Reset mock signals
+    mockStore.transactions.set([]);
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    fixture.destroy();
   });
 
   it('should create', () => {
@@ -54,34 +68,33 @@ describe('DetailsComponent', () => {
   });
 
   it('should have references to store signals', () => {
-    expect(component.transactions).toBe(store.transactions);
+    expect(component.transactions).toBe(mockStore.transactions);
   });
 
-  it('should read transactions from store (pre-populated by resolver)', () => {
-    // Simulate resolver having populated the store
-    store.setTransactions(mockTransactions);
-    initializeComponent();
-
-    expect(component.transactions().length).toBe(2);
-    expect(component.transactions()[0].sender.address).toBe('addr1');
-  });
-
-  it('should display transactions in template when store has data', async () => {
-    store.setTransactions(mockTransactions);
-    initializeComponent();
-
-    await fixture.whenStable();
+  it('should display transactions in template when store has data', () => {
+    mockStore.transactions.set(mockTransactions);
+    fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
     expect(compiled.textContent).toContain('addr1');
+    expect(compiled.textContent).toContain('addr2');
   });
 
   it('should display correct number of transactions from store', () => {
-    store.setTransactions(mockTransactions);
-    initializeComponent();
+    mockStore.transactions.set(mockTransactions);
+    fixture.detectChanges();
 
     expect(component.transactions().length).toBe(2);
     expect(component.transactions()[0].sender.address).toBe('addr1');
     expect(component.transactions()[1].amount).toBe(200);
+  });
+
+  it('should have correct column definitions', () => {
+    expect(component.columns).toEqual([
+      { field: 'sender', header: 'Sender' },
+      { field: 'target', header: 'Target' },
+      { field: 'amount', header: 'Amount' },
+      { field: 'status', header: 'Status' },
+    ]);
   });
 });

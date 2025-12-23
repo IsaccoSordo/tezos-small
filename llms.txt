@@ -6,7 +6,7 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @angular/fire, @ngneat/cashew, Firebase Auth, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
-**Last Updated**: 2025-12-22
+**Last Updated**: 2025-12-23
 **Dependencies**: All dependencies use exact versions (no wildcards like ^ or ~)
 **Live Demo**: https://isaccosordo.github.io/tezos-small/
 
@@ -62,9 +62,9 @@ Interfaces are organized in a `models/` directory using domain-based organizatio
 
 ## Services & State Management
 
-- [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts)
+- [src/app/services/tzkt.service.ts](src/app/services/tzkt.service.ts): TZKT API integration service for blockchain data (blocks, transactions, counts) - thin HTTP layer only
 - [src/app/services/auth.service.ts](src/app/services/auth.service.ts): Firebase Authentication service using `@angular/fire` and `toSignal()` pattern - NO subscriptions, NO constructor needed
-- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `withState` and `withMethods`
+- [src/app/store/tzkt.store.ts](src/app/store/tzkt.store.ts): Global state management using **NgRx SignalStore** with `rxMethod` for reactive data loading. Store subscribes to Router events via `withHooks` - components are purely presentational
 
 ## Authentication (Firebase via @angular/fire)
 
@@ -99,7 +99,7 @@ export class AuthService {
 ## Routing & Guards
 
 - [src/app/guards/auth.guard.ts](src/app/guards/auth.guard.ts): Functional route guards using `inject(AuthService)`
-- [src/app/resolvers/tzkt.resolvers.ts](src/app/resolvers/tzkt.resolvers.ts): Functional resolvers for preloading route data (blocks, count, transactions)
+- Routes do NOT use resolvers - the store handles all data loading via Router events
 
 ## HTTP Interceptors
 
@@ -112,16 +112,18 @@ export class AuthService {
 
 - [src/app/core/global-error.handler.ts](src/app/core/global-error.handler.ts): Custom Angular ErrorHandler for unhandled exceptions
 
-## Smart/Container Components
+## Components
 
+**Root & Navigation**
 - [src/app/app.component.ts](src/app/app.component.ts): Root application component
 - [src/app/navbar/navbar.component.ts](src/app/navbar/navbar.component.ts): Navigation header with authentication status display
-- [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Main blocks listing page with pagination and polling
-- [src/app/details/details.component.ts](src/app/details/details.component.ts): Transaction details page for individual blocks
 - [src/app/login/login.component.ts](src/app/login/login.component.ts): Login page with OAuth provider selection (Google, GitHub) and account linking UI
 
-## Presentational Components
+**Presentational Page Components** (read from store, no data fetching)
+- [src/app/blocks-overview/blocks-overview.component.ts](src/app/blocks-overview/blocks-overview.component.ts): Displays blocks from store, handles URL-driven pagination
+- [src/app/details/details.component.ts](src/app/details/details.component.ts): Displays transactions from store
 
+**Reusable UI Components**
 - [src/app/ui/table/table.component.ts](src/app/ui/table/table.component.ts): Generic data table with pagination, sorting, and customizable columns using PrimeNG Table
 - [src/app/ui/spinner/spinner.component.ts](src/app/ui/spinner/spinner.component.ts): Loading indicator using PrimeNG ProgressSpinner
 
@@ -189,7 +191,8 @@ export type { Column, TableData } from './ui.model';
 - Use standalone components (no NgModules)
 - Use **NgRx SignalStore** for TZKT state management (installed: @ngrx/signals)
 - Use **@angular/fire** with `toSignal()` pattern for Firebase auth state
-- Organize state with `withState()` for initial state and `withMethods()` for state updates
+- Organize state with `withState()` for initial state, `withMethods()` for state updates, and `withHooks()` for initialization
+- Use `rxMethod` from `@ngrx/signals/rxjs-interop` for reactive data loading - accepts Observable, Signal, or static value
 - Use `patchState()` for immutable state updates in SignalStore methods
 - State properties are automatically exposed as signals by SignalStore
 - Use functional HTTP interceptors with `withInterceptors()`
@@ -221,7 +224,8 @@ export type { Column, TableData } from './ui.model';
 - Follow single responsibility principle
 - Return observables for async operations
 - Handle errors gracefully with proper error messages
-- For TZKT state: use NgRx SignalStore with `withState()` and `withMethods()` patterns
+- For TZKT state: use NgRx SignalStore with `withState()`, `withMethods()`, and `withHooks()` patterns
+- Use `rxMethod` for reactive data loading - NO manual `.subscribe()` calls in store
 - For Firebase auth: use `toSignal()` pattern with `@angular/fire` observables
 - Use `patchState()` for all state updates to ensure immutability
 
@@ -276,38 +280,70 @@ onUserAction(param: string): void {
 - Use `finalize` for cleanup operations
 - Use `forkJoin` for combining parallel requests
 
-**Route Resolvers (CRITICAL)**
-- Use functional resolvers (class-based resolvers are deprecated since Angular 16)
-- Resolvers preload data before component renders - no loading states needed in resolved components
-- Use `inject()` function to access services within resolver functions
-- Resolvers block navigation until data is loaded - use sparingly for critical data only
-- Secondary/non-critical data should still be loaded in ngOnInit
-- Configure `withComponentInputBinding()` in router for type-safe resolved data access
-- Use `runGuardsAndResolvers: 'paramsOrQueryParamsChange'` for routes with pagination
+**Route-Driven State Management (CRITICAL)**
+- Store subscribes to Router events via `withHooks()` - components do NOT fetch data
+- Use `rxMethod` to react to URL changes - no manual `.subscribe()` calls
+- Components are purely presentational: read from store signals, navigate on user actions
+- URL is the single source of truth for pagination (queryParams) and detail views (route params)
 
-**Functional Resolver Pattern**
+**rxMethod Pattern for Route-Driven Loading**
 ```typescript
-import { inject } from '@angular/core';
-import { ResolveFn, ActivatedRouteSnapshot } from '@angular/router';
+export const Store = signalStore(
+  { providedIn: 'root' },
+  withState<TZKTState>({ blocks: [], count: 0, transactions: [], errors: [], loadingCounter: 0 }),
+  withMethods((store, service = inject(TzktService)) => ({
+    // rxMethod accepts Observable, Signal, or static value
+    loadBlocks: rxMethod<{ pageSize: number; page: number }>(
+      pipe(
+        switchMap(({ pageSize, page }) =>
+          service.getBlocks(pageSize, page).pipe(
+            // Enrich blocks with transaction counts (concatMap preserves order)
+            switchMap((blocks) =>
+              from(blocks).pipe(
+                concatMap((block) =>
+                  service.getTransactionsCount(block.level).pipe(
+                    map((count) => ({ ...block, transactions: count }))
+                  )
+                ),
+                toArray()
+              )
+            ),
+            tapResponse({
+              next: (blocks) => patchState(store, { blocks }),
+              error: (error) => patchState(store, (state) => ({
+                errors: [...state.errors, error],
+              })),
+            })
+          )
+        )
+      )
+    ),
+  })),
+  withHooks((store) => {
+    const router = inject(Router);
+    return {
+      onInit() {
+        // Store subscribes to Router events - components are purely presentational
+        const navigationEnd$ = router.events.pipe(
+          filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+          map((event) => event.urlAfterRedirects)
+        );
+        // Handle initial load (page refresh vs navigation)
+        const initialUrl$ = router.navigated
+          ? of(router.url)
+          : navigationEnd$.pipe(take(1));
+        const currentUrl$ = merge(initialUrl$, navigationEnd$).pipe(distinctUntilChanged());
 
-export const dataResolver: ResolveFn<DataType[]> = (
-  route: ActivatedRouteSnapshot
-) => {
-  const service = inject(DataService);
-  const id = route.paramMap.get('id');
-  return service.getData(id);
-};
-```
-
-**Route Configuration with Resolver**
-```typescript
-{
-  path: 'details/:id',
-  loadComponent: () => import('./details.component').then(m => m.DetailsComponent),
-  resolve: {
-    data: dataResolver,
-  },
-}
+        // Pipe URL stream into rxMethods
+        store.loadBlocks(currentUrl$.pipe(
+          filter((url) => getRouteType(url) === 'overview'),
+          map((url) => getPaginationParams(url)),
+          distinctUntilChanged((prev, curr) => prev.pageSize === curr.pageSize && prev.page === curr.page)
+        ));
+      },
+    };
+  })
+);
 ```
 
 **Accessibility**
@@ -369,6 +405,29 @@ const mockAuthService = {
 
 // In TestBed providers:
 { provide: AuthService, useValue: mockAuthService }
+```
+
+**Mocking Store in Tests** (for presentational components)
+```typescript
+const mockStore = {
+  blocks: signal<Block[]>([]),
+  count: signal(0),
+  transactions: signal<Transaction[]>([]),
+  errors: signal<Error[]>([]),
+  loadingCounter: signal(0),
+  loadBlocks: vi.fn(),
+  pollBlocksCount: vi.fn(),
+  loadTransactions: vi.fn(),
+  resetState: vi.fn(),
+};
+
+// In TestBed providers:
+{ provide: Store, useValue: mockStore }
+
+// In tests, set signal values directly:
+mockStore.blocks.set(mockBlocks);
+mockStore.count.set(1000);
+fixture.detectChanges();
 ```
 
 **Test Organization Patterns**
@@ -437,18 +496,21 @@ describe('ComponentName', () => {
 ## Architecture Patterns
 
 **State Management**
-- TZKT state: Centralized signal-based state in NgRx SignalStore (`tzkt.store.ts`)
+- TZKT state: Centralized signal-based state in NgRx SignalStore (`tzkt.store.ts`) with `rxMethod` for reactive loading
 - Auth state: Signal-based state in AuthService using `toSignal()` from `@angular/fire` observables
 - Reactive updates using Angular Signals
+- Store is 100% subscription-free via `rxMethod` - no manual `.subscribe()` calls
 
-**Data Flow**
-1. Component calls service method
-2. Service makes HTTP request to TZKT API
-3. Auth interceptor adds token if needed
-4. Loading interceptor increments counter
-5. Response/error handled by interceptors
-6. Service updates store with new data
-7. Components react to signal changes
+**Data Flow (Route-Driven)**
+1. User navigates (URL change triggers Router event)
+2. Store's `withHooks.onInit()` receives NavigationEnd event
+3. URL is parsed and piped into appropriate `rxMethod` (loadBlocks, loadTransactions, etc.)
+4. Service makes HTTP request to TZKT API
+5. Auth interceptor adds token if needed
+6. Loading interceptor increments counter
+7. Response/error handled by interceptors and `tapResponse`
+8. Store updates state via `patchState()`
+9. Components react to signal changes (purely presentational)
 
 **Authentication Flow**
 1. User clicks login button
@@ -536,7 +598,6 @@ describe('ComponentName', () => {
 
 **Directory Organization**
 - All guards go in `src/app/guards/` folder (e.g., auth.guard.ts)
-- All resolvers go in `src/app/resolvers/` folder (e.g., tzkt.resolvers.ts)
 - All interfaces go in `src/app/models/` folder with domain-based organization
 - All stores go in `src/app/store/` folder (e.g., tzkt.store.ts)
 - State files follow naming pattern: `<domain>.store.ts`
@@ -556,10 +617,9 @@ describe('ComponentName', () => {
 - Component-specific types can remain co-located with components (e.g., PageChangeEvent in table.component.ts)
 
 **Import Path Conventions**
-- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`, `../resolvers/`, `../models/`
+- Always use relative imports from sibling folders: `../store/`, `../services/`, `../guards/`, `../models/`
 - Use absolute imports for deeply nested components: `src/app/store/` from UI components
 - Guard imports in routes: `'./guards/auth.guard'`
-- Resolver imports in routes: `'./resolvers/tzkt.resolvers'`
 - Store imports: `'../store/tzkt.store'`
 - Model imports: `'../models'` (imports from barrel file, not individual domain files)
 - Config imports: `'../config/auth.config'`, `'../config/cache.config'`

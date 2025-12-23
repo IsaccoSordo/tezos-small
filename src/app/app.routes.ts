@@ -1,9 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './guards/auth.guard';
-import {
-  blocksResolver,
-  transactionsResolver,
-} from './resolvers/tzkt.resolvers';
 
 export const routes: Routes = [
   {
@@ -12,7 +8,6 @@ export const routes: Routes = [
       import('./blocks-overview/blocks-overview.component').then(
         (m) => m.BlocksOverviewComponent
       ),
-    resolve: { data: blocksResolver },
   },
   {
     path: 'login',
@@ -25,7 +20,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./details/details.component').then((m) => m.DetailsComponent),
     canActivate: [authGuard],
-    resolve: { transactions: transactionsResolver },
   },
   { path: '**', redirectTo: '' },
 ];

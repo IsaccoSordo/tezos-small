@@ -33,6 +33,9 @@ An Angular application for exploring Tezos blockchain blocks and transactions th
 
 - Zoneless change detection (Angular 21)
 - Standalone components with signal-based reactivity
+- NgRx SignalStore with `rxMethod` for reactive data loading
+- Route-driven state management (store reacts to URL changes)
+- Purely presentational components
 - Firebase integration via @angular/fire
 - Reactive data flow with RxJS and `toSignal()`
 - HTTP response caching with [@ngneat/cashew](https://github.com/ngneat/cashew)
@@ -174,13 +177,13 @@ See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.
 
 ```
 src/app/
-├── blocks-overview/          # Main blocks listing page
+├── blocks-overview/          # Main blocks listing page (presentational)
 ├── config/
 │   ├── auth.config.ts       # Protected API patterns
 │   └── cache.config.ts      # HTTP cache configuration
 ├── core/
 │   └── global-error.handler.ts # Global error handling
-├── details/                  # Transaction details page
+├── details/                  # Transaction details page (presentational)
 ├── guards/
 │   └── auth.guard.ts        # Route guards (authGuard, guestGuard)
 ├── interceptors/
@@ -194,32 +197,30 @@ src/app/
 │   ├── ui.model.ts          # UI interfaces (Column, TableData)
 │   └── index.ts             # Barrel file for imports
 ├── navbar/                   # Navigation component
-├── resolvers/
-│   └── tzkt.resolvers.ts    # Route resolvers
 ├── services/
 │   ├── auth.service.ts      # Firebase Auth with @angular/fire
-│   └── tzkt.service.ts      # TZKT API integration
+│   └── tzkt.service.ts      # TZKT API integration (thin HTTP layer)
 ├── store/
-│   ├── tzkt.state.ts        # State interface
-│   └── tzkt.store.ts        # NgRx SignalStore
+│   └── tzkt.store.ts        # NgRx SignalStore with rxMethod + withHooks
 ├── ui/                       # Reusable UI components
 │   ├── spinner/
 │   └── table/
-├── app.routes.ts            # Application routing
+├── app.routes.ts            # Application routing (lazy loading)
 ├── app.config.ts            # Global configuration
 └── app.component.ts         # Root component
 ```
 
 ### Key Components
 
-| Component                 | Purpose                                 |
-| ------------------------- | --------------------------------------- |
-| `BlocksOverviewComponent` | Displays paginated list of blocks       |
-| `DetailsComponent`        | Shows transactions for a specific block |
-| `LoginComponent`          | OAuth login with Google/GitHub          |
-| `NavbarComponent`         | Navigation header with auth status      |
-| `TableComponent`          | Reusable data table with pagination     |
-| `SpinnerComponent`        | Loading indicator                       |
+| Component                 | Purpose                                           |
+| ------------------------- | ------------------------------------------------- |
+| `BlocksOverviewComponent` | Presentational - displays blocks from store       |
+| `DetailsComponent`        | Presentational - displays transactions from store |
+| `LoginComponent`          | OAuth login with Google/GitHub                    |
+| `NavbarComponent`         | Navigation header with auth status                |
+| `TableComponent`          | Reusable data table with pagination               |
+| `SpinnerComponent`        | Loading indicator                                 |
+| `Store`                   | Route-driven state management with rxMethod       |
 
 ### Authentication
 
@@ -258,7 +259,7 @@ export class AuthService {
 
 ### State Management
 
-The application uses NgRx SignalStore for TZKT state:
+The application uses NgRx SignalStore with `rxMethod` for reactive, route-driven state:
 
 ```typescript
 export const Store = signalStore(
@@ -270,14 +271,38 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withMethods((store) => ({
-    setBlocks(blocks: Block[]): void {
-      patchState(store, { blocks });
-    },
-    incrementLoadingCounter(): void {
-      patchState(store, (state) => ({
-        loadingCounter: state.loadingCounter + 1,
-      }));
+  withMethods((store, service = inject(TzktService)) => ({
+    // rxMethod accepts Observable, Signal, or static value
+    loadBlocks: rxMethod<{ pageSize: number; page: number }>(
+      pipe(
+        switchMap(({ pageSize, page }) =>
+          service.getBlocks(pageSize, page).pipe(
+            // Enrich blocks with transaction counts (concatMap preserves order)
+            switchMap((blocks) =>
+              from(blocks).pipe(
+                concatMap((block) =>
+                  service.getTransactionsCount(block.level).pipe(
+                    map((count) => ({ ...block, transactions: count }))
+                  )
+                ),
+                toArray()
+              )
+            ),
+            tapResponse({
+              next: (blocks) => patchState(store, { blocks }),
+              error: (error) => patchState(store, (state) => ({
+                errors: [...state.errors, error],
+              })),
+            })
+          )
+        )
+      )
+    ),
+  })),
+  withHooks((store) => ({
+    onInit() {
+      // Store subscribes to Router events and reacts to URL changes
+      // Components are purely presentational - no data fetching logic
     },
   }))
 );
