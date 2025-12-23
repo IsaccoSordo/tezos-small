@@ -25,8 +25,6 @@ import {
  */
 export const Store = signalStore(
   { providedIn: 'root' },
-
-  // 1. Initial state
   withState<TZKTState>({
     blocks: [],
     count: 0,
@@ -34,16 +32,8 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-
-  // 2. Basic state mutators
   withStateMutations(),
-
-  // 3. Block data loading features
   withBlocksData(),
-
-  // 4. Transaction data loading features
   withTransactionsData(),
-
-  // 5. Router synchronization (must be last - needs access to all methods)
   withRouterSync()
 );
