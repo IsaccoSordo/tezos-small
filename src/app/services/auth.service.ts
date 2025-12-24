@@ -31,21 +31,16 @@ const githubProvider = new GithubAuthProvider();
 export class AuthService {
   private auth = inject(Auth);
 
-  /** Firebase user as a signal - automatically updates on auth state changes */
   private firebaseUser = toSignal(user(this.auth));
 
-  /** ID token as a signal - automatically refreshes */
   readonly token = toSignal(idToken(this.auth));
 
-  /** Mapped user for the application */
   readonly user = computed(() =>
     this.firebaseUser() ? this.mapFirebaseUser(this.firebaseUser()!) : null
   );
 
-  /** Whether the user is authenticated */
   readonly isAuthenticated = computed(() => !!this.firebaseUser());
 
-  /** Pending credential for account linking (when popup-safe flow is needed) */
   readonly pendingLink = signal<PendingLinkCredential | null>(null);
 
   login(provider = 'google'): Observable<User> {
@@ -82,7 +77,6 @@ export class AuthService {
       throw error;
     }
 
-    // Store pending credential for user-initiated linking
     const existingProvider =
       attemptedProvider === 'github' ? 'google' : 'github';
     const existingProviderName =
@@ -94,7 +88,6 @@ export class AuthService {
       existingProviderName,
     });
 
-    // Return error to signal UI to show linking prompt
     return throwError(() => ({
       code: 'auth/linking-required',
       message: `Please sign in with ${existingProviderName} to link your accounts.`,
@@ -133,7 +126,6 @@ export class AuthService {
     );
   }
 
-  /** Clears any pending link credential */
   clearPendingLink(): void {
     this.pendingLink.set(null);
   }

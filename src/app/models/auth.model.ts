@@ -1,9 +1,3 @@
-/**
- * Authentication Domain Models
- *
- * Interfaces for user authentication and OAuth.
- */
-
 export interface User {
   id: string;
   name: string;
@@ -23,10 +17,6 @@ export interface OAuthCallbackResponse {
   expiresIn: number;
 }
 
-/**
- * State interface for Auth SignalStore.
- * Defines the shape of authentication-related state.
- */
 export interface AuthState {
   user: User | null;
   token: string | null;

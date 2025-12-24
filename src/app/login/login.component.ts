@@ -36,7 +36,6 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
 
-    // Handle regular login
     this.loginTrigger$
       .pipe(
         switchMap((provider) => this.authService.login(provider)),
@@ -46,7 +45,6 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl(this.returnUrl);
       });
 
-    // Handle account linking completion
     this.linkTrigger$
       .pipe(
         switchMap(() => this.authService.completeAccountLinking()),

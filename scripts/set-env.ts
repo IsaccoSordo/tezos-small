@@ -19,7 +19,6 @@ import { config } from 'dotenv';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
-// Load .env file if it exists (for local development)
 const envPath = join(__dirname, '..', '.env');
 if (existsSync(envPath)) {
   config({ path: envPath });
@@ -84,14 +83,12 @@ function main(): void {
 
   const environmentsDir = join(__dirname, '..', 'src', 'environments');
 
-  // Ensure environments directory exists
   if (!existsSync(environmentsDir)) {
     mkdirSync(environmentsDir, { recursive: true });
   }
 
   const firebaseConfig = createFirebaseConfig();
 
-  // Generate development environment
   if (!prodOnly) {
     const devEnv: Environment = {
       production: false,
@@ -103,7 +100,6 @@ function main(): void {
     console.log(`Generated: ${devPath}`);
   }
 
-  // Generate production environment
   const prodEnv: Environment = {
     production: true,
     firebase: firebaseConfig,
@@ -113,7 +109,6 @@ function main(): void {
   writeFileSync(prodPath, generateEnvironmentContent(prodEnv));
   console.log(`Generated: ${prodPath}`);
 
-  // Validate that real values are set (warn if placeholders detected)
   const hasPlaceholders = Object.values(firebaseConfig).some(
     (value) => value.includes('YOUR_') || value === '' || value === 'undefined'
   );

@@ -23,18 +23,10 @@ import { TZKTState } from '../../models';
 import { TzktService } from '../../services/tzkt.service';
 import { getRouteType } from './url-utils';
 
-/**
- * Feature slice for blocks data loading.
- * Provides rxMethods for loading blocks with transaction counts and polling.
- */
 export function withBlocksData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
     withMethods((store, service = inject(TzktService)) => ({
-      /**
-       * Loads blocks with transaction counts.
-       * Uses concatMap to preserve block order when fetching transaction counts.
-       */
       loadBlocks: rxMethod<{ pageSize: number; page: number }>(
         pipe(
           switchMap(({ pageSize, page }) =>
@@ -65,9 +57,6 @@ export function withBlocksData() {
         )
       ),
 
-      /**
-       * Loads total block count.
-       */
       loadBlocksCount: rxMethod<void>(
         pipe(
           switchMap(() =>
@@ -84,15 +73,11 @@ export function withBlocksData() {
         )
       ),
 
-      /**
-       * Polls for block count only when on overview page.
-       * Accepts Observable<string> of URLs - polls when on overview, stops otherwise.
-       */
       pollBlocksCount: rxMethod<string>(
         pipe(
           switchMap((url) => {
             if (getRouteType(url) !== 'overview') {
-              return EMPTY; // Stop polling when not on overview
+              return EMPTY;
             }
             return interval(60000).pipe(
               startWith(0),

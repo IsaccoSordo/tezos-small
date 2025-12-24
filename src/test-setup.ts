@@ -1,10 +1,4 @@
-/**
- * Vitest Test Setup
- *
- * This file runs before each test file to set up the test environment.
- */
-
-// Mock window.matchMedia for PrimeNG components that use media queries
+// PrimeNG components require matchMedia mock for media queries
 const noop = (): void => {
   // Intentionally empty - required for matchMedia mock
 };

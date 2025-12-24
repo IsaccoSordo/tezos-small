@@ -78,7 +78,6 @@ describe('TzktService', () => {
 
   afterEach(() => {
     httpMock.verify();
-    // Reset store signals after each test
     store.resetState();
   });
 
@@ -283,9 +282,7 @@ describe('TzktService', () => {
       expect(store.loadingCounter()).toBe(0);
 
       service.getBlocksCount().subscribe({
-        error: () => {
-          // Error handled
-        },
+        error: vi.fn(),
       });
 
       expect(store.loadingCounter()).toBe(1);
@@ -293,7 +290,6 @@ describe('TzktService', () => {
       const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
       req.error(new ProgressEvent('Error'));
 
-      // After finalize, counter should be 0
       expect(store.loadingCounter()).toBe(0);
     });
   });

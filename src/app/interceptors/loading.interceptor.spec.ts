@@ -76,9 +76,7 @@ describe('loadingInterceptor', () => {
 
       httpClient.get(TEST_URL).subscribe({
         next: () => expect.fail('Should not succeed'),
-        error: () => {
-          // Error handled
-        },
+        error: vi.fn(),
       });
 
       expect(store.loadingCounter()).toBe(1);
@@ -94,27 +92,22 @@ describe('loadingInterceptor', () => {
     it('should handle multiple concurrent requests correctly', () => {
       expect(store.loadingCounter()).toBe(0);
 
-      // Start 3 requests
       httpClient.get('/api/test1').subscribe();
       httpClient.get('/api/test2').subscribe();
       httpClient.get('/api/test3').subscribe();
 
-      // Counter should be incremented 3 times
       expect(store.loadingCounter()).toBe(3);
 
-      // Complete first request
       const req1 = httpMock.expectOne('/api/test1');
       req1.flush(TEST_DATA);
 
       expect(store.loadingCounter()).toBe(2);
 
-      // Complete second request
       const req2 = httpMock.expectOne('/api/test2');
       req2.flush(TEST_DATA);
 
       expect(store.loadingCounter()).toBe(1);
 
-      // Complete third request
       const req3 = httpMock.expectOne('/api/test3');
       req3.flush(TEST_DATA);
 
@@ -124,19 +117,14 @@ describe('loadingInterceptor', () => {
     it('should maintain correct counter with mixed success and error responses', () => {
       expect(store.loadingCounter()).toBe(0);
 
-      // Start 3 requests
       httpClient.get('/api/success1').subscribe();
       httpClient.get('/api/error').subscribe({
-        error: () => {
-          // Error handled
-        },
+        error: vi.fn(),
       });
       httpClient.get('/api/success2').subscribe();
 
-      // Counter should be +3
       expect(store.loadingCounter()).toBe(3);
 
-      // Complete all requests (2 success, 1 error)
       const req1 = httpMock.expectOne('/api/success1');
       req1.flush(TEST_DATA);
 
@@ -208,15 +196,12 @@ describe('loadingInterceptor', () => {
     it('should handle rapid sequential requests', () => {
       expect(store.loadingCounter()).toBe(0);
 
-      // Make 5 rapid requests
       for (let i = 0; i < 5; i++) {
         httpClient.get(`${TEST_URL}/${i}`).subscribe();
       }
 
-      // Counter should be +5
       expect(store.loadingCounter()).toBe(5);
 
-      // Complete all requests
       for (let i = 0; i < 5; i++) {
         const req = httpMock.expectOne(`${TEST_URL}/${i}`);
         req.flush(TEST_DATA);
@@ -245,16 +230,12 @@ describe('loadingInterceptor', () => {
 
       expect(store.loadingCounter()).toBe(1);
 
-      // Get the request before unsubscribing
       const req = httpMock.expectOne(TEST_URL);
 
-      // Unsubscribe before response - finalize should still run
       subscription.unsubscribe();
 
-      // Counter should be decremented when unsubscribed
       expect(store.loadingCounter()).toBe(0);
 
-      // Expect no open requests after unsubscribe cancels it
       expect(req.cancelled).toBe(true);
     });
   });

@@ -6,14 +6,11 @@ export class GlobalErrorHandler implements ErrorHandler {
   private messageService = inject(MessageService);
 
   handleError(error: Error): void {
-    // Log to console for debugging
     console.error('Global error caught:', error);
 
-    // Get user-friendly error message
     const message =
       error.message || 'An unexpected error occurred. Please try again.';
 
-    // Display error toast
     this.messageService.add({
       severity: 'error',
       summary: 'Application Error',

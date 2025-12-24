@@ -49,21 +49,18 @@ describe('SpinnerComponent', () => {
   });
 
   it('should reactively update when loading counter changes', async () => {
-    // Initially not loading
     store.setLoadingCounter(0);
     fixture.detectChanges();
     await fixture.whenStable();
     let spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
     expect(spinner).toBeNull();
 
-    // Start loading
     store.setLoadingCounter(2);
     fixture.detectChanges();
     await fixture.whenStable();
     spinner = fixture.nativeElement.querySelector('.spinner-backdrop');
     expect(spinner).toBeTruthy();
 
-    // Stop loading
     store.setLoadingCounter(0);
     fixture.detectChanges();
     await fixture.whenStable();

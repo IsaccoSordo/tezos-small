@@ -12,7 +12,6 @@ import { TableComponent } from '../ui/table/table.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DetailsComponent {
-  // Store handles all data loading via Router events - component is purely presentational
   store = inject(Store);
   transactions = this.store.transactions;
 

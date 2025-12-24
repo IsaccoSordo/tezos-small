@@ -6,10 +6,6 @@ import {
 } from '@ngrx/signals';
 import { Block, Transaction, TZKTState } from '../../models';
 
-/**
- * Feature slice for basic state mutations.
- * Provides setter methods and state reset functionality.
- */
 export function withStateMutations() {
   return signalStoreFeature(
     { state: type<TZKTState>() },

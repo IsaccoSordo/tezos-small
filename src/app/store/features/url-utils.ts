@@ -1,8 +1,3 @@
-/**
- * URL parsing utilities for route-driven state management.
- * Shared across signal store features.
- */
-
 export type RouteType = 'overview' | 'details' | 'other';
 
 const parseUrl = (url: string) => {

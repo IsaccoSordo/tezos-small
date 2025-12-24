@@ -143,20 +143,18 @@ The test suite uses the following patterns:
 
 ```typescript
 describe('MyComponent', () => {
-  // Helper functions for common patterns
   const initializeComponent = () => {
     fixture.detectChanges();
-    vi.advanceTimersByTime(0); // Handle async timers
+    vi.advanceTimersByTime(0);
   };
 
   beforeEach(async () => {
     vi.useFakeTimers();
-    // Setup common test fixtures
   });
 
   afterEach(() => {
     fixture.destroy();
-    httpMock.verify(); // Ensure no pending requests
+    httpMock.verify();
     vi.useRealTimers();
   });
 
@@ -234,18 +232,14 @@ src/app/
 The application uses Firebase Authentication via `@angular/fire`:
 
 ```typescript
-// AuthService using toSignal pattern
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private auth = inject(Auth);
 
-  // Firebase user as signal - automatically updates
   private firebaseUser = toSignal(user(this.auth));
 
-  // ID token as signal - automatically refreshes
   readonly token = toSignal(idToken(this.auth));
 
-  // Computed signals for derived state
   readonly user = computed(() => this.mapFirebaseUser(this.firebaseUser()));
   readonly isAuthenticated = computed(() => !!this.firebaseUser());
 
@@ -279,10 +273,10 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withStateMutations(), // Basic setters and resetState
-  withBlocksData(), // Block loading rxMethods
-  withTransactionsData(), // Transaction loading rxMethods
-  withRouterSync() // Router event subscription (must be last)
+  withStateMutations(),
+  withBlocksData(),
+  withTransactionsData(),
+  withRouterSync()
 );
 ```
 

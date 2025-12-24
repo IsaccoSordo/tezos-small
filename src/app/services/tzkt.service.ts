@@ -4,10 +4,6 @@ import { Observable } from 'rxjs';
 import { Block, Transaction } from '../models';
 import { cacheContext } from '../config/cache.config';
 
-/**
- * Thin HTTP service for TZKT API calls.
- * Orchestration logic (combining requests) belongs in the Store.
- */
 @Injectable({
   providedIn: 'root',
 })

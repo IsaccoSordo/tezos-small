@@ -4,15 +4,6 @@ import { DetailsComponent } from './details.component';
 import { Store } from '../store/tzkt.store';
 import { Transaction } from '../models';
 
-/**
- * DetailsComponent Test Suite
- *
- * Testing Best Practices Applied:
- * - Component is purely presentational - reads from store
- * - Store is mocked with signals for isolated unit testing
- * - Tests verify component displays data from store correctly
- * - Store handles all data loading via Router events
- */
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
   let fixture: ComponentFixture<DetailsComponent>;
@@ -32,7 +23,6 @@ describe('DetailsComponent', () => {
     },
   ];
 
-  // Mock store with signals
   const mockStore = {
     blocks: signal([]),
     count: signal(0),
@@ -54,7 +44,6 @@ describe('DetailsComponent', () => {
     fixture = TestBed.createComponent(DetailsComponent);
     component = fixture.componentInstance;
 
-    // Reset mock signals
     mockStore.transactions.set([]);
     vi.clearAllMocks();
   });

@@ -8,15 +8,6 @@ import { Store } from '../store/tzkt.store';
 import { PageChangeEvent } from '../ui/table/table.component';
 import { Block } from '../models';
 
-/**
- * BlocksOverviewComponent Test Suite
- *
- * Testing Best Practices Applied:
- * - Component is purely presentational - reads from store
- * - Store is mocked with signals for isolated unit testing
- * - Tests verify component displays data from store correctly
- * - Tests verify URL-driven pagination (onPageChange navigates)
- */
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;
   let fixture: ComponentFixture<BlocksOverviewComponent>;
@@ -40,7 +31,6 @@ describe('BlocksOverviewComponent', () => {
     },
   ];
 
-  // Mock store with signals
   const mockStore = {
     blocks: signal<Block[]>([]),
     count: signal(0),
@@ -74,7 +64,6 @@ describe('BlocksOverviewComponent', () => {
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
 
-    // Reset mock signals
     mockStore.blocks.set([]);
     mockStore.count.set(0);
     vi.clearAllMocks();

@@ -73,13 +73,10 @@ describe('TableComponent', () => {
     it('should emit pageChange event when user changes page', () => {
       let emittedEvent: PageChangeEvent | undefined;
 
-      // Subscribe to the output
       component.pageChange.subscribe((event) => {
         emittedEvent = event;
       });
 
-      // Simulate PrimeNG lazy load event (has 'first' instead of 'page')
-      // first = page * rows, so for page 2 with 25 rows: first = 50
       const primeNgLazyEvent = { first: 50, rows: 25 };
       component.onPageChange(primeNgLazyEvent);
 
@@ -93,7 +90,6 @@ describe('TableComponent', () => {
         emittedEvent = event;
       });
 
-      // first = 0 means page 0
       const primeNgLazyEvent = { first: 0, rows: 50 };
       component.onPageChange(primeNgLazyEvent);
 

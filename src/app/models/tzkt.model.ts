@@ -1,10 +1,3 @@
-/**
- * TZKT Domain Models
- *
- * Interfaces for Tezos blockchain data from the TZKT API.
- * These models represent the core domain entities.
- */
-
 export interface Account {
   alias: string;
   address: string;
@@ -25,10 +18,6 @@ export interface Transaction {
   status: string;
 }
 
-/**
- * State interface for TZKT SignalStore.
- * Defines the shape of the TZKT-related application state.
- */
 export interface TZKTState {
   blocks: Block[];
   count: number;

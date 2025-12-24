@@ -23,25 +23,20 @@ export interface PageChangeEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent<T = unknown> {
-  // Content projection - body template
   bodyTemplate = contentChild<TemplateRef<unknown>>('body');
 
-  // Inputs - data and configuration
   data = input<T[]>([]);
   columns = input<{ field: string; header: string }[]>([]);
   totalRecords = input<number>(0);
   rows = input<number>(10);
-  first = input<number>(0); // Starting row index for pagination
+  first = input<number>(0);
   paginator = input<boolean>(false);
   scrollable = input<boolean>(true);
   scrollHeight = input<string>('600px');
 
-  // Output - emit page change events
   pageChange = output<PageChangeEvent>();
 
   onPageChange(event: { first?: number | null; rows?: number | null }) {
-    // PrimeNG lazy load event has 'first' (row index) and 'rows' (page size)
-    // Convert first to page number: page = first / rows
     const first = event.first ?? 0;
     const rows = event.rows ?? 10;
     const page = first ? Math.floor(first / rows) : 0;

@@ -11,17 +11,10 @@ import { pipe, switchMap } from 'rxjs';
 import { TZKTState } from '../../models';
 import { TzktService } from '../../services/tzkt.service';
 
-/**
- * Feature slice for transactions data loading.
- * Provides rxMethod for loading transactions by block level.
- */
 export function withTransactionsData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
     withMethods((store, service = inject(TzktService)) => ({
-      /**
-       * Loads transactions for a block level.
-       */
       loadTransactions: rxMethod<number>(
         pipe(
           switchMap((level) =>

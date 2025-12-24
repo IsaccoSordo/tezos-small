@@ -23,13 +23,10 @@ export class BlocksOverviewComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // Store handles all data loading via Router events
   store = inject(Store);
   blocks = this.store.blocks;
   count = this.store.count;
 
-  // Pagination state derived from URL (source of truth) - purely for display
-  // URL uses 1-indexed pages for UX, internally convert to 0-indexed for PrimeNG
   private queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
@@ -41,7 +38,6 @@ export class BlocksOverviewComponent {
   );
 
   pageSize = computed(() => this.queryParams().pageSize);
-  // Convert 1-indexed URL page to 0-indexed for PrimeNG's first calculation
   currentPage = computed(() => Math.max(0, this.queryParams().urlPage));
 
   columns = [
@@ -52,14 +48,10 @@ export class BlocksOverviewComponent {
     { field: 'timestamp', header: 'Timestamp' },
   ];
 
-  /**
-   * URL-driven pagination: only update URL, store reacts to Router events
-   * Convert 0-indexed PrimeNG page to 1-indexed URL page
-   */
   onPageChange(event: PageChangeEvent): void {
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { page: event.page, pageSize: event.pageSize }, // 1-indexed for URL
+      queryParams: { page: event.page, pageSize: event.pageSize },
       queryParamsHandling: 'merge',
     });
   }
