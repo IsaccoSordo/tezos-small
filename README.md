@@ -177,13 +177,13 @@ See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.
 
 ```
 src/app/
-├── blocks-overview/          # Main blocks listing page (presentational)
+├── blocks-overview/          # Main blocks listing page
 ├── config/
 │   ├── auth.config.ts       # Protected API patterns
 │   └── cache.config.ts      # HTTP cache configuration
 ├── core/
 │   └── global-error.handler.ts # Global error handling
-├── details/                  # Transaction details page (presentational)
+├── details/                  # Transaction details page
 ├── guards/
 │   └── auth.guard.ts        # Route guards (authGuard, guestGuard)
 ├── interceptors/
@@ -199,7 +199,7 @@ src/app/
 ├── navbar/                   # Navigation component
 ├── services/
 │   ├── auth.service.ts      # Firebase Auth with @angular/fire
-│   └── tzkt.service.ts      # TZKT API integration (thin HTTP layer)
+│   └── tzkt.service.ts      # TZKT API integration
 ├── store/
 │   ├── tzkt.store.ts        # Orchestrator - composes feature slices
 │   └── features/            # Composable signalStoreFeature slices
@@ -212,7 +212,7 @@ src/app/
 ├── ui/                       # Reusable UI components
 │   ├── spinner/
 │   └── table/
-├── app.routes.ts            # Application routing (lazy loading)
+├── app.routes.ts            # Application routing
 ├── app.config.ts            # Global configuration
 └── app.component.ts         # Root component
 ```
@@ -279,21 +279,21 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withStateMutations(),    // Basic setters and resetState
-  withBlocksData(),        // Block loading rxMethods
-  withTransactionsData(),  // Transaction loading rxMethods
-  withRouterSync()         // Router event subscription (must be last)
+  withStateMutations(), // Basic setters and resetState
+  withBlocksData(), // Block loading rxMethods
+  withTransactionsData(), // Transaction loading rxMethods
+  withRouterSync() // Router event subscription (must be last)
 );
 ```
 
 **Feature Slices:**
 
-| Feature | Purpose |
-|---------|---------|
-| `withStateMutations` | Basic setters: setBlocks, setCount, resetState, etc. |
-| `withBlocksData` | loadBlocks, loadBlocksCount, pollBlocksCount rxMethods |
-| `withTransactionsData` | loadTransactions rxMethod |
-| `withRouterSync` | Subscribes to Router events, triggers data loading |
+| Feature                | Purpose                                                |
+| ---------------------- | ------------------------------------------------------ |
+| `withStateMutations`   | Basic setters: setBlocks, setCount, resetState, etc.   |
+| `withBlocksData`       | loadBlocks, loadBlocksCount, pollBlocksCount rxMethods |
+| `withTransactionsData` | loadTransactions rxMethod                              |
+| `withRouterSync`       | Subscribes to Router events, triggers data loading     |
 
 **signalStoreFeature benefits:**
 
@@ -460,15 +460,15 @@ providePrimeNG({
 
 ## Development Commands
 
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `npm install`        | Install dependencies                     |
-| `npm start`          | Start dev server at http://localhost:4200|
-| `npm run build:prod` | Build for production                     |
-| `npm test`           | Run tests in watch mode                  |
-| `npm run test:ci`    | Run tests once (CI)                      |
-| `npm run lint`       | Run ESLint                               |
-| `npm run format`     | Format code with Prettier                |
+| Command              | Description                               |
+| -------------------- | ----------------------------------------- |
+| `npm install`        | Install dependencies                      |
+| `npm start`          | Start dev server at http://localhost:4200 |
+| `npm run build:prod` | Build for production                      |
+| `npm test`           | Run tests in watch mode                   |
+| `npm run test:ci`    | Run tests once (CI)                       |
+| `npm run lint`       | Run ESLint                                |
+| `npm run format`     | Format code with Prettier                 |
 
 ## License
 
