@@ -1,7 +1,14 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, from, throwError } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import {
+  map,
+  catchError,
+  switchMap,
+  filter,
+  take,
+  shareReplay,
+} from 'rxjs/operators';
 import {
   Auth,
   user,
@@ -31,7 +38,8 @@ const githubProvider = new GithubAuthProvider();
 export class AuthService {
   private auth = inject(Auth);
 
-  private firebaseUser = toSignal(user(this.auth));
+  private user$ = user(this.auth).pipe(shareReplay(1));
+  private firebaseUser = toSignal(this.user$);
 
   readonly token = toSignal(idToken(this.auth));
 
@@ -48,7 +56,16 @@ export class AuthService {
       provider === 'github' ? githubProvider : googleProvider;
 
     return from(signInWithPopup(this.auth, authProvider)).pipe(
-      map((result) => this.mapFirebaseUser(result.user)),
+      switchMap((result) =>
+        this.user$.pipe(
+          filter(
+            (user): user is FirebaseUser =>
+              !!user && user.uid === result.user.uid
+          ),
+          take(1),
+          map(() => this.mapFirebaseUser(result.user))
+        )
+      ),
       catchError((error) => this.handleAuthError(error, provider))
     );
   }
@@ -112,11 +129,19 @@ export class AuthService {
     return from(signInWithPopup(this.auth, authProvider)).pipe(
       switchMap((result) =>
         from(linkWithCredential(result.user, pending.credential)).pipe(
-          map(() => {
-            console.log('Accounts linked successfully!');
-            this.pendingLink.set(null);
-            return this.mapFirebaseUser(result.user);
-          })
+          switchMap(() =>
+            this.user$.pipe(
+              filter(
+                (user): user is FirebaseUser =>
+                  !!user && user.uid === result.user.uid
+              ),
+              take(1),
+              map(() => {
+                this.pendingLink.set(null);
+                return this.mapFirebaseUser(result.user);
+              })
+            )
+          )
         )
       ),
       catchError((err) => {
