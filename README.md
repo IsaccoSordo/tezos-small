@@ -201,7 +201,14 @@ src/app/
 │   ├── auth.service.ts      # Firebase Auth with @angular/fire
 │   └── tzkt.service.ts      # TZKT API integration (thin HTTP layer)
 ├── store/
-│   └── tzkt.store.ts        # NgRx SignalStore with rxMethod + withHooks
+│   ├── tzkt.store.ts        # Orchestrator - composes feature slices
+│   └── features/            # Composable signalStoreFeature slices
+│       ├── state-mutations.feature.ts  # withStateMutations
+│       ├── blocks-data.feature.ts      # withBlocksData
+│       ├── transactions-data.feature.ts # withTransactionsData
+│       ├── router-sync.feature.ts      # withRouterSync
+│       ├── url-utils.ts                # URL parsing utilities
+│       └── index.ts                    # Barrel file
 ├── ui/                       # Reusable UI components
 │   ├── spinner/
 │   └── table/
@@ -259,9 +266,10 @@ export class AuthService {
 
 ### State Management
 
-The application uses NgRx SignalStore with `rxMethod` for reactive, route-driven state:
+The application uses NgRx SignalStore with `signalStoreFeature` for composable, testable state slices:
 
 ```typescript
+// tzkt.store.ts
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({
@@ -271,42 +279,27 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withMethods((store, service = inject(TzktService)) => ({
-    // rxMethod accepts Observable, Signal, or static value
-    loadBlocks: rxMethod<{ pageSize: number; page: number }>(
-      pipe(
-        switchMap(({ pageSize, page }) =>
-          service.getBlocks(pageSize, page).pipe(
-            // Enrich blocks with transaction counts (concatMap preserves order)
-            switchMap((blocks) =>
-              from(blocks).pipe(
-                concatMap((block) =>
-                  service.getTransactionsCount(block.level).pipe(
-                    map((count) => ({ ...block, transactions: count }))
-                  )
-                ),
-                toArray()
-              )
-            ),
-            tapResponse({
-              next: (blocks) => patchState(store, { blocks }),
-              error: (error) => patchState(store, (state) => ({
-                errors: [...state.errors, error],
-              })),
-            })
-          )
-        )
-      )
-    ),
-  })),
-  withHooks((store) => ({
-    onInit() {
-      // Store subscribes to Router events and reacts to URL changes
-      // Components are purely presentational - no data fetching logic
-    },
-  }))
+  withStateMutations(),    // Basic setters and resetState
+  withBlocksData(),        // Block loading rxMethods
+  withTransactionsData(),  // Transaction loading rxMethods
+  withRouterSync()         // Router event subscription (must be last)
 );
 ```
+
+**Feature Slices:**
+
+| Feature | Purpose |
+|---------|---------|
+| `withStateMutations` | Basic setters: setBlocks, setCount, resetState, etc. |
+| `withBlocksData` | loadBlocks, loadBlocksCount, pollBlocksCount rxMethods |
+| `withTransactionsData` | loadTransactions rxMethod |
+| `withRouterSync` | Subscribes to Router events, triggers data loading |
+
+**signalStoreFeature benefits:**
+
+- Each feature can be tested in isolation
+- Features can be shared across stores
+- Separate files reduce merge conflicts
 
 ### HTTP Interceptors
 

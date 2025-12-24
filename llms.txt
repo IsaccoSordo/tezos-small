@@ -6,7 +6,7 @@ This is a single-page application featuring block browsing, transaction details,
 
 **Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @angular/fire, @ngneat/cashew, Firebase Auth, TZKT API
 **Node Requirements**: v20.19+ or v22.12+
-**Last Updated**: 2025-12-23
+**Last Updated**: 2025-12-24
 **Dependencies**: All dependencies use exact versions (no wildcards like ^ or ~)
 **Live Demo**: https://isaccosordo.github.io/tezos-small/
 
@@ -141,6 +141,9 @@ export class AuthService {
 - Use neutral, objective language - avoid subjective adjectives
 - Avoid marketing terms: "enterprise-grade", "premium", "cutting-edge", "sleek", "modern", "beautiful", "powerful", "robust"
 - Avoid promotional phrases: "deep-dive", "smart", "comprehensive", "industry-standard"
+- Avoid emphasis markers in headers: "CRITICAL", "IMPORTANT", "KEY" - just state the information
+- Avoid line count comparisons: "~50 lines instead of 300+" - these become outdated
+- Avoid promotional code comments: "Clean orchestrator", "Reusable feature slice" - just use file names
 - Do NOT use emojis in documentation unless explicitly requested
 - State facts, not opinions - describe what the code does, not how good it is
 - Use technical terminology appropriately without exaggeration
@@ -151,6 +154,12 @@ export class AuthService {
 - Use active voice when describing what the code does
 - Avoid superlatives and excessive enthusiasm
 - Keep descriptions factual and verifiable
+
+**Code Comments**
+- Comments should explain WHY, not WHAT
+- The code itself shows what it does; comments add context for decisions
+- Good: `// Use concatMap to preserve block order in results`
+- Bad: `// Loop through blocks and get transaction counts`
 
 **Examples of Neutral vs. Grandiose Language**
 - "A sleek, modern Angular application" -> "An Angular application"
@@ -236,7 +245,7 @@ export type { Column, TableData } from './ui.model';
 - For Firebase auth: use `toSignal()` pattern with `@angular/fire` observables
 - Use `patchState()` for all state updates to ensure immutability
 
-**Subscription Patterns (CRITICAL)**
+**Subscription Patterns**
 - NEVER subscribe inside method functions - use Subject pattern instead
 - NEVER subscribe in constructors - always use ngOnInit for subscriptions
 - Always use `takeUntilDestroyed(this.destroyRef)` to automatically unsubscribe
@@ -287,7 +296,7 @@ onUserAction(param: string): void {
 - Use `finalize` for cleanup operations
 - Use `forkJoin` for combining parallel requests
 
-**Route-Driven State Management (CRITICAL)**
+**Route-Driven State Management**
 - Store subscribes to Router events via `withHooks()` - components do NOT fetch data
 - Use `rxMethod` to react to URL changes - no manual `.subscribe()` calls
 - Components are purely presentational: read from store signals, navigate on user actions
@@ -299,10 +308,10 @@ onUserAction(param: string): void {
 Use `signalStoreFeature` to split large stores into composable, testable slices:
 
 ```typescript
-// blocks-data.feature.ts - Reusable feature slice
+// blocks-data.feature.ts
 export function withBlocksData() {
   return signalStoreFeature(
-    { state: type<TZKTState>() }, // State requirements
+    { state: type<TZKTState>() },
     withMethods((store, service = inject(TzktService)) => ({
       loadBlocks: rxMethod<{ pageSize: number; page: number }>(
         pipe(
@@ -322,7 +331,7 @@ export function withBlocksData() {
   );
 }
 
-// router-sync.feature.ts - Router integration feature
+// router-sync.feature.ts
 export function withRouterSync() {
   return signalStoreFeature(
     { state: type<TZKTState>(), methods: type<DataLoadingMethods>() },
@@ -346,23 +355,22 @@ export function withRouterSync() {
   );
 }
 
-// tzkt.store.ts - Clean orchestrator
+// tzkt.store.ts
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({ blocks: [], count: 0, transactions: [], errors: [], loadingCounter: 0 }),
-  withStateMutations(),    // Basic setters and resetState
-  withBlocksData(),        // Block loading rxMethods
-  withTransactionsData(),  // Transaction loading rxMethods
-  withRouterSync()         // Must be last - needs access to all methods
+  withStateMutations(),
+  withBlocksData(),
+  withTransactionsData(),
+  withRouterSync()
 );
 ```
 
-**signalStoreFeature Benefits:**
-- Readability: Main store goes from 200+ lines to 20 lines
-- Testability: Test each feature slice in isolation
-- Reusability: Share features across stores (e.g., `withPolling()`, `withPagination()`)
-- Collaboration: Fewer git merge conflicts with separate files
-- Naming convention: Use `withX` prefix for feature functions
+**signalStoreFeature characteristics:**
+- Each feature can be tested in isolation
+- Features can be shared across stores
+- Separate files reduce merge conflicts
+- Use `withX` prefix for feature functions
 
 **Accessibility**
 - Ensure WCAG AA compliance
