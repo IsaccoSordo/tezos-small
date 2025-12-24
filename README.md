@@ -33,6 +33,9 @@ An Angular application for exploring Tezos blockchain blocks and transactions th
 
 - Zoneless change detection (Angular 21)
 - Standalone components with signal-based reactivity
+- NgRx SignalStore with `rxMethod` for reactive data loading
+- Route-driven state management (store reacts to URL changes)
+- Purely presentational components
 - Firebase integration via @angular/fire
 - Reactive data flow with RxJS and `toSignal()`
 - HTTP response caching with [@ngneat/cashew](https://github.com/ngneat/cashew)
@@ -194,14 +197,18 @@ src/app/
 │   ├── ui.model.ts          # UI interfaces (Column, TableData)
 │   └── index.ts             # Barrel file for imports
 ├── navbar/                   # Navigation component
-├── resolvers/
-│   └── tzkt.resolvers.ts    # Route resolvers
 ├── services/
 │   ├── auth.service.ts      # Firebase Auth with @angular/fire
 │   └── tzkt.service.ts      # TZKT API integration
 ├── store/
-│   ├── tzkt.state.ts        # State interface
-│   └── tzkt.store.ts        # NgRx SignalStore
+│   ├── tzkt.store.ts        # Orchestrator - composes feature slices
+│   └── features/            # Composable signalStoreFeature slices
+│       ├── state-mutations.feature.ts  # withStateMutations
+│       ├── blocks-data.feature.ts      # withBlocksData
+│       ├── transactions-data.feature.ts # withTransactionsData
+│       ├── router-sync.feature.ts      # withRouterSync
+│       ├── url-utils.ts                # URL parsing utilities
+│       └── index.ts                    # Barrel file
 ├── ui/                       # Reusable UI components
 │   ├── spinner/
 │   └── table/
@@ -212,14 +219,15 @@ src/app/
 
 ### Key Components
 
-| Component                 | Purpose                                 |
-| ------------------------- | --------------------------------------- |
-| `BlocksOverviewComponent` | Displays paginated list of blocks       |
-| `DetailsComponent`        | Shows transactions for a specific block |
-| `LoginComponent`          | OAuth login with Google/GitHub          |
-| `NavbarComponent`         | Navigation header with auth status      |
-| `TableComponent`          | Reusable data table with pagination     |
-| `SpinnerComponent`        | Loading indicator                       |
+| Component                 | Purpose                                           |
+| ------------------------- | ------------------------------------------------- |
+| `BlocksOverviewComponent` | Presentational - displays blocks from store       |
+| `DetailsComponent`        | Presentational - displays transactions from store |
+| `LoginComponent`          | OAuth login with Google/GitHub                    |
+| `NavbarComponent`         | Navigation header with auth status                |
+| `TableComponent`          | Reusable data table with pagination               |
+| `SpinnerComponent`        | Loading indicator                                 |
+| `Store`                   | Route-driven state management with rxMethod       |
 
 ### Authentication
 
@@ -258,9 +266,10 @@ export class AuthService {
 
 ### State Management
 
-The application uses NgRx SignalStore for TZKT state:
+The application uses NgRx SignalStore with `signalStoreFeature` for composable, testable state slices:
 
 ```typescript
+// tzkt.store.ts
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({
@@ -270,18 +279,27 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withMethods((store) => ({
-    setBlocks(blocks: Block[]): void {
-      patchState(store, { blocks });
-    },
-    incrementLoadingCounter(): void {
-      patchState(store, (state) => ({
-        loadingCounter: state.loadingCounter + 1,
-      }));
-    },
-  }))
+  withStateMutations(), // Basic setters and resetState
+  withBlocksData(), // Block loading rxMethods
+  withTransactionsData(), // Transaction loading rxMethods
+  withRouterSync() // Router event subscription (must be last)
 );
 ```
+
+**Feature Slices:**
+
+| Feature                | Purpose                                                |
+| ---------------------- | ------------------------------------------------------ |
+| `withStateMutations`   | Basic setters: setBlocks, setCount, resetState, etc.   |
+| `withBlocksData`       | loadBlocks, loadBlocksCount, pollBlocksCount rxMethods |
+| `withTransactionsData` | loadTransactions rxMethod                              |
+| `withRouterSync`       | Subscribes to Router events, triggers data loading     |
+
+**signalStoreFeature benefits:**
+
+- Each feature can be tested in isolation
+- Features can be shared across stores
+- Separate files reduce merge conflicts
 
 ### HTTP Interceptors
 
@@ -442,15 +460,15 @@ providePrimeNG({
 
 ## Development Commands
 
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `npm install`        | Install dependencies                     |
-| `npm start`          | Start dev server at http://localhost:4200|
-| `npm run build:prod` | Build for production                     |
-| `npm test`           | Run tests in watch mode                  |
-| `npm run test:ci`    | Run tests once (CI)                      |
-| `npm run lint`       | Run ESLint                               |
-| `npm run format`     | Format code with Prettier                |
+| Command              | Description                               |
+| -------------------- | ----------------------------------------- |
+| `npm install`        | Install dependencies                      |
+| `npm start`          | Start dev server at http://localhost:4200 |
+| `npm run build:prod` | Build for production                      |
+| `npm test`           | Run tests in watch mode                   |
+| `npm run test:ci`    | Run tests once (CI)                       |
+| `npm run lint`       | Run ESLint                                |
+| `npm run format`     | Format code with Prettier                 |
 
 ## License
 

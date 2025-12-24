@@ -1,72 +1,38 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  Observable,
-  tap,
-  switchMap,
-  map,
-  of,
-  from,
-  mergeMap,
-  toArray,
-} from 'rxjs';
+import { Observable } from 'rxjs';
 import { Block, Transaction } from '../models';
 import { cacheContext } from '../config/cache.config';
-import { Store } from '../store/tzkt.store';
 
+/**
+ * Thin HTTP service for TZKT API calls.
+ * Orchestration logic (combining requests) belongs in the Store.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class TzktService {
   private http = inject(HttpClient);
-  private store = inject(Store);
   private readonly API_BASE = 'https://api.tzkt.io/v1';
 
   getBlocksCount(): Observable<number> {
-    return this.http
-      .get<number>(`${this.API_BASE}/blocks/count`, {
-        context: cacheContext,
-      })
-      .pipe(tap((count) => this.store.setCount(count)));
+    return this.http.get<number>(`${this.API_BASE}/blocks/count`, {
+      context: cacheContext,
+    });
   }
 
   getBlocks(limit: number, offset: number): Observable<Block[]> {
-    // Ensure parameters have valid values
     const validLimit = limit ?? 10;
     const validOffset = offset ?? 0;
 
-    return this.http
-      .get<Block[]>(`${this.API_BASE}/blocks`, {
-        params: {
-          limit: validLimit.toString(),
-          'offset.pg': validOffset.toString(),
-          'sort.desc': 'level',
-        },
-        context: cacheContext,
-      })
-      .pipe(
-        switchMap((blocks) => {
-          // Handle empty blocks case
-          if (blocks.length === 0) {
-            this.store.setBlocks(blocks);
-            return of(blocks);
-          }
-
-          // Fetch transaction counts with concurrency limit of 5 to avoid rate limiting
-          return from(blocks).pipe(
-            mergeMap(
-              (block) =>
-                this.getTransactionsCount(block.level).pipe(
-                  tap((count) => (block.transactions = count))
-                ),
-              5
-            ),
-            toArray(),
-            tap(() => this.store.setBlocks(blocks)),
-            map(() => blocks)
-          );
-        })
-      );
+    return this.http.get<Block[]>(`${this.API_BASE}/blocks`, {
+      params: {
+        limit: validLimit.toString(),
+        'offset.pg': validOffset.toString(),
+        'sort.desc': 'level',
+      },
+      context: cacheContext,
+    });
   }
 
   getTransactionsCount(level: number): Observable<number> {
@@ -80,11 +46,12 @@ export class TzktService {
   }
 
   getTransactions(level: number): Observable<Transaction[]> {
-    return this.http
-      .get<Transaction[]>(`${this.API_BASE}/operations/transactions`, {
+    return this.http.get<Transaction[]>(
+      `${this.API_BASE}/operations/transactions`,
+      {
         params: { level: level.toString() },
         context: cacheContext,
-      })
-      .pipe(tap((transactions) => this.store.setTransactions(transactions)));
+      }
+    );
   }
 }

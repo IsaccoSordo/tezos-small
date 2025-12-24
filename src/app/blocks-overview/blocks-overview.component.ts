@@ -2,15 +2,12 @@ import {
   Component,
   inject,
   ChangeDetectionStrategy,
-  OnInit,
-  DestroyRef,
-  signal,
+  computed,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { interval, switchMap } from 'rxjs';
-import { TzktService } from '../services/tzkt.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { Store } from '../store/tzkt.store';
 import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
 
@@ -22,19 +19,30 @@ import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
   imports: [CommonModule, RouterLink, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlocksOverviewComponent implements OnInit {
-  private service = inject(TzktService);
-  private destroyRef = inject(DestroyRef);
+export class BlocksOverviewComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  // Store handles all data loading via Router events
   store = inject(Store);
   blocks = this.store.blocks;
   count = this.store.count;
 
-  // Pagination state from query params
-  currentPage = signal(0);
-  pageSize = signal(10);
+  // Pagination state derived from URL (source of truth) - purely for display
+  // URL uses 1-indexed pages for UX, internally convert to 0-indexed for PrimeNG
+  private queryParams = toSignal(
+    this.route.queryParams.pipe(
+      map((params) => ({
+        pageSize: +(params['pageSize'] ?? 10),
+        urlPage: +(params['page'] ?? 0),
+      }))
+    ),
+    { initialValue: { pageSize: 10, urlPage: 0 } }
+  );
+
+  pageSize = computed(() => this.queryParams().pageSize);
+  // Convert 1-indexed URL page to 0-indexed for PrimeNG's first calculation
+  currentPage = computed(() => Math.max(0, this.queryParams().urlPage));
 
   columns = [
     { field: 'hash', header: 'Hash' },
@@ -44,34 +52,14 @@ export class BlocksOverviewComponent implements OnInit {
     { field: 'timestamp', header: 'Timestamp' },
   ];
 
-  ngOnInit(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const page = params.get('page');
-    const pageSize = params.get('pageSize');
-
-    if (page) this.currentPage.set(+page);
-    if (pageSize) this.pageSize.set(+pageSize);
-
-    // Poll for block count every 60 seconds to keep data fresh
-    interval(60000)
-      .pipe(
-        switchMap(() => this.service.getBlocksCount()),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe();
-  }
-
+  /**
+   * URL-driven pagination: only update URL, store reacts to Router events
+   * Convert 0-indexed PrimeNG page to 1-indexed URL page
+   */
   onPageChange(event: PageChangeEvent): void {
-    const page = event.page;
-    const pageSize = event.pageSize;
-
-    this.currentPage.set(page);
-    this.pageSize.set(pageSize);
-
-    // Navigate with new query params - resolver will fetch new data
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { page, pageSize },
+      queryParams: { page: event.page, pageSize: event.pageSize }, // 1-indexed for URL
       queryParamsHandling: 'merge',
     });
   }

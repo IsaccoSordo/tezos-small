@@ -1,27 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { DetailsComponent } from './details.component';
-import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
 import { Store } from '../store/tzkt.store';
+import { Transaction } from '../models';
 
 /**
  * DetailsComponent Test Suite
  *
  * Testing Best Practices Applied:
- * - Component relies on resolver for data preloading (no HTTP calls in component)
- * - Tests verify component reads from store correctly
- * - Tests verify template rendering with preloaded data
+ * - Component is purely presentational - reads from store
+ * - Store is mocked with signals for isolated unit testing
+ * - Tests verify component displays data from store correctly
+ * - Store handles all data loading via Router events
  */
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
   let fixture: ComponentFixture<DetailsComponent>;
-  let httpMock: HttpTestingController;
-  let store: InstanceType<typeof Store>;
 
-  const mockTransactions = [
+  const mockTransactions: Transaction[] = [
     {
       sender: { address: 'addr1', alias: 'User1' },
       target: { address: 'addr2', alias: 'User2' },
@@ -36,20 +32,35 @@ describe('DetailsComponent', () => {
     },
   ];
 
+  // Mock store with signals
+  const mockStore = {
+    blocks: signal([]),
+    count: signal(0),
+    transactions: signal<Transaction[]>([]),
+    errors: signal<Error[]>([]),
+    loadingCounter: signal(0),
+    loadBlocks: vi.fn(),
+    pollBlocksCount: vi.fn(),
+    loadTransactions: vi.fn(),
+    resetState: vi.fn(),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DetailsComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting(), Store],
+      providers: [{ provide: Store, useValue: mockStore }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DetailsComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
-    store = TestBed.inject(Store);
+
+    // Reset mock signals
+    mockStore.transactions.set([]);
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    httpMock.verify();
+    fixture.destroy();
   });
 
   it('should create', () => {
@@ -57,35 +68,33 @@ describe('DetailsComponent', () => {
   });
 
   it('should have references to store signals', () => {
-    expect(component.transactions).toBe(store.transactions);
+    expect(component.transactions).toBe(mockStore.transactions);
   });
 
-  it('should not make HTTP requests on init (resolver handles data loading)', () => {
+  it('should display transactions in template when store has data', () => {
+    mockStore.transactions.set(mockTransactions);
     fixture.detectChanges();
-
-    // Component should not make any HTTP requests - resolver preloads data
-    httpMock.expectNone(
-      (req) => req.url === 'https://api.tzkt.io/v1/operations/transactions'
-    );
-  });
-
-  it('should display transactions in template when store has data', async () => {
-    // Simulate resolver having preloaded data into store
-    store.setTransactions(mockTransactions);
-
-    fixture.detectChanges();
-    await fixture.whenStable();
 
     const compiled = fixture.nativeElement;
     expect(compiled.textContent).toContain('addr1');
+    expect(compiled.textContent).toContain('addr2');
   });
 
   it('should display correct number of transactions from store', () => {
-    store.setTransactions(mockTransactions);
+    mockStore.transactions.set(mockTransactions);
     fixture.detectChanges();
 
     expect(component.transactions().length).toBe(2);
     expect(component.transactions()[0].sender.address).toBe('addr1');
     expect(component.transactions()[1].amount).toBe(200);
+  });
+
+  it('should have correct column definitions', () => {
+    expect(component.columns).toEqual([
+      { field: 'sender', header: 'Sender' },
+      { field: 'target', header: 'Target' },
+      { field: 'amount', header: 'Amount' },
+      { field: 'status', header: 'Status' },
+    ]);
   });
 });

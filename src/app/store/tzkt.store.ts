@@ -1,6 +1,28 @@
-import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { Block, Transaction, TZKTState } from '../models';
+import { signalStore, withState } from '@ngrx/signals';
+import { TZKTState } from '../models';
+import {
+  withStateMutations,
+  withBlocksData,
+  withTransactionsData,
+  withRouterSync,
+} from './features';
 
+/**
+ * TZKT Signal Store - Orchestrator
+ *
+ * Uses composable signalStoreFeature functions for clean separation:
+ * - withStateMutations: Basic setters and resetState
+ * - withBlocksData: loadBlocks, loadBlocksCount, pollBlocksCount
+ * - withTransactionsData: loadTransactions
+ * - withRouterSync: handleRouteChange + Router event subscription in onInit
+ *
+ * The order of composition matters:
+ * 1. withState - defines the initial state
+ * 2. withStateMutations - basic state mutators (setters, resetState)
+ * 3. withBlocksData - block loading rxMethods
+ * 4. withTransactionsData - transaction loading rxMethods
+ * 5. withRouterSync - router subscription (must come LAST, needs access to all methods)
+ */
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({
@@ -10,47 +32,8 @@ export const Store = signalStore(
     loadingCounter: 0,
     transactions: [],
   }),
-  withMethods((store) => ({
-    setBlocks(blocks: Block[]): void {
-      patchState(store, { blocks });
-    },
-
-    setCount(count: number): void {
-      patchState(store, { count });
-    },
-
-    setTransactions(transactions: Transaction[]): void {
-      patchState(store, { transactions });
-    },
-
-    setErrors(errors: Error[]): void {
-      patchState(store, { errors });
-    },
-
-    incrementLoadingCounter(): void {
-      patchState(store, (state) => ({
-        loadingCounter: state.loadingCounter + 1,
-      }));
-    },
-
-    decrementLoadingCounter(): void {
-      patchState(store, (state) => ({
-        loadingCounter: Math.max(0, state.loadingCounter - 1),
-      }));
-    },
-
-    setLoadingCounter(count: number): void {
-      patchState(store, { loadingCounter: count });
-    },
-
-    resetState(): void {
-      patchState(store, {
-        blocks: [],
-        count: 0,
-        transactions: [],
-        errors: [],
-        loadingCounter: 0,
-      });
-    },
-  }))
+  withStateMutations(),
+  withBlocksData(),
+  withTransactionsData(),
+  withRouterSync()
 );
