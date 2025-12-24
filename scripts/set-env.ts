@@ -58,6 +58,7 @@ export const environment = {
     storageBucket: '${env.firebase.storageBucket}',
     messagingSenderId: '${env.firebase.messagingSenderId}',
     appId: '${env.firebase.appId}',
+    measurementId: '${env.firebase.measurementId}',
   },
 };
 `;
