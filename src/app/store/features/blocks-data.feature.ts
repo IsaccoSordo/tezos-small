@@ -13,11 +13,11 @@ import {
   interval,
   startWith,
   from,
-  concatMap,
   map,
   toArray,
   of,
   EMPTY,
+  mergeMap,
 } from 'rxjs';
 import { TZKTState } from '../../models';
 import { TzktService } from '../../services/tzkt.service';
@@ -35,12 +35,15 @@ export function withBlocksData() {
                 blocks.length === 0
                   ? of(blocks)
                   : from(blocks).pipe(
-                      concatMap((block) =>
-                        service
-                          .getTransactionsCount(block.level)
-                          .pipe(
-                            map((count) => ({ ...block, transactions: count }))
-                          )
+                      mergeMap(
+                        (block) =>
+                          service.getTransactionsCount(block.level).pipe(
+                            map((count) => ({
+                              ...block,
+                              transactions: count,
+                            }))
+                          ),
+                        5
                       ),
                       toArray()
                     )
