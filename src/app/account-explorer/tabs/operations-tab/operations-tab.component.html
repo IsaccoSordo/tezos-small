@@ -9,70 +9,75 @@
     (pageChange)="onPageChange($event)"
   >
     <ng-template #body let-operation>
-      <td>
-        <span class="type-badge" [class]="getTypeClass(operation.type)">
-          {{ operation.type }}
-        </span>
-      </td>
-      <td>
-        @if (operation.hash) {
-          <span class="hash" [title]="operation.hash">
-            {{ truncateHash(operation.hash) }}
+      <tr class="data-row">
+        <td>
+          <span class="type-badge" [class]="getTypeClass(operation.type)">
+            {{ operation.type }}
           </span>
-        } @else {
-          <span class="no-hash">-</span>
-        }
-      </td>
-      <td>
-        <a [routerLink]="['/details', operation.level]" class="level-link">
-          {{ operation.level | number }}
-        </a>
-      </td>
-      <td>
-        <span class="timestamp" [title]="operation.timestamp">
-          {{ formatTimestamp(operation.timestamp) }}
-        </span>
-      </td>
-      <td>
-        @if (operation.sender) {
-          <a
-            [routerLink]="['/account', operation.sender.address]"
-            class="address-link"
-          >
-            {{
-              operation.sender.alias || truncateHash(operation.sender.address)
-            }}
+        </td>
+        <td>
+          @if (operation.hash) {
+            <span class="hash" [title]="operation.hash">
+              {{ truncateHash(operation.hash) }}
+            </span>
+          } @else {
+            <span class="no-hash">-</span>
+          }
+        </td>
+        <td>
+          <a [routerLink]="['/details', operation.level]" class="level-link">
+            {{ operation.level | number }}
           </a>
-        } @else {
-          <span class="no-address">-</span>
-        }
-      </td>
-      <td>
-        @if (operation.target) {
-          <a
-            [routerLink]="['/account', operation.target.address]"
-            class="address-link"
-          >
-            {{
-              operation.target.alias || truncateHash(operation.target.address)
-            }}
-          </a>
-        } @else {
-          <span class="no-address">-</span>
-        }
-      </td>
-      <td>
-        <span class="amount">{{ formatAmount(operation.amount) }}</span>
-      </td>
-      <td>
-        @if (operation.status) {
-          <span class="status-badge" [class]="getStatusClass(operation.status)">
-            {{ operation.status }}
+        </td>
+        <td>
+          <span class="timestamp" [title]="operation.timestamp">
+            {{ formatTimestamp(operation.timestamp) }}
           </span>
-        } @else {
-          <span class="no-status">-</span>
-        }
-      </td>
+        </td>
+        <td>
+          @if (operation.sender) {
+            <a
+              [routerLink]="['/account', operation.sender.address]"
+              class="address-link"
+            >
+              {{
+                operation.sender.alias || truncateHash(operation.sender.address)
+              }}
+            </a>
+          } @else {
+            <span class="no-address">-</span>
+          }
+        </td>
+        <td>
+          @if (operation.target) {
+            <a
+              [routerLink]="['/account', operation.target.address]"
+              class="address-link"
+            >
+              {{
+                operation.target.alias || truncateHash(operation.target.address)
+              }}
+            </a>
+          } @else {
+            <span class="no-address">-</span>
+          }
+        </td>
+        <td>
+          <span class="amount">{{ formatAmount(operation.amount) }}</span>
+        </td>
+        <td>
+          @if (operation.status) {
+            <span
+              class="status-badge"
+              [class]="getStatusClass(operation.status)"
+            >
+              {{ operation.status }}
+            </span>
+          } @else {
+            <span class="no-status">-</span>
+          }
+        </td>
+      </tr>
     </ng-template>
   </app-table>
 </div>
