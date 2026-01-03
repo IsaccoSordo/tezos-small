@@ -1,11 +1,5 @@
 .tokens-tab {
   padding: 1rem 0;
-
-  ::ng-deep .p-datatable td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 
 .token-info {
