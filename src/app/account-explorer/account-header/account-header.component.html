@@ -1,0 +1,85 @@
+@if (account(); as acc) {
+  <div class="account-header">
+    <div class="header-main">
+      <div class="identity-section">
+        <div class="badges">
+          <span class="type-badge" [class.contract]="isContract()">
+            {{ isContract() ? 'Contract' : 'Account' }}
+          </span>
+          @if (contractKind(); as kind) {
+            <span class="kind-badge">{{ kind }}</span>
+          }
+          @for (tzip of tzips(); track tzip) {
+            <span class="tzip-badge">{{ tzip }}</span>
+          }
+        </div>
+
+        @if (acc.alias) {
+          <h1 class="alias">{{ acc.alias }}</h1>
+        }
+
+        <div class="address-row">
+          <i class="pi pi-wallet"></i>
+          <span class="address">{{ acc.address }}</span>
+          <button class="copy-btn" (click)="copyAddress()" title="Copy address">
+            <i class="pi pi-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="balance-section">
+        <span class="balance-label">Balance</span>
+        <span class="balance-value"
+          >{{ balanceXTZ() }} <span class="currency">XTZ</span></span
+        >
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stat-item">
+        <span class="stat-value">{{ acc.numTransactions | number }}</span>
+        <span class="stat-label">Transactions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ acc.activeTokensCount | number }}</span>
+        <span class="stat-label">Tokens</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ acc.numContracts | number }}</span>
+        <span class="stat-label">Contracts</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ acc.numOriginations | number }}</span>
+        <span class="stat-label">Originations</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ acc.numDelegations | number }}</span>
+        <span class="stat-label">Delegations</span>
+      </div>
+    </div>
+
+    <div class="meta-section">
+      <div class="meta-item">
+        <span class="meta-label">First Activity</span>
+        <span class="meta-value">{{ formatDate(acc.firstActivityTime) }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Last Activity</span>
+        <span class="meta-value">{{ formatDate(acc.lastActivityTime) }}</span>
+      </div>
+      @if (contractCreator(); as creator) {
+        <div class="meta-item">
+          <span class="meta-label">Created by</span>
+          <a [routerLink]="['/account', creator.address]" class="creator-link">
+            {{ creator.alias || creator.address }}
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="account-header skeleton">
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line short"></div>
+  </div>
+}

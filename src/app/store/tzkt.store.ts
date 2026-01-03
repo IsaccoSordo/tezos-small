@@ -4,6 +4,7 @@ import {
   withStateMutations,
   withBlocksData,
   withTransactionsData,
+  withAccountData,
   withRouterSync,
 } from './features';
 
@@ -15,9 +16,22 @@ export const Store = signalStore(
     errors: [],
     loadingCounter: 0,
     transactions: [],
+    account: null,
+    accountOperations: [],
+    accountOperationsCount: 0,
+    entrypoints: [],
+    storage: null,
+    contractInterface: null,
+    contractViews: [],
+    tokenBalances: [],
+    tokenBalancesCount: 0,
+    contractEvents: [],
+    contractEventsCount: 0,
+    activeTab: 'operations',
   }),
   withStateMutations(),
   withBlocksData(),
   withTransactionsData(),
+  withAccountData(),
   withRouterSync()
 );

@@ -8,3 +8,16 @@ export type {
 } from './auth.model';
 
 export type { Column, TableData } from './ui.model';
+
+export type {
+  AddressType,
+  AccountInfo,
+  ContractInfo,
+  AccountOperation,
+  ContractEntrypoint,
+  ContractView,
+  TokenBalance,
+  ContractEvent,
+  ContractStorage,
+  ContractInterface,
+} from './account.model';

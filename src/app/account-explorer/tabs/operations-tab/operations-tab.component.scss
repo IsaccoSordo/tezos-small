@@ -1,0 +1,121 @@
+.operations-tab {
+  padding: 1rem 0;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.type-transaction {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.type-origination {
+  background: #d4edda;
+  color: #155724;
+}
+
+.type-delegation {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.type-reveal {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.type-endorsement {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.type-baking {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.type-default {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.hash {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.no-hash,
+.no-address,
+.no-status {
+  color: #adb5bd;
+}
+
+.level-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.timestamp {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.address-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.amount {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-applied {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-failed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-backtracked {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-skipped {
+  background: #e2e3e5;
+  color: #383d41;
+}

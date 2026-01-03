@@ -1,0 +1,60 @@
+.tokens-tab {
+  padding: 1rem 0;
+
+  ::ng-deep .p-datatable td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.token-name {
+  font-weight: 600;
+  color: #212529;
+}
+
+.token-symbol {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.contract-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.token-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.balance {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #28a745;
+}
+
+.standard-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: #e9ecef;
+  color: #495057;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}

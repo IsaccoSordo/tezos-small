@@ -63,6 +63,24 @@
   font-weight: 600;
 }
 
+.proposer-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+}
+
+.no-proposer {
+  color: #adb5bd;
+  font-style: italic;
+}
+
 .timestamp {
   color: #6c757d;
   font-size: 0.9rem;

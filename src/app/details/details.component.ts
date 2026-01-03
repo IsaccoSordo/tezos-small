@@ -1,5 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '../store/tzkt.store';
 import { TableComponent } from '../ui/table/table.component';
 
@@ -8,7 +9,7 @@ import { TableComponent } from '../ui/table/table.component';
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss'],
   standalone: true,
-  imports: [CommonModule, TableComponent],
+  imports: [CommonModule, RouterLink, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DetailsComponent {

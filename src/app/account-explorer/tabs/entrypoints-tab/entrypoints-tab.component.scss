@@ -1,0 +1,115 @@
+.entrypoints-tab {
+  padding: 1rem 0;
+}
+
+.entrypoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.entrypoint-card {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+
+  &.expanded {
+    border-color: #0d6efd;
+  }
+}
+
+.entrypoint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #e9ecef;
+  }
+
+  i {
+    color: #6c757d;
+  }
+}
+
+.entrypoint-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.entrypoint-name {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.unused-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: #e9ecef;
+  color: #6c757d;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.entrypoint-body {
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+
+  h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.5rem 0;
+
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
+}
+
+.params-code,
+.michelson-code {
+  margin: 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #212529;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.michelson-code {
+  color: #667eea;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #6c757d;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
