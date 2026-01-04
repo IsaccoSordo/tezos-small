@@ -101,6 +101,9 @@ jobs:
           FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
 
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/tezos-small/browser/index.html dist/tezos-small/browser/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
