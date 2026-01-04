@@ -6,7 +6,7 @@ import {
   AccountOperation,
   TokenBalance,
 } from '../models/account.model';
-import { cacheContext } from '../config/cache.config';
+import { cacheContext } from '../config/httpContext.config';
 import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({

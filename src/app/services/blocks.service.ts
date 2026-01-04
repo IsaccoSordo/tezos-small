@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Block, Transaction } from '../models';
-import { cacheContext } from '../config/cache.config';
+import { cacheContext } from '../config/httpContext.config';
 import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({

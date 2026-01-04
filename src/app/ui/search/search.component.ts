@@ -4,17 +4,24 @@ import {
   inject,
   signal,
   DestroyRef,
+  OnInit,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import {
+  AutoCompleteModule,
+  AutoCompleteCompleteEvent,
+} from 'primeng/autocomplete';
 import { debounceTime, Subject, switchMap, of, catchError } from 'rxjs';
 import { SearchService } from '../../services/search.service';
 import { SearchResult } from '../../models';
-
-const MIN_SEARCH_LENGTH = 2;
-const DEBOUNCE_MS = 300;
+import {
+  MIN_SEARCH_LENGTH,
+  SEARCH_DEBOUNCE_MS,
+  BLOCK_LEVEL_PATTERN,
+  TEZOS_ADDRESS_PATTERN,
+} from '../../config/search.config';
 
 @Component({
   selector: 'app-search',
@@ -24,7 +31,7 @@ const DEBOUNCE_MS = 300;
   imports: [FormsModule, AutoCompleteModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
   private router = inject(Router);
   private searchService = inject(SearchService);
   private destroyRef = inject(DestroyRef);
@@ -34,10 +41,10 @@ export class SearchComponent {
 
   private searchTrigger$ = new Subject<string>();
 
-  constructor() {
+  ngOnInit(): void {
     this.searchTrigger$
       .pipe(
-        debounceTime(DEBOUNCE_MS),
+        debounceTime(SEARCH_DEBOUNCE_MS),
         switchMap((query) => this.search(query)),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -48,33 +55,38 @@ export class SearchComponent {
 
   onSearch(event: AutoCompleteCompleteEvent): void {
     const query = event.query.trim();
+
     if (query.length < MIN_SEARCH_LENGTH) {
       this.suggestions.set([]);
       return;
     }
+
     this.searchTrigger$.next(query);
   }
 
   onSelect(result: SearchResult): void {
-    if (result.type === 'block') {
-      this.router.navigate(['/details', result.value]);
-    } else {
-      this.router.navigate(['/account', result.value]);
-    }
+    const route = result.type === 'block' ? '/details' : '/account';
+    this.router.navigate([route, result.value]);
     this.searchQuery = '';
     this.suggestions.set([]);
   }
 
   onKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      const query = this.searchQuery.trim();
-      if (this.isBlockLevel(query)) {
-        this.router.navigate(['/details', query]);
-        this.searchQuery = '';
-      } else if (this.isAddress(query)) {
-        this.router.navigate(['/account', query]);
-        this.searchQuery = '';
-      }
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    const query = this.searchQuery.trim();
+
+    if (this.isBlockLevel(query)) {
+      this.router.navigate(['/details', query]);
+      this.searchQuery = '';
+      return;
+    }
+
+    if (this.isAddress(query)) {
+      this.router.navigate(['/account', query]);
+      this.searchQuery = '';
     }
   }
 
@@ -112,10 +124,10 @@ export class SearchComponent {
   }
 
   private isBlockLevel(query: string): boolean {
-    return /^\d+$/.test(query);
+    return BLOCK_LEVEL_PATTERN.test(query);
   }
 
   private isAddress(query: string): boolean {
-    return /^(tz[123]|KT1)[a-zA-Z0-9]{33}$/.test(query);
+    return TEZOS_ADDRESS_PATTERN.test(query);
   }
 }
