@@ -9,8 +9,6 @@ import {
   take,
   of,
   Observable,
-  pairwise,
-  startWith,
 } from 'rxjs';
 import { TZKTState } from '../../models';
 import {
@@ -236,21 +234,6 @@ export function withRouterSync() {
               )
             )
           );
-
-          // Clear account state when leaving account route
-          currentUrl$
-            .pipe(
-              startWith(''),
-              pairwise(),
-              filter(
-                ([prev, curr]) =>
-                  getRouteType(prev) === 'account' &&
-                  getRouteType(curr) !== 'account'
-              )
-            )
-            .subscribe(() => {
-              store.clearAccountState();
-            });
         },
       };
     })
