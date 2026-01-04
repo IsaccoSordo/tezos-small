@@ -129,6 +129,8 @@
 .stats-section {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
   gap: 1rem;
   padding: 1rem 0;
   border-top: 1px solid #dee2e6;
