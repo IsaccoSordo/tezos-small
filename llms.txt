@@ -10,36 +10,37 @@ This project is a zoneless, signal-based SPA using NgRx SignalStore and Firebase
 
 ## Core Map
 
-* [package.json](https://www.google.com/search?q=package.json): Exact versioning (no wildcards).
-* [src/main.ts](https://www.google.com/search?q=src/main.ts): Bootstrap with `bootstrapApplication`.
-* [src/app/app.config.ts](https://www.google.com/search?q=src/app/app.config.ts): Global providers (Firebase, PrimeNG Aura, Interceptors).
-* [src/app/app.routes.ts](https://www.google.com/search?q=src/app/app.routes.ts): Lazy-loaded routes; data loading is URL-driven via Store hooks.
+- [package.json](https://www.google.com/search?q=package.json): Exact versioning (no wildcards).
+- [src/main.ts](https://www.google.com/search?q=src/main.ts): Bootstrap with `bootstrapApplication`.
+- [src/app/app.config.ts](https://www.google.com/search?q=src/app/app.config.ts): Global providers (Firebase, PrimeNG Aura, Interceptors).
+- [src/app/app.routes.ts](https://www.google.com/search?q=src/app/app.routes.ts): Lazy-loaded routes; data loading is URL-driven via Store hooks.
 
 ## Architecture & Patterns
 
 ### State & Data Flow
 
-* **SignalStore:** Uses composable `signalStoreFeature` slices (`src/app/store/features/`).
-* **Reactive Loading:** `withRouterSync` feature subscribes to Router events and triggers `rxMethod` calls. Components only read signals.
-* **Interceptors:** Centralized loading (`loadingCounter`) and error handling (PrimeNG Toast).
+- **SignalStore:** Uses composable `signalStoreFeature` slices (`src/app/store/features/`).
+- **Reactive Loading:** `withRouterSync` feature subscribes to Router events and triggers `rxMethod` calls. Components only read signals.
+- **Interceptors:** Centralized loading (`loadingCounter`) and error handling (PrimeNG Toast).
 
 ### Authentication
 
-* **Service:** `src/app/services/auth.service.ts` uses `toSignal()` for Firebase state.
-* **Linking:** `pendingLink` signal manages cross-provider email collisions.
+- **Service:** `src/app/services/auth.service.ts` uses `toSignal()` for Firebase state.
+- **Linking:** `pendingLink` signal manages cross-provider email collisions.
 
 ## Coding Standards
 
-* **Signals:** Avoid `effect()`. Use `computed()` for derived state or SignalStore methods for side effects.
-* **Logic:** Prefer **early returns**. Avoid nested `if/else` blocks to maintain flat, readable functions.
-* **Subscriptions:** **Never** subscribe in a constructor. Use the `Subject` pattern with `takeUntilDestroyed` in `ngOnInit`, or ideally, use `rxMethod` in the Store.
-* **Error Handling:** Do **not** catch network exceptions in services or components. The `error.interceptor.ts` handles all HTTP failures.
-* **Interactions:** Components are presentational. They trigger Store methods; they do not fetch data or manage complex state logic.
+- **Components**: MUST use changeDetection: ChangeDetectionStrategy.OnPush
+- **Signals:** Avoid `effect()`. Use `computed()` for derived state or SignalStore methods for side effects.
+- **Logic:** Prefer **early returns**. Avoid nested `if/else` blocks to maintain flat, readable functions.
+- **Subscriptions:** **Never** subscribe in a constructor. Use the `Subject` pattern with `takeUntilDestroyed` in `ngOnInit`, or ideally, use `rxMethod` in the Store.
+- **Error Handling:** Do **not** catch network exceptions in services or components. The `error.interceptor.ts` handles all HTTP failures.
+- **Interactions:** Components are presentational. They trigger Store methods; they do not fetch data or manage complex state logic.
+- **Comments:** Only write comments to explain WHY a decision was made. Never write comments explaining WHAT the code is doing.
 
 ## Project Constraints
 
-1. **Zoneless:** Never use `NgZone` or `ChangeDetectorRef`.
-2. **Imports:** Use relative paths for siblings; absolute (`src/app/...`) for deep nesting; barrel files (`../models`) for all interfaces.
-3. **Clean Code:** Neutral documentation. No promotional adjectives (e.g., "sleek", "modern").
-4. **Testing:** Mock `AuthService` and `Store` using signals. Use `vi.useFakeTimers()` for async tests.
-5. **Comments:** Only write comments to explain why that line (or set of lines) is needed. Don't ever write comments that explain what the code is doing.
+- **Zoneless:** Never use `NgZone` or `ChangeDetectorRef`.
+- **Imports:** Use relative paths for siblings; absolute (`src/app/...`) for deep nesting; barrel files (`../models`) for all interfaces.
+- **Clean Code:** Neutral documentation. No promotional adjectives (e.g., "sleek", "modern").
+- **Testing:** Mock `AuthService` and `Store` using signals. Use `vi.useFakeTimers()` for async tests.
