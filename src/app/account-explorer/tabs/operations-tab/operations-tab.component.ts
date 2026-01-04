@@ -14,6 +14,7 @@ import {
   TIME,
   HASH_DISPLAY,
 } from '../../../config/constants';
+import { formatNumber } from '../../../utils/format.utils';
 
 @Component({
   selector: 'app-operations-tab',
@@ -47,7 +48,7 @@ export class OperationsTabComponent {
   }
 
   formatAmount(amount: number | undefined): string {
-    const xtz = !amount ? '0' : (amount / TEZOS.MUTEZ_PER_XTZ).toFixed(6);
+    const xtz = !amount ? '0' : formatNumber(amount / TEZOS.MUTEZ_PER_XTZ);
     return `${xtz} ${TEZOS.SYMBOL}`;
   }
 

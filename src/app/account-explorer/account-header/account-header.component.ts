@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AccountInfo, ContractInfo } from '../../models';
 import { TEZOS } from '../../config/constants';
+import { formatNumber } from '../../utils/format.utils';
 
 @Component({
   selector: 'app-account-header',
@@ -25,7 +26,7 @@ export class AccountHeaderComponent {
     const acc = this.account();
     return !acc || !acc.balance
       ? '0'
-      : (acc.balance / TEZOS.MUTEZ_PER_XTZ).toFixed(6);
+      : formatNumber(acc.balance / TEZOS.MUTEZ_PER_XTZ);
   });
 
   contractCreator = computed(() => {
