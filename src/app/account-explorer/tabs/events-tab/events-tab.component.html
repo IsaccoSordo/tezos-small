@@ -1,0 +1,66 @@
+<div class="events-tab">
+  @if (events().length > 0) {
+    <div class="events-list">
+      @for (event of events(); track event.id) {
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-tag">
+              <i class="pi pi-bolt"></i>
+              {{ event.tag }}
+            </div>
+            <div class="event-meta">
+              <a [routerLink]="['/details', event.level]" class="level-link">
+                Block {{ event.level | number }}
+              </a>
+              <span class="timestamp">{{
+                formatTimestamp(event.timestamp)
+              }}</span>
+            </div>
+          </div>
+          @if (hasPayload(event.payload)) {
+            <div class="event-payload">
+              <div
+                class="payload-header"
+                tabindex="0"
+                role="button"
+                (click)="toggleEvent(event.id)"
+                (keydown.enter)="toggleEvent(event.id)"
+              >
+                <span>Payload</span>
+                <i
+                  class="pi"
+                  [class.pi-chevron-down]="!isExpanded(event.id)"
+                  [class.pi-chevron-up]="isExpanded(event.id)"
+                ></i>
+              </div>
+              @if (isExpanded(event.id)) {
+                <pre class="payload-content">{{
+                  formatPayload(event.payload)
+                }}</pre>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (totalRecords() > pageSize()) {
+      <div class="pagination-wrapper">
+        <app-table
+          [data]="[]"
+          [columns]="[]"
+          [totalRecords]="totalRecords()"
+          [rows]="pageSize()"
+          [first]="currentPage() * pageSize()"
+          [paginator]="true"
+          (pageChange)="onPageChange($event)"
+        />
+      </div>
+    }
+  } @else {
+    <div class="empty-state">
+      <i class="pi pi-bolt"></i>
+      <p>No events emitted</p>
+    </div>
+  }
+</div>

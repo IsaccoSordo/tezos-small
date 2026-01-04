@@ -7,7 +7,7 @@ import {
   switchMap,
   filter,
   take,
-  shareReplay,
+  first,
 } from 'rxjs/operators';
 import {
   Auth,
@@ -38,7 +38,7 @@ const githubProvider = new GithubAuthProvider();
 export class AuthService {
   private auth = inject(Auth);
 
-  private user$ = user(this.auth).pipe(shareReplay(1));
+  private user$ = user(this.auth);
   private firebaseUser = toSignal(this.user$);
 
   readonly token = toSignal(idToken(this.auth));
@@ -50,6 +50,14 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this.firebaseUser());
 
   readonly pendingLink = signal<PendingLinkCredential | null>(null);
+
+  /** Waits for Firebase auth to initialize and returns auth status */
+  waitForAuthReady(): Observable<boolean> {
+    return this.user$.pipe(
+      first(),
+      map((user) => !!user)
+    );
+  }
 
   login(provider = 'google'): Observable<User> {
     const authProvider =

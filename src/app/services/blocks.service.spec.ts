@@ -5,13 +5,14 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { TzktService } from './tzkt.service';
+import { BlocksService } from './blocks.service';
 import { Store } from '../store/tzkt.store';
 import { loadingInterceptor } from '../interceptors/loading.interceptor';
 import { Block, Transaction } from '../models';
+import { TZKT_API_BASE } from '../config/api.config';
 
 /**
- * TzktService Test Suite
+ * BlocksService Test Suite
  *
  * Testing Best Practices Applied:
  * - Nested describe blocks organize tests by method/feature
@@ -20,12 +21,10 @@ import { Block, Transaction } from '../models';
  * - HttpTestingController verifies all HTTP interactions
  * - Service is pure HTTP layer - does not update store directly
  */
-describe('TzktService', () => {
-  let service: TzktService;
+describe('BlocksService', () => {
+  let service: BlocksService;
   let httpMock: HttpTestingController;
   let store: InstanceType<typeof Store>;
-
-  const API_BASE = 'https://api.tzkt.io/v1';
 
   const mockBlocks = [
     {
@@ -67,11 +66,11 @@ describe('TzktService', () => {
           withInterceptors([withHttpCacheInterceptor(), loadingInterceptor])
         ),
         provideHttpClientTesting(),
-        TzktService,
+        BlocksService,
         Store,
       ],
     });
-    service = TestBed.inject(TzktService);
+    service = TestBed.inject(BlocksService);
     httpMock = TestBed.inject(HttpTestingController);
     store = TestBed.inject(Store);
   });
@@ -92,7 +91,7 @@ describe('TzktService', () => {
         result = count;
       });
 
-      const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
+      const req = httpMock.expectOne(`${TZKT_API_BASE}/blocks/count`);
       expect(req.request.method).toBe('GET');
       req.flush(5000);
 
@@ -106,7 +105,7 @@ describe('TzktService', () => {
 
       expect(store.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
+      const req = httpMock.expectOne(`${TZKT_API_BASE}/blocks/count`);
       req.flush(100);
 
       expect(store.loadingCounter()).toBe(0);
@@ -120,7 +119,7 @@ describe('TzktService', () => {
         },
       });
 
-      const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
+      const req = httpMock.expectOne(`${TZKT_API_BASE}/blocks/count`);
       req.error(new ProgressEvent('Network error'));
 
       expect(errorOccurred).toBe(true);
@@ -136,7 +135,7 @@ describe('TzktService', () => {
 
       const req = httpMock.expectOne(
         (req) =>
-          req.url === `${API_BASE}/blocks` &&
+          req.url === `${TZKT_API_BASE}/blocks` &&
           req.params.get('limit') === '10' &&
           req.params.get('offset.pg') === '0' &&
           req.params.get('sort.desc') === 'level'
@@ -155,7 +154,7 @@ describe('TzktService', () => {
 
       const req = httpMock.expectOne(
         (req) =>
-          req.url === `${API_BASE}/blocks` &&
+          req.url === `${TZKT_API_BASE}/blocks` &&
           req.params.get('limit') === '20' &&
           req.params.get('offset.pg') === '5'
       );
@@ -170,7 +169,9 @@ describe('TzktService', () => {
         },
       });
 
-      const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
+      const req = httpMock.expectOne(
+        (req) => req.url === `${TZKT_API_BASE}/blocks`
+      );
       req.error(new ProgressEvent('Network error'));
 
       expect(errorOccurred).toBe(true);
@@ -183,7 +184,9 @@ describe('TzktService', () => {
 
       expect(store.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne((req) => req.url === `${API_BASE}/blocks`);
+      const req = httpMock.expectOne(
+        (req) => req.url === `${TZKT_API_BASE}/blocks`
+      );
       req.flush([]);
 
       expect(store.loadingCounter()).toBe(0);
@@ -199,7 +202,7 @@ describe('TzktService', () => {
 
       const req = httpMock.expectOne(
         (req) =>
-          req.url === `${API_BASE}/operations/transactions/count` &&
+          req.url === `${TZKT_API_BASE}/operations/transactions/count` &&
           req.params.get('level') === '12345'
       );
       expect(req.request.method).toBe('GET');
@@ -217,7 +220,7 @@ describe('TzktService', () => {
       });
 
       const req = httpMock.expectOne(
-        (req) => req.url === `${API_BASE}/operations/transactions/count`
+        (req) => req.url === `${TZKT_API_BASE}/operations/transactions/count`
       );
       req.error(new ProgressEvent('Network error'));
 
@@ -234,7 +237,7 @@ describe('TzktService', () => {
 
       const req = httpMock.expectOne(
         (req) =>
-          req.url === `${API_BASE}/operations/transactions` &&
+          req.url === `${TZKT_API_BASE}/operations/transactions` &&
           req.params.get('level') === '12345'
       );
       expect(req.request.method).toBe('GET');
@@ -254,7 +257,7 @@ describe('TzktService', () => {
       });
 
       const req = httpMock.expectOne(
-        (req) => req.url === `${API_BASE}/operations/transactions`
+        (req) => req.url === `${TZKT_API_BASE}/operations/transactions`
       );
       req.error(new ProgressEvent('Network error'));
 
@@ -269,7 +272,7 @@ describe('TzktService', () => {
       expect(store.loadingCounter()).toBe(1);
 
       const req = httpMock.expectOne(
-        (req) => req.url === `${API_BASE}/operations/transactions`
+        (req) => req.url === `${TZKT_API_BASE}/operations/transactions`
       );
       req.flush(mockTransactions);
 
@@ -287,7 +290,7 @@ describe('TzktService', () => {
 
       expect(store.loadingCounter()).toBe(1);
 
-      const req = httpMock.expectOne(`${API_BASE}/blocks/count`);
+      const req = httpMock.expectOne(`${TZKT_API_BASE}/blocks/count`);
       req.error(new ProgressEvent('Error'));
 
       expect(store.loadingCounter()).toBe(0);

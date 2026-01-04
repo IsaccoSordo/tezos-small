@@ -1,0 +1,48 @@
+<div class="code-tab">
+  @if (contractInterface()) {
+    <div class="section">
+      <h3 class="section-title">
+        <i class="pi pi-database"></i>
+        Storage Schema
+      </h3>
+      <div class="code-block">
+        <pre>{{ storageSchemaFormatted() }}</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">
+        <i class="pi pi-list"></i>
+        Entrypoints Schema
+      </h3>
+      <div class="code-block">
+        <pre>{{ entrypointsFormatted() }}</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">
+        <i class="pi pi-th-large"></i>
+        Big Maps
+      </h3>
+      <div class="code-block">
+        <pre>{{ bigMapsFormatted() }}</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">
+        <i class="pi pi-bolt"></i>
+        Events Schema
+      </h3>
+      <div class="code-block">
+        <pre>{{ eventsFormatted() }}</pre>
+      </div>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <i class="pi pi-code"></i>
+      <p>No interface data available</p>
+    </div>
+  }
+</div>

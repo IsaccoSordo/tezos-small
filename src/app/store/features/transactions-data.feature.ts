@@ -6,27 +6,20 @@ import {
   type,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap } from 'rxjs';
+import { pipe, switchMap, tap } from 'rxjs';
 import { TZKTState } from '../../models';
-import { TzktService } from '../../services/tzkt.service';
+import { BlocksService } from '../../services/blocks.service';
 
 export function withTransactionsData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
-    withMethods((store, service = inject(TzktService)) => ({
+    withMethods((store, service = inject(BlocksService)) => ({
       loadTransactions: rxMethod<number>(
         pipe(
           switchMap((level) =>
-            service.getTransactions(level).pipe(
-              tapResponse({
-                next: (transactions) => patchState(store, { transactions }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            )
+            service
+              .getTransactions(level)
+              .pipe(tap((transactions) => patchState(store, { transactions })))
           )
         )
       ),

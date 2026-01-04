@@ -1,0 +1,44 @@
+<div class="tokens-tab">
+  <app-table
+    [data]="tokens()"
+    [columns]="columns"
+    [totalRecords]="totalRecords()"
+    [rows]="pageSize()"
+    [first]="currentPage() * pageSize()"
+    [paginator]="true"
+    (pageChange)="onPageChange($event)"
+  >
+    <ng-template #body let-token>
+      <tr class="data-row">
+        <td>
+          <div class="token-info">
+            <span class="token-name">{{ getTokenName(token) }}</span>
+            @if (getTokenSymbol(token)) {
+              <span class="token-symbol">{{ getTokenSymbol(token) }}</span>
+            }
+          </div>
+        </td>
+        <td>
+          <a
+            [routerLink]="['/account', token.token.contract.address]"
+            class="contract-link"
+          >
+            {{
+              token.token.contract.alias ||
+                truncateAddress(token.token.contract.address)
+            }}
+          </a>
+        </td>
+        <td>
+          <span class="token-id">{{ token.token.tokenId }}</span>
+        </td>
+        <td>
+          <span class="balance">{{ formatBalance(token) }}</span>
+        </td>
+        <td>
+          <span class="standard-badge">{{ token.token.standard }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </app-table>
+</div>

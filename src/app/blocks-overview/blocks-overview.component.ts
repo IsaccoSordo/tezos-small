@@ -9,7 +9,9 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Store } from '../store/tzkt.store';
-import { TableComponent, PageChangeEvent } from '../ui/table/table.component';
+import { TableComponent } from '../ui/table/table.component';
+import { PageChangeEvent } from '../models';
+import { PAGINATION } from '../config/constants';
 
 @Component({
   selector: 'app-blocks-overview',
@@ -30,11 +32,16 @@ export class BlocksOverviewComponent {
   private queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
-        pageSize: +(params['pageSize'] ?? 10),
-        urlPage: +(params['page'] ?? 0),
+        pageSize: +(params['pageSize'] ?? PAGINATION.DEFAULT_PAGE_SIZE),
+        urlPage: +(params['page'] ?? PAGINATION.DEFAULT_PAGE),
       }))
     ),
-    { initialValue: { pageSize: 10, urlPage: 0 } }
+    {
+      initialValue: {
+        pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+        urlPage: PAGINATION.DEFAULT_PAGE,
+      },
+    }
   );
 
   pageSize = computed(() => this.queryParams().pageSize);

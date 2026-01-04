@@ -21,5 +21,13 @@ export const routes: Routes = [
       import('./details/details.component').then((m) => m.DetailsComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'account/:address',
+    loadComponent: () =>
+      import('./account-explorer/account-explorer.component').then(
+        (m) => m.AccountExplorerComponent
+      ),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

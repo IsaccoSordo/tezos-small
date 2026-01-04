@@ -1,0 +1,19 @@
+<div class="storage-tab">
+  @if (storage()) {
+    <div class="storage-container">
+      @for (key of getStorageKeys(); track key) {
+        <div class="storage-item">
+          <div class="storage-key">{{ key }}</div>
+          <div class="storage-value" [class.json]="isObject(key)">
+            <pre>{{ getStorageValue(key) }}</pre>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <i class="pi pi-database"></i>
+      <p>No storage data available</p>
+    </div>
+  }
+</div>

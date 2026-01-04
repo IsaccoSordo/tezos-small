@@ -1,0 +1,46 @@
+<div class="entrypoints-tab">
+  @if (entrypoints().length > 0) {
+    <div class="entrypoints-list">
+      @for (ep of entrypoints(); track ep.name) {
+        <div class="entrypoint-card" [class.expanded]="isExpanded(ep.name)">
+          <div
+            class="entrypoint-header"
+            tabindex="0"
+            role="button"
+            (click)="toggleEntrypoint(ep.name)"
+            (keydown.enter)="toggleEntrypoint(ep.name)"
+          >
+            <div class="entrypoint-info">
+              <span class="entrypoint-name">{{ ep.name }}</span>
+              @if (ep.unused) {
+                <span class="unused-badge">Unused</span>
+              }
+            </div>
+            <i
+              class="pi"
+              [class.pi-chevron-down]="!isExpanded(ep.name)"
+              [class.pi-chevron-up]="isExpanded(ep.name)"
+            ></i>
+          </div>
+          @if (isExpanded(ep.name)) {
+            <div class="entrypoint-body">
+              <h4>Parameters Schema</h4>
+              <pre class="params-code">{{
+                formatParameters(ep.jsonParameters)
+              }}</pre>
+              @if (ep.michelsonParameters) {
+                <h4>Michelson</h4>
+                <pre class="michelson-code">{{ ep.michelsonParameters }}</pre>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <i class="pi pi-list"></i>
+      <p>No entrypoints available</p>
+    </div>
+  }
+</div>

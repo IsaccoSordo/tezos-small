@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TableComponent, PageChangeEvent } from './table.component';
+import { TableComponent } from './table.component';
+import { PageChangeEvent } from '../../models';
 
 /**
  * TableComponent Test Suite

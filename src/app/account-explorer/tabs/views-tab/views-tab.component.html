@@ -1,0 +1,41 @@
+<div class="views-tab">
+  @if (views().length > 0) {
+    <div class="views-list">
+      @for (view of views(); track view.name) {
+        <div class="view-card" [class.expanded]="isExpanded(view.name)">
+          <div
+            class="view-header"
+            tabindex="0"
+            role="button"
+            (click)="toggleView(view.name)"
+            (keydown.enter)="toggleView(view.name)"
+          >
+            <span class="view-name">{{ view.name }}</span>
+            <i
+              class="pi"
+              [class.pi-chevron-down]="!isExpanded(view.name)"
+              [class.pi-chevron-up]="isExpanded(view.name)"
+            ></i>
+          </div>
+          @if (isExpanded(view.name)) {
+            <div class="view-body">
+              <div class="type-section">
+                <h4>Parameter Type</h4>
+                <pre>{{ formatType(view.jsonParameterType) }}</pre>
+              </div>
+              <div class="type-section">
+                <h4>Return Type</h4>
+                <pre>{{ formatType(view.jsonReturnType) }}</pre>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <i class="pi pi-eye"></i>
+      <p>No on-chain views available</p>
+    </div>
+  }
+</div>

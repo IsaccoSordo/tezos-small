@@ -37,7 +37,18 @@
             {{ block.transactions }}
           </span>
         </td>
-        <td>{{ block.proposer?.alias ?? '\<none>' }}</td>
+        <td>
+          @if (block.proposer?.address) {
+            <a
+              [routerLink]="['/account', block.proposer.address]"
+              class="proposer-link"
+            >
+              {{ block.proposer.alias ?? block.proposer.address }}
+            </a>
+          } @else {
+            <span class="no-proposer">&lt;none&gt;</span>
+          }
+        </td>
         <td class="timestamp">
           {{ block.timestamp | date: 'dd.MM.yyyy HH:mm' }}
         </td>

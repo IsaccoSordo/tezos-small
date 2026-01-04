@@ -6,7 +6,6 @@ import {
   type,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
 import {
   pipe,
   switchMap,
@@ -18,15 +17,17 @@ import {
   of,
   EMPTY,
   mergeMap,
+  tap,
 } from 'rxjs';
 import { TZKTState } from '../../models';
-import { TzktService } from '../../services/tzkt.service';
+import { BlocksService } from '../../services/blocks.service';
+import { RATE_LIMIT, POLLING } from '../../config/constants';
 import { getRouteType } from './url-utils';
 
 export function withBlocksData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
-    withMethods((store, service = inject(TzktService)) => ({
+    withMethods((store, service = inject(BlocksService)) => ({
       loadBlocks: rxMethod<{ pageSize: number; page: number }>(
         pipe(
           switchMap(({ pageSize, page }) =>
@@ -43,18 +44,12 @@ export function withBlocksData() {
                               transactions: count,
                             }))
                           ),
-                        5
+                        RATE_LIMIT.HIGH
                       ),
                       toArray()
                     )
               ),
-              tapResponse({
-                next: (blocks) => patchState(store, { blocks }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
+              tap((blocks) => patchState(store, { blocks }))
             )
           )
         )
@@ -63,15 +58,9 @@ export function withBlocksData() {
       loadBlocksCount: rxMethod<void>(
         pipe(
           switchMap(() =>
-            service.getBlocksCount().pipe(
-              tapResponse({
-                next: (count) => patchState(store, { count }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            )
+            service
+              .getBlocksCount()
+              .pipe(tap((count) => patchState(store, { count })))
           )
         )
       ),
@@ -82,18 +71,12 @@ export function withBlocksData() {
             if (getRouteType(url) !== 'overview') {
               return EMPTY;
             }
-            return interval(60000).pipe(
+            return interval(POLLING.BLOCKS_COUNT_MS).pipe(
               startWith(0),
               switchMap(() =>
-                service.getBlocksCount().pipe(
-                  tapResponse({
-                    next: (count) => patchState(store, { count }),
-                    error: (error: Error) =>
-                      patchState(store, (state) => ({
-                        errors: [...state.errors, error],
-                      })),
-                  })
-                )
+                service
+                  .getBlocksCount()
+                  .pipe(tap((count) => patchState(store, { count })))
               )
             );
           })

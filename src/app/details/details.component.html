@@ -8,22 +8,28 @@
     <ng-template #body let-transaction>
       <tr class="data-row">
         <td>
-          <span class="address-field">
+          <a
+            [routerLink]="['/account', transaction.sender.address]"
+            class="address-link"
+          >
             <i
               class="pi pi-user"
               style="font-size: 0.8rem; margin-right: 0.3rem"
             ></i>
-            {{ transaction.sender.address }}
-          </span>
+            {{ transaction.sender.alias ?? transaction.sender.address }}
+          </a>
         </td>
         <td>
-          <span class="address-field">
+          <a
+            [routerLink]="['/account', transaction.target.address]"
+            class="address-link"
+          >
             <i
               class="pi pi-send"
               style="font-size: 0.8rem; margin-right: 0.3rem"
             ></i>
-            {{ transaction.target.address }}
-          </span>
+            {{ transaction.target.alias ?? transaction.target.address }}
+          </a>
         </td>
         <td>
           <span class="amount">{{ transaction.amount }} ꜩ</span>
