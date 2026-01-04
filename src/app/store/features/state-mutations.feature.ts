@@ -35,10 +35,6 @@ export function withStateMutations() {
         patchState(store, { transactions });
       },
 
-      setErrors(errors: Error[]): void {
-        patchState(store, { errors });
-      },
-
       incrementLoadingCounter(): void {
         patchState(store, (state) => ({
           loadingCounter: state.loadingCounter + 1,
@@ -108,7 +104,6 @@ export function withStateMutations() {
           blocks: [],
           count: 0,
           transactions: [],
-          errors: [],
           loadingCounter: 0,
           account: null,
           accountOperations: [],

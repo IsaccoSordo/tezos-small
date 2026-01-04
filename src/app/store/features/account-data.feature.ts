@@ -6,15 +6,25 @@ import {
   type,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap, from, mergeMap, toArray, EMPTY, map } from 'rxjs';
+import {
+  pipe,
+  switchMap,
+  from,
+  mergeMap,
+  toArray,
+  EMPTY,
+  map,
+  tap,
+} from 'rxjs';
 import { TZKTState, AccountInfo, ContractInfo } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { ContractService } from '../../services/contract.service';
 import { isContractAddress } from './url-utils';
 
 // Calculate total operations count from account info
-function getOperationsCount(account: AccountInfo | ContractInfo | null): number {
+function getOperationsCount(
+  account: AccountInfo | ContractInfo | null
+): number {
   if (!account) return 0;
   return (
     (account.numTransactions || 0) +
@@ -48,13 +58,7 @@ export function withAccountData() {
                 : accountService.getAccount(address);
 
               return account$.pipe(
-                tapResponse({
-                  next: (account) => patchState(store, { account }),
-                  error: (error: Error) =>
-                    patchState(store, (state) => ({
-                      errors: [...state.errors, error],
-                    })),
-                })
+                tap((account) => patchState(store, { account }))
               );
             })
           )
@@ -72,20 +76,14 @@ export function withAccountData() {
               return accountService
                 .getAccountOperations(address, pageSize, page * pageSize)
                 .pipe(
-                  tapResponse({
-                    next: (operations) =>
-                      patchState(store, {
-                        accountOperations: operations,
-                        // Count is derived from account info which is already loaded
-                        accountOperationsCount: getOperationsCount(
-                          store.account()
-                        ),
-                      }),
-                    error: (error: Error) =>
-                      patchState(store, (state) => ({
-                        errors: [...state.errors, error],
-                      })),
-                  })
+                  tap((operations) =>
+                    patchState(store, {
+                      accountOperations: operations,
+                      accountOperationsCount: getOperationsCount(
+                        store.account()
+                      ),
+                    })
+                  )
                 );
             })
           )
@@ -100,7 +98,6 @@ export function withAccountData() {
             switchMap(({ address, pageSize, page }) => {
               if (!address) return EMPTY;
 
-              // Load count and balances with rate limiting
               return from([
                 accountService
                   .getTokenBalancesCount(address)
@@ -116,25 +113,19 @@ export function withAccountData() {
               ]).pipe(
                 mergeMap((obs) => obs, 2),
                 toArray(),
-                tapResponse({
-                  next: (results) => {
-                    const countResult = results.find((r) => r.type === 'count');
-                    const balancesResult = results.find(
-                      (r) => r.type === 'balances'
-                    );
-                    patchState(store, {
-                      tokenBalances:
-                        balancesResult?.type === 'balances'
-                          ? balancesResult.balances
-                          : [],
-                      tokenBalancesCount:
-                        countResult?.type === 'count' ? countResult.count : 0,
-                    });
-                  },
-                  error: (error: Error) =>
-                    patchState(store, (state) => ({
-                      errors: [...state.errors, error],
-                    })),
+                tap((results) => {
+                  const countResult = results.find((r) => r.type === 'count');
+                  const balancesResult = results.find(
+                    (r) => r.type === 'balances'
+                  );
+                  patchState(store, {
+                    tokenBalances:
+                      balancesResult?.type === 'balances'
+                        ? balancesResult.balances
+                        : [],
+                    tokenBalancesCount:
+                      countResult?.type === 'count' ? countResult.count : 0,
+                  });
                 })
               );
             })

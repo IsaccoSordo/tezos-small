@@ -14,7 +14,6 @@ export const Store = signalStore(
   withState<TZKTState>({
     blocks: [],
     count: 0,
-    errors: [],
     loadingCounter: 0,
     transactions: [],
     account: null,

@@ -1,7 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AccountInfo, AccountOperation, TokenBalance } from '../models/account.model';
+import {
+  AccountInfo,
+  AccountOperation,
+  TokenBalance,
+} from '../models/account.model';
 import { cacheContext } from '../config/cache.config';
 
 @Injectable({

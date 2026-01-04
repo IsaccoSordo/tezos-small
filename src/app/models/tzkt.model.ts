@@ -21,7 +21,6 @@ export interface Transaction {
 export interface TZKTState {
   blocks: Block[];
   count: number;
-  errors: Error[];
   loadingCounter: number;
   transactions: Transaction[];
   // Account explorer state
