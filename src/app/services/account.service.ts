@@ -6,7 +6,7 @@ import {
   AccountOperation,
   TokenBalance,
 } from '../models/account.model';
-import { cacheContext } from '../config/httpContext.config';
+import { context } from '../config/httpContext.config';
 import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class AccountService {
 
   getAccount(address: string): Observable<AccountInfo> {
     return this.http.get<AccountInfo>(`${TZKT_API_BASE}/accounts/${address}`, {
-      context: cacheContext,
+      context,
     });
   }
 
@@ -34,7 +34,7 @@ export class AccountService {
           offset: offset.toString(),
           'sort.desc': 'id',
         },
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -52,7 +52,7 @@ export class AccountService {
         offset: offset.toString(),
         'sort.desc': 'lastTime',
       },
-      context: cacheContext,
+      context,
     });
   }
 
@@ -62,7 +62,7 @@ export class AccountService {
         account: address,
         'balance.ne': '0',
       },
-      context: cacheContext,
+      context,
     });
   }
 }
