@@ -6,11 +6,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import {
-  TableComponent,
-  PageChangeEvent,
-} from '../../../ui/table/table.component';
-import { ContractEvent } from '../../../models';
+import { TableComponent } from '../../../ui/table/table.component';
+import { ContractEvent, PageChangeEvent } from '../../../models';
+import { PAGINATION } from '../../../config/constants';
 
 @Component({
   selector: 'app-events-tab',
@@ -23,8 +21,8 @@ import { ContractEvent } from '../../../models';
 export class EventsTabComponent {
   events = input<ContractEvent[]>([]);
   totalRecords = input<number>(0);
-  pageSize = input<number>(10);
-  currentPage = input<number>(0);
+  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
+  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
 
   pageChange = output<PageChangeEvent>();
 

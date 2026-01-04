@@ -18,6 +18,7 @@ import {
 } from 'rxjs';
 import { TZKTState } from '../../models';
 import { ContractService } from '../../services/contract.service';
+import { RATE_LIMIT } from '../../config/constants';
 import { isContractAddress } from './url-utils';
 
 export function withContractData() {
@@ -95,7 +96,7 @@ export function withContractData() {
                 .getContractEvents(address, pageSize, page * pageSize)
                 .pipe(map((events) => ({ type: 'events' as const, events }))),
             ]).pipe(
-              mergeMap((obs) => obs, 2),
+              mergeMap((obs) => obs, RATE_LIMIT.LOW),
               toArray(),
               tap((results) => {
                 const countResult = results.find((r) => r.type === 'count');
@@ -142,7 +143,7 @@ export function withContractData() {
                 }))
               ),
             ]).pipe(
-              mergeMap((obs) => obs, 3),
+              mergeMap((obs) => obs, RATE_LIMIT.DEFAULT),
               toArray(),
               tap((results) => {
                 const entrypointsResult = results.find(

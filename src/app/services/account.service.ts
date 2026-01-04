@@ -7,16 +7,16 @@ import {
   TokenBalance,
 } from '../models/account.model';
 import { cacheContext } from '../config/cache.config';
+import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountService {
   private http = inject(HttpClient);
-  private readonly API_BASE = 'https://api.tzkt.io/v1';
 
   getAccount(address: string): Observable<AccountInfo> {
-    return this.http.get<AccountInfo>(`${this.API_BASE}/accounts/${address}`, {
+    return this.http.get<AccountInfo>(`${TZKT_API_BASE}/accounts/${address}`, {
       context: cacheContext,
     });
   }
@@ -27,7 +27,7 @@ export class AccountService {
     offset: number
   ): Observable<AccountOperation[]> {
     return this.http.get<AccountOperation[]>(
-      `${this.API_BASE}/accounts/${address}/operations`,
+      `${TZKT_API_BASE}/accounts/${address}/operations`,
       {
         params: {
           limit: limit.toString(),
@@ -44,7 +44,7 @@ export class AccountService {
     limit: number,
     offset: number
   ): Observable<TokenBalance[]> {
-    return this.http.get<TokenBalance[]>(`${this.API_BASE}/tokens/balances`, {
+    return this.http.get<TokenBalance[]>(`${TZKT_API_BASE}/tokens/balances`, {
       params: {
         account: address,
         'balance.ne': '0',
@@ -57,7 +57,7 @@ export class AccountService {
   }
 
   getTokenBalancesCount(address: string): Observable<number> {
-    return this.http.get<number>(`${this.API_BASE}/tokens/balances/count`, {
+    return this.http.get<number>(`${TZKT_API_BASE}/tokens/balances/count`, {
       params: {
         account: address,
         'balance.ne': '0',

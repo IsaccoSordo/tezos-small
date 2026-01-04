@@ -19,6 +19,7 @@ import {
 import { TZKTState, AccountInfo, ContractInfo } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { ContractService } from '../../services/contract.service';
+import { RATE_LIMIT, DEFAULT_TAB } from '../../config/constants';
 import { isContractAddress } from './url-utils';
 
 // Calculate total operations count from account info
@@ -111,7 +112,7 @@ export function withAccountData() {
                     }))
                   ),
               ]).pipe(
-                mergeMap((obs) => obs, 2),
+                mergeMap((obs) => obs, RATE_LIMIT.LOW),
                 toArray(),
                 tap((results) => {
                   const countResult = results.find((r) => r.type === 'count');
@@ -145,7 +146,7 @@ export function withAccountData() {
             tokenBalancesCount: 0,
             contractEvents: [],
             contractEventsCount: 0,
-            activeTab: 'operations',
+            activeTab: DEFAULT_TAB,
           });
         },
       })

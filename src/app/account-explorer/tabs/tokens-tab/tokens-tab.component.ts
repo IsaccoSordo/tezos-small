@@ -6,11 +6,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import {
-  TableComponent,
-  PageChangeEvent,
-} from '../../../ui/table/table.component';
-import { TokenBalance } from '../../../models';
+import { TableComponent } from '../../../ui/table/table.component';
+import { TokenBalance, PageChangeEvent } from '../../../models';
+import { PAGINATION, HASH_DISPLAY } from '../../../config/constants';
 
 @Component({
   selector: 'app-tokens-tab',
@@ -23,8 +21,8 @@ import { TokenBalance } from '../../../models';
 export class TokensTabComponent {
   tokens = input<TokenBalance[]>([]);
   totalRecords = input<number>(0);
-  pageSize = input<number>(10);
-  currentPage = input<number>(0);
+  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
+  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
 
   pageChange = output<PageChangeEvent>();
 
@@ -64,6 +62,10 @@ export class TokensTabComponent {
   }
 
   truncateAddress(address: string): string {
-    return address.slice(0, 8) + '...' + address.slice(-6);
+    return (
+      address.slice(0, HASH_DISPLAY.PREFIX_LENGTH) +
+      '...' +
+      address.slice(-HASH_DISPLAY.SUFFIX_LENGTH)
+    );
   }
 }

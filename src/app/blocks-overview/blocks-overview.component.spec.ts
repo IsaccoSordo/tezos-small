@@ -5,8 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { signal } from '@angular/core';
 import { Store } from '../store/tzkt.store';
-import { PageChangeEvent } from '../ui/table/table.component';
-import { Block } from '../models';
+import { Block, PageChangeEvent } from '../models';
 
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;

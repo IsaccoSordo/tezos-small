@@ -8,11 +8,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-
-export interface PageChangeEvent {
-  page: number;
-  pageSize: number;
-}
+import { PageChangeEvent } from '../../models';
+import { PAGINATION } from '../../config/constants';
 
 @Component({
   selector: 'app-table',
@@ -28,7 +25,7 @@ export class TableComponent<T = unknown> {
   data = input<T[]>([]);
   columns = input<{ field: string; header: string }[]>([]);
   totalRecords = input<number>(0);
-  rows = input<number>(10);
+  rows = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
   first = input<number>(0);
   paginator = input<boolean>(false);
   scrollable = input<boolean>(true);
@@ -38,7 +35,7 @@ export class TableComponent<T = unknown> {
 
   onPageChange(event: { first?: number | null; rows?: number | null }) {
     const first = event.first ?? 0;
-    const rows = event.rows ?? 10;
+    const rows = event.rows ?? PAGINATION.DEFAULT_PAGE_SIZE;
     const page = first ? Math.floor(first / rows) : 0;
 
     this.pageChange.emit({

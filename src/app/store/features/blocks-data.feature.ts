@@ -20,13 +20,14 @@ import {
   tap,
 } from 'rxjs';
 import { TZKTState } from '../../models';
-import { TzktService } from '../../services/tzkt.service';
+import { BlocksService } from '../../services/blocks.service';
+import { RATE_LIMIT, POLLING } from '../../config/constants';
 import { getRouteType } from './url-utils';
 
 export function withBlocksData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
-    withMethods((store, service = inject(TzktService)) => ({
+    withMethods((store, service = inject(BlocksService)) => ({
       loadBlocks: rxMethod<{ pageSize: number; page: number }>(
         pipe(
           switchMap(({ pageSize, page }) =>
@@ -43,7 +44,7 @@ export function withBlocksData() {
                               transactions: count,
                             }))
                           ),
-                        5
+                        RATE_LIMIT.HIGH
                       ),
                       toArray()
                     )
@@ -70,7 +71,7 @@ export function withBlocksData() {
             if (getRouteType(url) !== 'overview') {
               return EMPTY;
             }
-            return interval(60000).pipe(
+            return interval(POLLING.BLOCKS_COUNT_MS).pipe(
               startWith(0),
               switchMap(() =>
                 service

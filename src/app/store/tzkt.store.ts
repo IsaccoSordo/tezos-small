@@ -8,6 +8,7 @@ import {
   withContractData,
   withRouterSync,
 } from './features';
+import { DEFAULT_TAB } from '../config/constants';
 
 export const Store = signalStore(
   { providedIn: 'root' },
@@ -27,7 +28,7 @@ export const Store = signalStore(
     tokenBalancesCount: 0,
     contractEvents: [],
     contractEventsCount: 0,
-    activeTab: 'operations',
+    activeTab: DEFAULT_TAB,
   }),
   withStateMutations(),
   withBlocksData(),

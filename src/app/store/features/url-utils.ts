@@ -1,3 +1,5 @@
+import { TEZOS, PAGINATION, DEFAULT_TAB } from '../../config/constants';
+
 export type RouteType = 'overview' | 'details' | 'account' | 'other';
 
 const parseUrl = (url: string) => {
@@ -17,11 +19,11 @@ export const getRouteType = (url: string): RouteType => {
 };
 
 export const isContractAddress = (address: string): boolean => {
-  return address.startsWith('KT1');
+  return address.startsWith(TEZOS.CONTRACT_PREFIX);
 };
 
 export const isUserAddress = (address: string): boolean => {
-  return /^tz[123]/.test(address);
+  return TEZOS.USER_ADDRESS_PATTERN.test(address);
 };
 
 export const getAddressType = (address: string): 'user' | 'contract' | null => {
@@ -37,14 +39,14 @@ export const getAccountAddress = (url: string): string | null => {
 
 export const getAccountTab = (url: string): string => {
   const { params } = parseUrl(url);
-  return params.get('tab') ?? 'operations';
+  return params.get('tab') ?? DEFAULT_TAB;
 };
 
 export const getPaginationParams = (url: string) => {
   const { params } = parseUrl(url);
   return {
-    pageSize: +(params.get('pageSize') ?? 10),
-    page: +(params.get('page') ?? 0),
+    pageSize: +(params.get('pageSize') ?? PAGINATION.DEFAULT_PAGE_SIZE),
+    page: +(params.get('page') ?? PAGINATION.DEFAULT_PAGE),
   };
 };
 

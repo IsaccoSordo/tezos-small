@@ -6,11 +6,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TableComponent } from '../../../ui/table/table.component';
+import { AccountOperation, PageChangeEvent } from '../../../models';
 import {
-  TableComponent,
-  PageChangeEvent,
-} from '../../../ui/table/table.component';
-import { AccountOperation } from '../../../models';
+  PAGINATION,
+  TEZOS,
+  TIME,
+  HASH_DISPLAY,
+} from '../../../config/constants';
 
 @Component({
   selector: 'app-operations-tab',
@@ -23,8 +26,8 @@ import { AccountOperation } from '../../../models';
 export class OperationsTabComponent {
   operations = input<AccountOperation[]>([]);
   totalRecords = input<number>(0);
-  pageSize = input<number>(10);
-  currentPage = input<number>(0);
+  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
+  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
 
   pageChange = output<PageChangeEvent>();
 
@@ -44,16 +47,17 @@ export class OperationsTabComponent {
   }
 
   formatAmount(amount: number | undefined): string {
-    return (!amount ? '0' : (amount / 1_000_000).toFixed(6)) + ' ꜩ';
+    const xtz = !amount ? '0' : (amount / TEZOS.MUTEZ_PER_XTZ).toFixed(6);
+    return `${xtz} ${TEZOS.SYMBOL}`;
   }
 
   formatTimestamp(timestamp: string): string {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    const diffMins = Math.floor(diffMs / TIME.MINUTE_MS);
+    const diffHours = Math.floor(diffMs / TIME.HOUR_MS);
+    const diffDays = Math.floor(diffMs / TIME.DAY_MS);
 
     if (diffMins < 60) {
       return `${diffMins}m ago`;
@@ -67,7 +71,11 @@ export class OperationsTabComponent {
 
   truncateHash(hash: string | undefined): string {
     if (!hash) return '-';
-    return hash.slice(0, 8) + '...' + hash.slice(-6);
+    return (
+      hash.slice(0, HASH_DISPLAY.PREFIX_LENGTH) +
+      '...' +
+      hash.slice(-HASH_DISPLAY.SUFFIX_LENGTH)
+    );
   }
 
   getTypeClass(type: string): string {

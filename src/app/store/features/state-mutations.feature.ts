@@ -18,6 +18,7 @@ import {
   TokenBalance,
   ContractEvent,
 } from '../../models';
+import { DEFAULT_TAB } from '../../config/constants';
 
 export function withStateMutations() {
   return signalStoreFeature(
@@ -116,7 +117,7 @@ export function withStateMutations() {
           tokenBalancesCount: 0,
           contractEvents: [],
           contractEventsCount: 0,
-          activeTab: 'operations',
+          activeTab: DEFAULT_TAB,
         });
       },
     }))

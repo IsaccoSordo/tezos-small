@@ -8,3 +8,13 @@ export interface TableData {
   page: number;
   pageSize: number;
 }
+
+export interface PageChangeEvent {
+  page: number;
+  pageSize: number;
+}
+
+export interface TabConfig {
+  label: string;
+  value: string;
+}

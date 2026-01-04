@@ -7,7 +7,7 @@ export type {
   AuthState,
 } from './auth.model';
 
-export type { Column, TableData } from './ui.model';
+export type { Column, TableData, PageChangeEvent, TabConfig } from './ui.model';
 
 export type {
   AddressType,
