@@ -7,225 +7,157 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
-import { pipe, switchMap, forkJoin, EMPTY } from 'rxjs';
-import { TZKTState } from '../../models';
+import { pipe, switchMap, from, mergeMap, toArray, EMPTY, map } from 'rxjs';
+import { TZKTState, AccountInfo, ContractInfo } from '../../models';
 import { AccountService } from '../../services/account.service';
+import { ContractService } from '../../services/contract.service';
 import { isContractAddress } from './url-utils';
+
+// Calculate total operations count from account info
+function getOperationsCount(account: AccountInfo | ContractInfo | null): number {
+  if (!account) return 0;
+  return (
+    (account.numTransactions || 0) +
+    (account.numDelegations || 0) +
+    (account.numOriginations || 0) +
+    (account.numReveals || 0) +
+    (account.numActivations || 0) +
+    (account.numRegisterConstants || 0) +
+    (account.numSetDepositsLimits || 0) +
+    (account.numMigrations || 0) +
+    (account.numDrainDelegates || 0)
+  );
+}
 
 export function withAccountData() {
   return signalStoreFeature(
     { state: type<TZKTState>() },
-    withMethods((store, service = inject(AccountService)) => ({
-      loadAccount: rxMethod<string>(
-        pipe(
-          switchMap((address) => {
-            if (!address) return EMPTY;
+    withMethods(
+      (
+        store,
+        accountService = inject(AccountService),
+        contractService = inject(ContractService)
+      ) => ({
+        loadAccount: rxMethod<string>(
+          pipe(
+            switchMap((address) => {
+              if (!address) return EMPTY;
 
-            const account$ = isContractAddress(address)
-              ? service.getContract(address)
-              : service.getAccount(address);
+              const account$ = isContractAddress(address)
+                ? contractService.getContract(address)
+                : accountService.getAccount(address);
 
-            return account$.pipe(
-              tapResponse({
-                next: (account) => patchState(store, { account }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
+              return account$.pipe(
+                tapResponse({
+                  next: (account) => patchState(store, { account }),
+                  error: (error: Error) =>
+                    patchState(store, (state) => ({
+                      errors: [...state.errors, error],
+                    })),
+                })
+              );
+            })
+          )
+        ),
 
-      loadAccountOperations: rxMethod<{
-        address: string;
-        pageSize: number;
-        page: number;
-      }>(
-        pipe(
-          switchMap(({ address, pageSize, page }) => {
-            if (!address) return EMPTY;
+        loadAccountOperations: rxMethod<{
+          address: string;
+          pageSize: number;
+          page: number;
+        }>(
+          pipe(
+            switchMap(({ address, pageSize, page }) => {
+              if (!address) return EMPTY;
 
-            return forkJoin({
-              operations: service.getAccountOperations(
-                address,
-                pageSize,
-                page * pageSize
-              ),
-              count: service.getAccountOperationsCount(address),
-            }).pipe(
-              tapResponse({
-                next: ({ operations, count }) =>
-                  patchState(store, {
-                    accountOperations: operations,
-                    accountOperationsCount: count,
-                  }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
+              return accountService
+                .getAccountOperations(address, pageSize, page * pageSize)
+                .pipe(
+                  tapResponse({
+                    next: (operations) =>
+                      patchState(store, {
+                        accountOperations: operations,
+                        // Count is derived from account info which is already loaded
+                        accountOperationsCount: getOperationsCount(
+                          store.account()
+                        ),
+                      }),
+                    error: (error: Error) =>
+                      patchState(store, (state) => ({
+                        errors: [...state.errors, error],
+                      })),
+                  })
+                );
+            })
+          )
+        ),
 
-      loadContractEntrypoints: rxMethod<string>(
-        pipe(
-          switchMap((address) => {
-            if (!address || !isContractAddress(address)) return EMPTY;
+        loadTokenBalances: rxMethod<{
+          address: string;
+          pageSize: number;
+          page: number;
+        }>(
+          pipe(
+            switchMap(({ address, pageSize, page }) => {
+              if (!address) return EMPTY;
 
-            return service.getContractEntrypoints(address).pipe(
-              tapResponse({
-                next: (entrypoints) => patchState(store, { entrypoints }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
+              // Load count and balances with rate limiting
+              return from([
+                accountService
+                  .getTokenBalancesCount(address)
+                  .pipe(map((count) => ({ type: 'count' as const, count }))),
+                accountService
+                  .getTokenBalances(address, pageSize, page * pageSize)
+                  .pipe(
+                    map((balances) => ({
+                      type: 'balances' as const,
+                      balances,
+                    }))
+                  ),
+              ]).pipe(
+                mergeMap((obs) => obs, 2),
+                toArray(),
+                tapResponse({
+                  next: (results) => {
+                    const countResult = results.find((r) => r.type === 'count');
+                    const balancesResult = results.find(
+                      (r) => r.type === 'balances'
+                    );
+                    patchState(store, {
+                      tokenBalances:
+                        balancesResult?.type === 'balances'
+                          ? balancesResult.balances
+                          : [],
+                      tokenBalancesCount:
+                        countResult?.type === 'count' ? countResult.count : 0,
+                    });
+                  },
+                  error: (error: Error) =>
+                    patchState(store, (state) => ({
+                      errors: [...state.errors, error],
+                    })),
+                })
+              );
+            })
+          )
+        ),
 
-      loadContractStorage: rxMethod<string>(
-        pipe(
-          switchMap((address) => {
-            if (!address || !isContractAddress(address)) return EMPTY;
-
-            return service.getContractStorage(address).pipe(
-              tapResponse({
-                next: (storage) => patchState(store, { storage }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
-
-      loadContractInterface: rxMethod<string>(
-        pipe(
-          switchMap((address) => {
-            if (!address || !isContractAddress(address)) return EMPTY;
-
-            return service.getContractInterface(address).pipe(
-              tapResponse({
-                next: (contractInterface) =>
-                  patchState(store, { contractInterface }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
-
-      loadContractViews: rxMethod<string>(
-        pipe(
-          switchMap((address) => {
-            if (!address || !isContractAddress(address)) return EMPTY;
-
-            return service.getContractViews(address).pipe(
-              tapResponse({
-                next: (contractViews) => patchState(store, { contractViews }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
-
-      loadTokenBalances: rxMethod<{
-        address: string;
-        pageSize: number;
-        page: number;
-      }>(
-        pipe(
-          switchMap(({ address, pageSize, page }) => {
-            if (!address) return EMPTY;
-
-            return forkJoin({
-              balances: service.getTokenBalances(
-                address,
-                pageSize,
-                page * pageSize
-              ),
-              count: service.getTokenBalancesCount(address),
-            }).pipe(
-              tapResponse({
-                next: ({ balances, count }) =>
-                  patchState(store, {
-                    tokenBalances: balances,
-                    tokenBalancesCount: count,
-                  }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
-
-      loadContractEvents: rxMethod<{
-        address: string;
-        pageSize: number;
-        page: number;
-      }>(
-        pipe(
-          switchMap(({ address, pageSize, page }) => {
-            if (!address || !isContractAddress(address)) return EMPTY;
-
-            return forkJoin({
-              events: service.getContractEvents(
-                address,
-                pageSize,
-                page * pageSize
-              ),
-              count: service.getContractEventsCount(address),
-            }).pipe(
-              tapResponse({
-                next: ({ events, count }) =>
-                  patchState(store, {
-                    contractEvents: events,
-                    contractEventsCount: count,
-                  }),
-                error: (error: Error) =>
-                  patchState(store, (state) => ({
-                    errors: [...state.errors, error],
-                  })),
-              })
-            );
-          })
-        )
-      ),
-
-      clearAccountState: () => {
-        patchState(store, {
-          account: null,
-          accountOperations: [],
-          accountOperationsCount: 0,
-          entrypoints: [],
-          storage: null,
-          contractInterface: null,
-          contractViews: [],
-          tokenBalances: [],
-          tokenBalancesCount: 0,
-          contractEvents: [],
-          contractEventsCount: 0,
-          activeTab: 'operations',
-        });
-      },
-    }))
+        clearAccountState: () => {
+          patchState(store, {
+            account: null,
+            accountOperations: [],
+            accountOperationsCount: 0,
+            entrypoints: [],
+            storage: null,
+            contractInterface: null,
+            contractViews: [],
+            tokenBalances: [],
+            tokenBalancesCount: 0,
+            contractEvents: [],
+            contractEventsCount: 0,
+            activeTab: 'operations',
+          });
+        },
+      })
+    )
   );
 }

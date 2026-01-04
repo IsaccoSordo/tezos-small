@@ -5,6 +5,7 @@ import {
   withBlocksData,
   withTransactionsData,
   withAccountData,
+  withContractData,
   withRouterSync,
 } from './features';
 
@@ -33,5 +34,6 @@ export const Store = signalStore(
   withBlocksData(),
   withTransactionsData(),
   withAccountData(),
+  withContractData(),
   withRouterSync()
 );
