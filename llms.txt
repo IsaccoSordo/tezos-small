@@ -1,99 +1,45 @@
 # Tezos Small
 
-> An Angular 21 application for exploring Tezos blockchain blocks and transactions through the TZKT API.
+> Angular 21 application for exploring Tezos blockchain via TZKT API.
 
-This is a single-page application featuring block browsing, transaction details, Firebase authentication, zoneless change detection, and NgRx SignalStore. It uses TypeScript strict mode and PrimeNG Aura theme.
+This project is a zoneless, signal-based SPA using NgRx SignalStore and Firebase Auth. It prioritizes reactive patterns without manual subscriptions.
 
-**Stack**: Angular 21, TypeScript 5.9, PrimeNG 21, RxJS 7.8, NgRx Signals, @angular/fire, @ngneat/cashew, Firebase Auth, TZKT API
-**Node Requirements**: v20.19+ or v22.12+
-**Last Updated**: 2025-12-24
-**Live Demo**: https://isaccosordo.github.io/tezos-small/
+**Stack:** Angular 21 (Zoneless), TypeScript 5.9, PrimeNG 21, NgRx Signals, @angular/fire, @ngneat/cashew.
+**Node:** v20.19+
+**Live Demo:** [https://isaccosordo.github.io/tezos-small/](https://isaccosordo.github.io/tezos-small/)
 
-## Project Structure & Organization
+## Core Map
 
-### Core Files
+* [package.json](https://www.google.com/search?q=package.json): Exact versioning (no wildcards).
+* [src/main.ts](https://www.google.com/search?q=src/main.ts): Bootstrap with `bootstrapApplication`.
+* [src/app/app.config.ts](https://www.google.com/search?q=src/app/app.config.ts): Global providers (Firebase, PrimeNG Aura, Interceptors).
+* [src/app/app.routes.ts](https://www.google.com/search?q=src/app/app.routes.ts): Lazy-loaded routes; data loading is URL-driven via Store hooks.
 
-* [README.md](README.md): Project overview and quick start
-* [package.json](https://www.google.com/search?q=package.json): Exact versioned dependencies (no wildcards)
-* [tsconfig.json](https://www.google.com/search?q=tsconfig.json): Strict mode configuration
-* [angular.json](https://www.google.com/search?q=angular.json) & [vitest.config.ts](https://www.google.com/search?q=vitest.config.ts): Build and test configurations
+## Architecture & Patterns
 
-### Directory Rules
+### State & Data Flow
 
-* **Models** (`src/app/models/`): Domain-based organization (e.g., `tzkt.model.ts`). Use `index.ts` barrel files.
-* **State** (`src/app/store/`): NgRx SignalStore files. Composable features reside in `features/` using the `with` prefix.
-* **Services** (`src/app/services/`): Singleton services (API, Auth, Search).
-* **Guards/Interceptors**: Reside in `src/app/guards/` and `src/app/interceptors/`.
-* **UI Components**: Reusable widgets in `src/app/ui/`.
-* **Feature Pages**: Root-level directories (e.g., `blocks-overview/`, `login/`).
+* **SignalStore:** Uses composable `signalStoreFeature` slices (`src/app/store/features/`).
+* **Reactive Loading:** `withRouterSync` feature subscribes to Router events and triggers `rxMethod` calls. Components only read signals.
+* **Interceptors:** Centralized loading (`loadingCounter`) and error handling (PrimeNG Toast).
 
----
+### Authentication
 
-## Technical Architecture
+* **Service:** `src/app/services/auth.service.ts` uses `toSignal()` for Firebase state.
+* **Linking:** `pendingLink` signal manages cross-provider email collisions.
 
-### 1. State Management (NgRx SignalStore)
+## Coding Standards
 
-* **Centralized & Subscription-free**: All state is managed via signals. Components read signals; they do not manage subscriptions.
-* **Route-Driven**: The store subscribes to Router events in `onInit` to trigger data loading. Components do not fetch data.
-* **rxMethod**: Used for all async/reactive data loading.
-* **Plugin Pattern**: Use `signalStoreFeature` to split logic into composable slices (e.g., `withBlocksData`).
+* **Signals:** Avoid `effect()`. Use `computed()` for derived state or SignalStore methods for side effects.
+* **Logic:** Prefer **early returns**. Avoid nested `if/else` blocks to maintain flat, readable functions.
+* **Subscriptions:** **Never** subscribe in a constructor. Use the `Subject` pattern with `takeUntilDestroyed` in `ngOnInit`, or ideally, use `rxMethod` in the Store.
+* **Error Handling:** Do **not** catch network exceptions in services or components. The `error.interceptor.ts` handles all HTTP failures.
+* **Interactions:** Components are presentational. They trigger Store methods; they do not fetch data or manage complex state logic.
 
-### 2. Authentication (Firebase + @angular/fire)
+## Project Constraints
 
-* **Signal-based Auth**: Uses `toSignal()` to convert Firebase observables.
-* **AuthService**: Exposes `user()`, `token()`, and `isAuthenticated()` signals.
-* **Account Linking**: Handles credential collisions via a `pendingLink` signal and UI flow.
-
-### 3. HTTP & Error Handling
-
-* **Functional Interceptors**:
-* `auth.interceptor.ts`: Attaches Bearer tokens.
-* `loading.interceptor.ts`: Global `loadingCounter` state (no component-level flags).
-* `error.interceptor.ts`: Centralized toast notifications via PrimeNG.
-
-
-* **Caching**: Managed by `@ngneat/cashew` via `withCache()` context.
-* **Global Handler**: `global-error.handler.ts` for unhandled exceptions.
-
----
-
-## Development Standards
-
-### Angular & TypeScript
-
-* **Zoneless**: No `NgZone`. Signals drive all updates.
-* **Standalone**: No `NgModules`.
-* **Templates**: Use native control flow (`@if`, `@for`). Inline templates for simple presentational components; `templateUrl` for smart components.
-* **Early Returns**: Avoid nested `if` statements.
-* **Constants**: All magic numbers and patterns must reside in `src/app/config/`.
-
-### Subscription Management
-
-* **Manual Subscriptions**: Avoid where possible. If required, use `takeUntilDestroyed(this.destroyRef)`.
-* **Subject Pattern**: For user actions, use a `Subject` and `switchMap` in `ngOnInit`.
-
-### Documentation Style
-
-* **Tone**: Neutral, objective, and factual.
-* **Avoid**: Marketing jargon ("modern", "powerful"), emojis, and line-count comparisons.
-* **Comments**: Explain *why*, not *what*.
-
----
-
-## Testing Strategy
-
-* **Tooling**: Vitest with `jsdom`.
-* **Mocking**: Mock `AuthService` and `Store` using simple signals.
-* **Timers**: Use `vi.useFakeTimers()` for async/polling logic.
-* **Cleanup**: Always use `fixture.destroy()` and `httpMock.verify()` in `afterEach`.
-
-
-* **Command**: `npm test` or `npm run test:ci`.
-
----
-
-## Environment & CI/CD
-
-* **Build-time Env**: `scripts/set-env.ts` generates files from shell variables (gitignored).
-* **CI/CD**: GitHub Actions handles linting, testing, and deployment to GitHub Pages on push to `main`.
-* **Secrets**: Managed via GitHub Secrets in the `production` environment.
+1. **Zoneless:** Never use `NgZone` or `ChangeDetectorRef`.
+2. **Imports:** Use relative paths for siblings; absolute (`src/app/...`) for deep nesting; barrel files (`../models`) for all interfaces.
+3. **Clean Code:** Neutral documentation. No promotional adjectives (e.g., "sleek", "modern").
+4. **Testing:** Mock `AuthService` and `Store` using signals. Use `vi.useFakeTimers()` for async tests.
+5. **Comments:** Only write comments to explain why that line (or set of lines) is needed. Don't ever write comments that explain what the code is doing.
