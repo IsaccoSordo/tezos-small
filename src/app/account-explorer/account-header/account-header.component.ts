@@ -22,8 +22,7 @@ export class AccountHeaderComponent {
 
   balanceXTZ = computed(() => {
     const acc = this.account();
-    if (!acc) return '0';
-    return (acc.balance / 1_000_000).toFixed(6);
+    return !acc || !acc.balance ? '0' : (acc.balance / 1_000_000).toFixed(6);
   });
 
   contractCreator = computed(() => {

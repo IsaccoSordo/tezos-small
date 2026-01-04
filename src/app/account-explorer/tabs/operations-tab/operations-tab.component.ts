@@ -44,8 +44,7 @@ export class OperationsTabComponent {
   }
 
   formatAmount(amount: number | undefined): string {
-    if (amount === undefined || amount === null) return '-';
-    return (amount / 1_000_000).toFixed(6) + ' ꜩ';
+    return (!amount ? '0' : (amount / 1_000_000).toFixed(6)) + ' ꜩ';
   }
 
   formatTimestamp(timestamp: string): string {
