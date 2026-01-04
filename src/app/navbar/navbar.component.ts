@@ -13,6 +13,7 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../services/auth.service';
+import { SearchComponent } from '../ui/search/search.component';
 
 @Component({
   selector: 'app-navbar',
@@ -25,6 +26,7 @@ import { AuthService } from '../services/auth.service';
     ButtonModule,
     AvatarModule,
     TooltipModule,
+    SearchComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

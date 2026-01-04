@@ -15,6 +15,10 @@ An Angular application for exploring Tezos blockchain blocks and transactions th
 - Browse Tezos blockchain blocks in a paginated table
 - View block details including hash, level, proposer, and timestamp
 - Display transaction counts per block
+- Global search bar with autocomplete suggestions
+  - Search by block level (e.g., `12345`)
+  - Search by account address (tz1, tz2, tz3, KT1)
+  - Search by account alias with dropdown suggestions
 
 **Transaction Details**
 
@@ -177,8 +181,10 @@ See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.
 src/app/
 ├── blocks-overview/          # Main blocks listing page
 ├── config/
+│   ├── api.config.ts        # TZKT API base URL
 │   ├── auth.config.ts       # Protected API patterns
-│   └── cache.config.ts      # HTTP cache configuration
+│   ├── cache.config.ts      # HTTP cache configuration
+│   └── search.config.ts     # Search constants and patterns
 ├── core/
 │   └── global-error.handler.ts # Global error handling
 ├── details/                  # Transaction details page
@@ -191,12 +197,14 @@ src/app/
 ├── login/                    # Login page with OAuth
 ├── models/
 │   ├── auth.model.ts        # Auth interfaces (User, AuthState)
+│   ├── search.model.ts      # Search interfaces (AccountSuggestion, SearchResult)
 │   ├── tzkt.model.ts        # TZKT interfaces (Block, Transaction)
 │   ├── ui.model.ts          # UI interfaces (Column, TableData)
 │   └── index.ts             # Barrel file for imports
 ├── navbar/                   # Navigation component
 ├── services/
 │   ├── auth.service.ts      # Firebase Auth with @angular/fire
+│   ├── search.service.ts    # Search suggestions via TZKT API
 │   └── tzkt.service.ts      # TZKT API integration
 ├── store/
 │   ├── tzkt.store.ts        # Orchestrator - composes feature slices
@@ -208,6 +216,7 @@ src/app/
 │       ├── url-utils.ts                # URL parsing utilities
 │       └── index.ts                    # Barrel file
 ├── ui/                       # Reusable UI components
+│   ├── search/              # Global search with autocomplete
 │   ├── spinner/
 │   └── table/
 ├── app.routes.ts            # Application routing
@@ -222,7 +231,8 @@ src/app/
 | `BlocksOverviewComponent` | Presentational - displays blocks from store       |
 | `DetailsComponent`        | Presentational - displays transactions from store |
 | `LoginComponent`          | OAuth login with Google/GitHub                    |
-| `NavbarComponent`         | Navigation header with auth status                |
+| `NavbarComponent`         | Navigation header with search bar and auth status |
+| `SearchComponent`         | Global search with autocomplete suggestions       |
 | `TableComponent`          | Reusable data table with pagination               |
 | `SpinnerComponent`        | Loading indicator                                 |
 | `Store`                   | Route-driven state management with rxMethod       |
@@ -379,12 +389,13 @@ https://api.tzkt.io/v1
 
 ### Endpoints Used
 
-| Endpoint                                 | Description           |
-| ---------------------------------------- | --------------------- |
-| `/blocks/count`                          | Total block count     |
-| `/blocks?limit=X&offset=Y`               | Paginated block list  |
-| `/operations/transactions/count?level=X` | Transactions in block |
-| `/operations/transactions?level=X`       | Block transactions    |
+| Endpoint                                 | Description              |
+| ---------------------------------------- | ------------------------ |
+| `/blocks/count`                          | Total block count        |
+| `/blocks?limit=X&offset=Y`               | Paginated block list     |
+| `/operations/transactions/count?level=X` | Transactions in block    |
+| `/operations/transactions?level=X`       | Block transactions       |
+| `/suggest/accounts/{query}`              | Account alias suggestions|
 
 ## Interfaces
 
