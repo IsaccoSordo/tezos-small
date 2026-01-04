@@ -48,7 +48,9 @@ describe('SearchComponent', () => {
 
   describe('onSearch', () => {
     it('should clear suggestions when query is too short', () => {
-      component.suggestions.set([{ type: 'account', label: 'test', value: 'test' }]);
+      component.suggestions.set([
+        { type: 'account', label: 'test', value: 'test' },
+      ]);
 
       component.onSearch({ query: 'a', originalEvent: new Event('input') });
 
@@ -56,9 +58,14 @@ describe('SearchComponent', () => {
     });
 
     it('should trigger search for valid query', () => {
-      vi.spyOn(searchService, 'suggestAccounts').mockReturnValue(of(mockSuggestions));
+      vi.spyOn(searchService, 'suggestAccounts').mockReturnValue(
+        of(mockSuggestions)
+      );
 
-      component.onSearch({ query: 'plenty', originalEvent: new Event('input') });
+      component.onSearch({
+        query: 'plenty',
+        originalEvent: new Event('input'),
+      });
       vi.advanceTimersByTime(350);
 
       expect(searchService.suggestAccounts).toHaveBeenCalledWith('plenty');
@@ -71,7 +78,9 @@ describe('SearchComponent', () => {
       vi.advanceTimersByTime(350);
 
       const suggestions = component.suggestions();
-      expect(suggestions.some(s => s.type === 'block' && s.value === '12345')).toBe(true);
+      expect(
+        suggestions.some((s) => s.type === 'block' && s.value === '12345')
+      ).toBe(true);
     });
 
     it('should add address suggestion for valid address query', () => {
@@ -81,7 +90,9 @@ describe('SearchComponent', () => {
       vi.advanceTimersByTime(350);
 
       const suggestions = component.suggestions();
-      expect(suggestions.some(s => s.type === 'account' && s.value === address)).toBe(true);
+      expect(
+        suggestions.some((s) => s.type === 'account' && s.value === address)
+      ).toBe(true);
     });
 
     it('should handle API errors gracefully', () => {
@@ -100,7 +111,11 @@ describe('SearchComponent', () => {
     it('should navigate to block details for block type', () => {
       const navigateSpy = vi.spyOn(router, 'navigate');
 
-      component.onSelect({ type: 'block', label: 'Block 12345', value: '12345' });
+      component.onSelect({
+        type: 'block',
+        label: 'Block 12345',
+        value: '12345',
+      });
 
       expect(navigateSpy).toHaveBeenCalledWith(['/details', '12345']);
       expect(component.searchQuery).toBe('');
@@ -109,14 +124,20 @@ describe('SearchComponent', () => {
     it('should navigate to account for account type', () => {
       const navigateSpy = vi.spyOn(router, 'navigate');
 
-      component.onSelect({ type: 'account', label: 'Test Account', value: 'tz1abc123' });
+      component.onSelect({
+        type: 'account',
+        label: 'Test Account',
+        value: 'tz1abc123',
+      });
 
       expect(navigateSpy).toHaveBeenCalledWith(['/account', 'tz1abc123']);
       expect(component.searchQuery).toBe('');
     });
 
     it('should clear suggestions after selection', () => {
-      component.suggestions.set([{ type: 'account', label: 'test', value: 'test' }]);
+      component.suggestions.set([
+        { type: 'account', label: 'test', value: 'test' },
+      ]);
 
       component.onSelect({ type: 'account', label: 'test', value: 'test' });
 
@@ -141,7 +162,10 @@ describe('SearchComponent', () => {
 
       component.onKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/account', 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb']);
+      expect(navigateSpy).toHaveBeenCalledWith([
+        '/account',
+        'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+      ]);
       expect(component.searchQuery).toBe('');
     });
 
@@ -171,7 +195,9 @@ describe('SearchComponent', () => {
       component.onSearch({ query: address, originalEvent: new Event('input') });
       vi.advanceTimersByTime(350);
 
-      expect(component.suggestions().some(s => s.type === 'account')).toBe(true);
+      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
+        true
+      );
     });
 
     it('should recognize tz2 addresses', () => {
@@ -180,7 +206,9 @@ describe('SearchComponent', () => {
       component.onSearch({ query: address, originalEvent: new Event('input') });
       vi.advanceTimersByTime(350);
 
-      expect(component.suggestions().some(s => s.type === 'account')).toBe(true);
+      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
+        true
+      );
     });
 
     it('should recognize tz3 addresses', () => {
@@ -189,7 +217,9 @@ describe('SearchComponent', () => {
       component.onSearch({ query: address, originalEvent: new Event('input') });
       vi.advanceTimersByTime(350);
 
-      expect(component.suggestions().some(s => s.type === 'account')).toBe(true);
+      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
+        true
+      );
     });
 
     it('should recognize KT1 addresses', () => {
@@ -198,7 +228,9 @@ describe('SearchComponent', () => {
       component.onSearch({ query: address, originalEvent: new Event('input') });
       vi.advanceTimersByTime(350);
 
-      expect(component.suggestions().some(s => s.type === 'account')).toBe(true);
+      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
+        true
+      );
     });
   });
 });
