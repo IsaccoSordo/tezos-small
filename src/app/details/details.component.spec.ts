@@ -3,6 +3,8 @@ import { signal } from '@angular/core';
 import { DetailsComponent } from './details.component';
 import { Store } from '../store/tzkt.store';
 import { Transaction } from '../models';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -38,7 +40,15 @@ describe('DetailsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DetailsComponent],
-      providers: [{ provide: Store, useValue: mockStore }],
+      providers: [
+        { provide: Store, useValue: mockStore },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            queryParams: of(),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DetailsComponent);
@@ -65,8 +75,8 @@ describe('DetailsComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.textContent).toContain('addr1');
-    expect(compiled.textContent).toContain('addr2');
+    expect(compiled.textContent).toContain('User1');
+    expect(compiled.textContent).toContain('User2');
   });
 
   it('should display correct number of transactions from store', () => {
