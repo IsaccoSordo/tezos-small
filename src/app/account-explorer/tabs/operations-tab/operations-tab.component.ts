@@ -62,9 +62,11 @@ export class OperationsTabComponent {
 
     if (diffMins < 60) {
       return `${diffMins}m ago`;
-    } else if (diffHours < 24) {
+    }
+    if (diffHours < 24) {
       return `${diffHours}h ago`;
-    } else if (diffDays < 7) {
+    }
+    if (diffDays < 7) {
       return `${diffDays}d ago`;
     }
     return date.toLocaleDateString();

@@ -24,6 +24,12 @@
   background-clip: text;
 }
 
+.search-container {
+  margin-left: 2rem;
+  flex: 1;
+  max-width: 400px;
+}
+
 .user-section {
   display: flex;
   align-items: center;

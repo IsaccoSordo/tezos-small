@@ -9,7 +9,7 @@ import {
   ContractView,
   ContractEvent,
 } from '../models/account.model';
-import { cacheContext } from '../config/cache.config';
+import { context } from '../config/httpContext.config';
 import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class ContractService {
     return this.http.get<ContractInfo>(
       `${TZKT_API_BASE}/contracts/${address}`,
       {
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -31,7 +31,7 @@ export class ContractService {
     return this.http.get<ContractEntrypoint[]>(
       `${TZKT_API_BASE}/contracts/${address}/entrypoints`,
       {
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -40,7 +40,7 @@ export class ContractService {
     return this.http.get<ContractStorage>(
       `${TZKT_API_BASE}/contracts/${address}/storage`,
       {
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -49,7 +49,7 @@ export class ContractService {
     return this.http.get<ContractInterface>(
       `${TZKT_API_BASE}/contracts/${address}/interface`,
       {
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -58,7 +58,7 @@ export class ContractService {
     return this.http.get<ContractView[]>(
       `${TZKT_API_BASE}/contracts/${address}/views`,
       {
-        context: cacheContext,
+        context,
       }
     );
   }
@@ -75,7 +75,7 @@ export class ContractService {
         offset: offset.toString(),
         'sort.desc': 'id',
       },
-      context: cacheContext,
+      context,
     });
   }
 
@@ -84,7 +84,7 @@ export class ContractService {
       params: {
         contract: address,
       },
-      context: cacheContext,
+      context,
     });
   }
 }

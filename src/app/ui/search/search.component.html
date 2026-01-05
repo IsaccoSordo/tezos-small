@@ -1,0 +1,35 @@
+<p-autoComplete
+  [(ngModel)]="searchQuery"
+  [suggestions]="suggestions()"
+  (completeMethod)="onSearch($event)"
+  (onSelect)="onSelect($event.value)"
+  (keydown)="onKeyDown($event)"
+  optionLabel="label"
+  placeholder="Search by level, hash or alias"
+  [scrollHeight]="'300px'"
+  [showEmptyMessage]="false"
+  [minLength]="2"
+  appendTo="body"
+>
+  <ng-template let-result pTemplate="item">
+    <div class="search-result-item">
+      @switch (result.type) {
+        @case ('block') {
+          <i class="pi pi-box result-icon block-icon"></i>
+        }
+        @case ('contract') {
+          <i class="pi pi-file result-icon contract-icon"></i>
+        }
+        @case ('user') {
+          <i class="pi pi-user result-icon user-icon"></i>
+        }
+      }
+      <div class="result-content">
+        <span class="result-label">{{ result.label }}</span>
+        @if (result.type !== 'block' && result.label !== result.value) {
+          <span class="result-address">{{ result.value }}</span>
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-autoComplete>

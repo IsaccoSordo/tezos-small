@@ -21,3 +21,9 @@ export type {
   ContractStorage,
   ContractInterface,
 } from './account.model';
+
+export type {
+  AccountSuggestion,
+  SearchResultType,
+  SearchResult,
+} from './search.model';

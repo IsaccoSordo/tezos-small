@@ -1,3 +1,16 @@
+import { SearchResult } from './search.model';
+import {
+  AccountInfo,
+  ContractInfo,
+  AccountOperation,
+  ContractEntrypoint,
+  ContractStorage,
+  ContractInterface,
+  ContractView,
+  TokenBalance,
+  ContractEvent,
+} from './account.model';
+
 export interface Account {
   alias: string;
   address: string;
@@ -23,20 +36,17 @@ export interface TZKTState {
   count: number;
   loadingCounter: number;
   transactions: Transaction[];
-  // Account explorer state
-  account:
-    | import('./account.model').AccountInfo
-    | import('./account.model').ContractInfo
-    | null;
-  accountOperations: import('./account.model').AccountOperation[];
+  searchSuggestions: SearchResult[];
+  account: AccountInfo | ContractInfo | null;
+  accountOperations: AccountOperation[];
   accountOperationsCount: number;
-  entrypoints: import('./account.model').ContractEntrypoint[];
-  storage: import('./account.model').ContractStorage | null;
-  contractInterface: import('./account.model').ContractInterface | null;
-  contractViews: import('./account.model').ContractView[];
-  tokenBalances: import('./account.model').TokenBalance[];
+  entrypoints: ContractEntrypoint[];
+  storage: ContractStorage | null;
+  contractInterface: ContractInterface | null;
+  contractViews: ContractView[];
+  tokenBalances: TokenBalance[];
   tokenBalancesCount: number;
-  contractEvents: import('./account.model').ContractEvent[];
+  contractEvents: ContractEvent[];
   contractEventsCount: number;
   activeTab: string;
 }

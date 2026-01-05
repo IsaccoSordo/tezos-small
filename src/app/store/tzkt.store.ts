@@ -6,6 +6,7 @@ import {
   withTransactionsData,
   withAccountData,
   withContractData,
+  withSearchData,
   withRouterSync,
 } from './features';
 import { DEFAULT_TAB } from '../config/constants';
@@ -17,6 +18,7 @@ export const Store = signalStore(
     count: 0,
     loadingCounter: 0,
     transactions: [],
+    searchSuggestions: [],
     account: null,
     accountOperations: [],
     accountOperationsCount: 0,
@@ -35,5 +37,6 @@ export const Store = signalStore(
   withTransactionsData(),
   withAccountData(),
   withContractData(),
+  withSearchData(),
   withRouterSync()
 );

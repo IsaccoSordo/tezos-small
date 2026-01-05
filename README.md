@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](#license)
 
-An Angular application for exploring Tezos blockchain blocks and transactions through the [TZKT API](https://tzkt.io/api/).
+An Angular application for exploring Tezos blockchain blocks, transactions, and accounts through the [TZKT API](https://tzkt.io/api/).
 
 ## Features
 
@@ -16,51 +16,56 @@ An Angular application for exploring Tezos blockchain blocks and transactions th
 - View block details including hash, level, proposer, and timestamp
 - Display transaction counts per block
 
+**Global Search**
+
+- Search by block level (e.g., `12345`)
+- Search by account address (tz1, tz2, tz3, KT1)
+- Search by account alias with autocomplete suggestions
+- Visual icons distinguish blocks, contracts, and user accounts
+
+**Account Explorer**
+
+- View account details (balance, type, first activity)
+- Browse account operations with pagination
+- View token balances for any account
+- Contract-specific features:
+  - Entrypoints and storage inspection
+  - Contract code and interface
+  - On-chain views
+  - Contract events
+
 **Transaction Details**
 
 - View individual block transactions
 - Display sender, receiver, amount, and transaction status
-- Responsive table layout
 
 **Authentication**
 
-- Firebase Authentication with Google and GitHub OAuth providers
+- Firebase Authentication with Google and GitHub OAuth
 - Account linking for users with multiple OAuth accounts
 - Protected routes with auth guards
-- JWT token handling via HTTP interceptor
 
-**Technical Implementation**
+**Technical Highlights**
 
 - Zoneless change detection (Angular 21)
 - Standalone components with signal-based reactivity
 - NgRx SignalStore with `rxMethod` for reactive data loading
-- Route-driven state management (store reacts to URL changes)
+- Route-driven state management
 - Purely presentational components
-- Firebase integration via @angular/fire
-- Reactive data flow with RxJS and `toSignal()`
-- HTTP response caching with [@ngneat/cashew](https://github.com/ngneat/cashew)
-- Loading states with PrimeNG ProgressSpinner
-- Toast notifications for error handling
-- PrimeNG Aura theme
-- TypeScript strict mode
-- SCSS styling
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js: v20.19+ or v22.12+
-- npm: v8.0.0 or higher
+- npm: v8.0.0+
 - Firebase project with Authentication enabled
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/IsaccoSordo/tezos-small.git
 cd tezos-small
-
-# Install dependencies
 npm install
 ```
 
@@ -79,354 +84,168 @@ FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 3. Enable Google and GitHub sign-in providers in Firebase Console
 
-### Development Server
+### Development
 
 ```bash
 npm start
 ```
 
-Navigate to `http://localhost:4200/`. The application will automatically reload when you modify source files.
+Navigate to `http://localhost:4200/`.
 
-### Build for Production
+### Production Build
 
 ```bash
 npm run build:prod
 ```
 
-Build artifacts will be stored in the `dist/tezos-small` directory.
-
 ## Testing
 
-The project includes unit tests for components, services, interceptors, and UI elements.
-
-### Prerequisites
-
-Node.js v20.19+ or v22.12+ is required for running tests.
-
-### Run Unit Tests
-
 ```bash
-npm test                           # Watch mode with auto-reload
-npm run test:ci                    # Run once (for CI/automated testing)
-npm test -- --coverage             # Generate coverage reports
+npm test              # Watch mode
+npm run test:ci       # Run once (CI)
+npm test -- --coverage # Coverage reports
 ```
 
-Tests are executed via [Vitest](https://vitest.dev) with jsdom for DOM emulation.
+Tests use [Vitest](https://vitest.dev) with jsdom.
 
-### Testing Patterns
-
-The test suite uses the following patterns:
-
-**Helper Functions**
-
-- Reusable functions for common mock patterns: `initializeComponent()`, `flushCountRequest()`, `flushInitialBlocksRequest()`
-
-**Single Responsibility**
-
-- Each test verifies one specific behavior
-- Tests use "should..." naming convention
-- Focused assertions for easier debugging
-
-**Test Organization**
-
-- Nested `describe` blocks group related tests
-- `beforeEach` sets up test fixtures
-- `afterEach` cleans up resources and verifies HTTP mocks
-
-**Async Testing**
-
-- `vi.useFakeTimers()` with `vi.advanceTimersByTime()` for timer-based operations
-- `fixture.destroy()` for cleanup of subscriptions
-- `HttpTestingController` verifies HTTP interactions
-
-**Example:**
-
-```typescript
-describe('MyComponent', () => {
-  const initializeComponent = () => {
-    fixture.detectChanges();
-    vi.advanceTimersByTime(0);
-  };
-
-  beforeEach(async () => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    fixture.destroy();
-    httpMock.verify();
-    vi.useRealTimers();
-  });
-
-  it('should initialize and fetch data', () => {
-    initializeComponent();
-    flushMockRequests();
-
-    expect(component.data()).toBeTruthy();
-  });
-});
-```
-
-See [blocks-overview.component.spec.ts](src/app/blocks-overview/blocks-overview.component.spec.ts) for complete examples.
-
-## Architecture
-
-### Project Structure
+## Project Structure
 
 ```
 src/app/
-├── blocks-overview/          # Main blocks listing page
+├── account-explorer/         # Account/contract explorer
+│   ├── account-header/       # Account info header
+│   └── tabs/                 # Operations, tokens, events, code, etc.
+├── blocks-overview/          # Main blocks listing
 ├── config/
-│   ├── auth.config.ts       # Protected API patterns
-│   └── cache.config.ts      # HTTP cache configuration
+│   ├── api.config.ts         # TZKT API base URL
+│   ├── auth.config.ts        # Protected API patterns
+│   ├── cache.config.ts       # HTTP cache configuration
+│   ├── constants.ts          # App constants
+│   ├── httpContext.config.ts # HTTP context tokens
+│   └── search.config.ts      # Search patterns
 ├── core/
-│   └── global-error.handler.ts # Global error handling
-├── details/                  # Transaction details page
+│   └── global-error.handler.ts
+├── details/                  # Block transaction details
 ├── guards/
-│   └── auth.guard.ts        # Route guards (authGuard, guestGuard)
+│   └── auth.guard.ts         # authGuard, guestGuard
 ├── interceptors/
-│   ├── auth.interceptor.ts  # Bearer token injection
-│   ├── error.interceptor.ts # HTTP error handling with toast
-│   └── loading.interceptor.ts # Loading state management
-├── login/                    # Login page with OAuth
+│   ├── auth.interceptor.ts   # Bearer token injection
+│   ├── error.interceptor.ts  # Error handling with toast
+│   └── loading.interceptor.ts
+├── login/                    # OAuth login page
 ├── models/
-│   ├── auth.model.ts        # Auth interfaces (User, AuthState)
-│   ├── tzkt.model.ts        # TZKT interfaces (Block, Transaction)
-│   ├── ui.model.ts          # UI interfaces (Column, TableData)
-│   └── index.ts             # Barrel file for imports
-├── navbar/                   # Navigation component
+│   ├── account.model.ts      # Account/contract interfaces
+│   ├── auth.model.ts         # User, AuthState
+│   ├── search.model.ts       # SearchResult, AccountSuggestion
+│   ├── tzkt.model.ts         # Block, Transaction, TZKTState
+│   ├── ui.model.ts           # Column, TableData
+│   └── index.ts              # Barrel file
+├── navbar/                   # Navigation with search
 ├── services/
-│   ├── auth.service.ts      # Firebase Auth with @angular/fire
-│   └── tzkt.service.ts      # TZKT API integration
+│   ├── account.service.ts    # Account API
+│   ├── auth.service.ts       # Firebase Auth
+│   ├── blocks.service.ts     # Blocks API
+│   ├── contract.service.ts   # Contract API
+│   └── search.service.ts     # Search suggestions API
 ├── store/
-│   ├── tzkt.store.ts        # Orchestrator - composes feature slices
-│   └── features/            # Composable signalStoreFeature slices
-│       ├── state-mutations.feature.ts  # withStateMutations
-│       ├── blocks-data.feature.ts      # withBlocksData
-│       ├── transactions-data.feature.ts # withTransactionsData
-│       ├── router-sync.feature.ts      # withRouterSync
-│       ├── url-utils.ts                # URL parsing utilities
-│       └── index.ts                    # Barrel file
-├── ui/                       # Reusable UI components
-│   ├── spinner/
-│   └── table/
-├── app.routes.ts            # Application routing
-├── app.config.ts            # Global configuration
-└── app.component.ts         # Root component
+│   ├── tzkt.store.ts         # Main store orchestrator
+│   └── features/
+│       ├── account-data.feature.ts
+│       ├── blocks-data.feature.ts
+│       ├── contract-data.feature.ts
+│       ├── router-sync.feature.ts
+│       ├── search-data.feature.ts
+│       ├── state-mutations.feature.ts
+│       ├── transactions-data.feature.ts
+│       └── url-utils.ts
+├── ui/
+│   ├── search/               # Global search component
+│   ├── spinner/              # Loading indicator
+│   └── table/                # Reusable data table
+├── utils/
+│   └── format.utils.ts       # Formatting helpers
+├── app.routes.ts
+├── app.config.ts
+└── app.component.ts
 ```
 
-### Key Components
-
-| Component                 | Purpose                                           |
-| ------------------------- | ------------------------------------------------- |
-| `BlocksOverviewComponent` | Presentational - displays blocks from store       |
-| `DetailsComponent`        | Presentational - displays transactions from store |
-| `LoginComponent`          | OAuth login with Google/GitHub                    |
-| `NavbarComponent`         | Navigation header with auth status                |
-| `TableComponent`          | Reusable data table with pagination               |
-| `SpinnerComponent`        | Loading indicator                                 |
-| `Store`                   | Route-driven state management with rxMethod       |
-
-### Authentication
-
-The application uses Firebase Authentication via `@angular/fire`:
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class AuthService {
-  private auth = inject(Auth);
-
-  private firebaseUser = toSignal(user(this.auth));
-
-  readonly token = toSignal(idToken(this.auth));
-
-  readonly user = computed(() => this.mapFirebaseUser(this.firebaseUser()));
-  readonly isAuthenticated = computed(() => !!this.firebaseUser());
-
-  login(provider = 'google'): Observable<User> {
-    return from(signInWithPopup(this.auth, authProvider)).pipe(
-      map((result) => this.mapFirebaseUser(result.user))
-    );
-  }
-}
-```
-
-**Key Features:**
-
-- Signal-based state using `toSignal()` from `@angular/core/rxjs-interop`
-- Automatic token refresh via `idToken()` observable
-- Account linking for users with same email across providers
-- No subscriptions or constructors needed
+## Architecture
 
 ### State Management
 
-The application uses NgRx SignalStore with `signalStoreFeature` for composable, testable state slices:
+NgRx SignalStore with composable `signalStoreFeature` slices:
 
 ```typescript
-// tzkt.store.ts
 export const Store = signalStore(
   { providedIn: 'root' },
   withState<TZKTState>({
     blocks: [],
     count: 0,
-    errors: [],
     loadingCounter: 0,
     transactions: [],
+    searchSuggestions: [],
+    account: null,
+    accountOperations: [],
+    // ... more state
   }),
   withStateMutations(),
   withBlocksData(),
   withTransactionsData(),
+  withAccountData(),
+  withContractData(),
+  withSearchData(),
   withRouterSync()
 );
 ```
 
-**Feature Slices:**
+| Feature                | Purpose                                    |
+| ---------------------- | ------------------------------------------ |
+| `withStateMutations`   | Basic setters for state properties         |
+| `withBlocksData`       | Block loading and polling                  |
+| `withTransactionsData` | Transaction loading                        |
+| `withAccountData`      | Account/operations loading                 |
+| `withContractData`     | Contract-specific data (entrypoints, etc.) |
+| `withSearchData`       | Search suggestions with debounce           |
+| `withRouterSync`       | Route-driven data loading                  |
 
-| Feature                | Purpose                                                |
-| ---------------------- | ------------------------------------------------------ |
-| `withStateMutations`   | Basic setters: setBlocks, setCount, resetState, etc.   |
-| `withBlocksData`       | loadBlocks, loadBlocksCount, pollBlocksCount rxMethods |
-| `withTransactionsData` | loadTransactions rxMethod                              |
-| `withRouterSync`       | Subscribes to Router events, triggers data loading     |
+### Key Components
 
-**signalStoreFeature benefits:**
-
-- Each feature can be tested in isolation
-- Features can be shared across stores
-- Separate files reduce merge conflicts
+| Component                  | Purpose                                |
+| -------------------------- | -------------------------------------- |
+| `BlocksOverviewComponent`  | Displays blocks from store             |
+| `DetailsComponent`         | Displays block transactions            |
+| `AccountExplorerComponent` | Account/contract details with tabs     |
+| `SearchComponent`          | Global search with autocomplete        |
+| `TableComponent`           | Reusable paginated table               |
+| `NavbarComponent`          | Navigation header with search and auth |
 
 ### HTTP Interceptors
 
-**Auth Interceptor**
-
-Attaches Bearer token to protected API requests:
-
-- Uses `AuthService.token()` signal
-- Only adds token for URLs matching `PROTECTED_API_PATTERNS`
-
-**Cache Interceptor** ([@ngneat/cashew](https://github.com/ngneat/cashew))
-
-- Configurable TTL per request via `withCache({ ttl: ms })`
-- Automatic cache key generation
-
-**Error Interceptor**
-
-- Displays toast notifications via PrimeNG `MessageService`
-- Returns EMPTY observable to prevent error propagation
-
-**Loading Interceptor**
-
-- Counter-based approach handles concurrent requests
-
-### API Integration
-
-The `TzktService` handles all blockchain API calls:
-
-- `getBlocksCount()` - Fetch total block count
-- `getBlocks(limit, offset)` - Paginated block listing
-- `getTransactionsCount(level)` - Get transaction count for a block
-- `getTransactions(level)` - Fetch transactions for a block
-
-## Deployment
-
-### GitHub Pages
-
-The application is deployed to GitHub Pages via GitHub Actions:
-
-- **On Pull Request**: Runs lint, format, and test checks
-- **On Push to Main**: Runs checks, builds, and deploys to GitHub Pages
-
-The workflow uses environment secrets from the `production` environment in GitHub repository settings.
-
-### Manual Deployment
-
-```bash
-npm run build:prod
-# Deploy dist/tezos-small/browser to your hosting provider
-```
-
-## Dependencies
-
-### Core
-
-- `@angular/*@21.0.6` - Angular framework
-- `@angular/fire@21.0.0-rc.0` - Firebase integration for Angular
-- `@ngrx/signals@21.0.0` - NgRx SignalStore for state management
-- `@ngneat/cashew@5.3.0` - HTTP response caching
-- `rxjs@7.8.2` - Reactive programming
-- `typescript@5.9.3` - Type safety
-
-### UI
-
-- `primeng@21.0.1` - Angular UI component library
-- `@primeuix/themes@2.0.2` - Theming system
-- `primeicons@7.0.0` - Icon library
-
-### Testing
-
-- `vitest@4.0.15` - Test runner
-- `jsdom@27.3.0` - DOM emulation for tests
+- **Auth**: Attaches Bearer token to protected requests
+- **Cache**: Response caching via [@ngneat/cashew](https://github.com/ngneat/cashew)
+- **Error**: Toast notifications via PrimeNG MessageService
+- **Loading**: Counter-based loading state management
 
 ## API Reference
 
-This application uses the [TZKT API](https://tzkt.io/api/) for Tezos blockchain data.
+Base URL: `https://api.tzkt.io/v1`
 
-### Base URL
-
-```
-https://api.tzkt.io/v1
-```
-
-### Endpoints Used
-
-| Endpoint                                 | Description           |
-| ---------------------------------------- | --------------------- |
-| `/blocks/count`                          | Total block count     |
-| `/blocks?limit=X&offset=Y`               | Paginated block list  |
-| `/operations/transactions/count?level=X` | Transactions in block |
-| `/operations/transactions?level=X`       | Block transactions    |
-
-## Interfaces
-
-### User
-
-```typescript
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-}
-```
-
-### Block
-
-```typescript
-interface Block {
-  hash: string;
-  level: number;
-  proposer?: Account;
-  timestamp: string;
-  transactions: number;
-}
-```
-
-### Transaction
-
-```typescript
-interface Transaction {
-  sender: Account;
-  target: Account;
-  amount: number;
-  status: string;
-}
-```
+| Endpoint                                 | Description               |
+| ---------------------------------------- | ------------------------- |
+| `/blocks/count`                          | Total block count         |
+| `/blocks?limit=X&offset=Y`               | Paginated blocks          |
+| `/operations/transactions?level=X`       | Block transactions        |
+| `/accounts/{address}`                    | Account details           |
+| `/accounts/{address}/operations`         | Account operations        |
+| `/tokens/balances?account={address}`     | Token balances            |
+| `/contracts/{address}/entrypoints`       | Contract entrypoints      |
+| `/contracts/{address}/storage`           | Contract storage          |
+| `/contracts/{address}/interface`         | Contract interface        |
+| `/suggest/accounts/{query}`              | Account suggestions       |
 
 ## Configuration
 
 ### Environment Variables
-
-Required environment variables for Firebase:
 
 | Variable                  | Description                  |
 | ------------------------- | ---------------------------- |
@@ -436,47 +255,25 @@ Required environment variables for Firebase:
 | `FIREBASE_SENDER_ID`      | Firebase messaging sender ID |
 | `FIREBASE_MEASUREMENT_ID` | Firebase Analytics ID        |
 
-### PrimeNG Theme
-
-The application uses PrimeNG Aura theme configured in [app.config.ts](src/app/app.config.ts):
-
-```typescript
-providePrimeNG({
-  theme: {
-    preset: Aura,
-    options: {
-      darkModeSelector: false,
-      cssLayer: false,
-    },
-  },
-});
-```
-
-## Development Commands
+## Commands
 
 | Command              | Description                               |
 | -------------------- | ----------------------------------------- |
-| `npm install`        | Install dependencies                      |
 | `npm start`          | Start dev server at http://localhost:4200 |
 | `npm run build:prod` | Build for production                      |
 | `npm test`           | Run tests in watch mode                   |
-| `npm run test:ci`    | Run tests once (CI)                       |
+| `npm run test:ci`    | Run tests once                            |
 | `npm run lint`       | Run ESLint                                |
-| `npm run format`     | Format code with Prettier                 |
+| `npm run format`     | Format with Prettier                      |
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENCE](./LICENCE) file for details.
+GNU General Public License v3.0. See [LICENCE](./LICENCE).
 
-## Contributing
+## Resources
 
-Contributions are welcome. Please submit issues and pull requests through the repository.
-
-## Additional Resources
-
-- [Angular Documentation](https://angular.io/docs)
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [AngularFire Documentation](https://github.com/angular/angularfire)
-- [PrimeNG Documentation](https://primeng.org)
-- [TZKT API Documentation](https://tzkt.io/api/)
-- [RxJS Guide](https://rxjs.dev/)
+- [Angular](https://angular.io/docs)
+- [NgRx SignalStore](https://ngrx.io/guide/signals)
+- [PrimeNG](https://primeng.org)
+- [TZKT API](https://tzkt.io/api/)
+- [Firebase](https://firebase.google.com/docs)
