@@ -10,7 +10,8 @@ import {
   of,
   Observable,
 } from 'rxjs';
-import { TZKTState } from '../../models';
+import { TZKTState, CursorDirection } from '../../models';
+import { PAGINATION } from '../../config/constants';
 import {
   getRouteType,
   getPaginationParams,
@@ -26,7 +27,11 @@ interface DataLoadingMethods {
   loadTransactions: (source: Observable<number>) => void;
   loadAccount: (source: Observable<string>) => void;
   loadAccountOperations: (
-    source: Observable<{ address: string; pageSize: number; page: number }>
+    source: Observable<{
+      address: string;
+      limit: number;
+      direction: CursorDirection;
+    }>
   ) => void;
   loadContractEntrypoints: (source: Observable<string>) => void;
   loadContractStorage: (source: Observable<string>) => void;
@@ -103,30 +108,25 @@ export function withRouterSync() {
           // Load account info when address changes
           store.loadAccount(accountAddress$);
 
-          // Load operations when on operations tab
+          // Load operations when on operations tab (first page on initial navigation)
           store.loadAccountOperations(
             accountUrl$.pipe(
               map((url) => ({
                 address: getAccountAddress(url),
                 tab: getAccountTab(url),
-                ...getPaginationParams(url),
               })),
               filter(
-                (
-                  params
-                ): params is {
-                  address: string;
-                  pageSize: number;
-                  page: number;
-                  tab: string;
-                } => params.address !== null && params.tab === 'operations'
+                (params): params is { address: string; tab: string } =>
+                  params.address !== null && params.tab === 'operations'
               ),
               distinctUntilChanged(
-                (prev, curr) =>
-                  prev.address === curr.address &&
-                  prev.pageSize === curr.pageSize &&
-                  prev.page === curr.page
-              )
+                (prev, curr) => prev.address === curr.address
+              ),
+              map((params) => ({
+                address: params.address,
+                limit: PAGINATION.DEFAULT_PAGE_SIZE,
+                direction: 'first' as CursorDirection,
+              }))
             )
           );
 

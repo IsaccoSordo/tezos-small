@@ -31,6 +31,12 @@ export interface Transaction {
   status: string;
 }
 
+export interface CursorState {
+  cursors: number[];
+  currentIndex: number;
+  hasMore: boolean;
+}
+
 export interface TZKTState {
   blocks: Block[];
   count: number;
@@ -40,6 +46,7 @@ export interface TZKTState {
   account: AccountInfo | ContractInfo | null;
   accountOperations: AccountOperation[];
   accountOperationsCount: number;
+  operationsCursor: CursorState;
   entrypoints: ContractEntrypoint[];
   storage: ContractStorage | null;
   contractInterface: ContractInterface | null;

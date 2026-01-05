@@ -15,10 +15,8 @@
               @case ('operations') {
                 <app-operations-tab
                   [operations]="accountOperations()"
-                  [totalRecords]="accountOperationsCount()"
-                  [pageSize]="pageSize()"
-                  [currentPage]="currentPage()"
-                  (pageChange)="onPageChange($event)"
+                  [cursorState]="operationsCursor()"
+                  (navigate)="onOperationsNavigate($event)"
                 />
               }
               @case ('storage') {

@@ -1,13 +1,5 @@
 <div class="operations-tab">
-  <app-table
-    [data]="operations()"
-    [columns]="columns"
-    [totalRecords]="totalRecords()"
-    [rows]="pageSize()"
-    [first]="currentPage() * pageSize()"
-    [paginator]="true"
-    (pageChange)="onPageChange($event)"
-  >
+  <app-table [data]="operations()" [columns]="columns">
     <ng-template #body let-operation>
       <tr class="data-row">
         <td>
@@ -80,4 +72,11 @@
       </tr>
     </ng-template>
   </app-table>
+
+  <app-cursor-paginator
+    [currentIndex]="cursorState().currentIndex"
+    [hasMore]="cursorState().hasMore"
+    [hasData]="hasData()"
+    (navigationChange)="onNavigate($event)"
+  />
 </div>

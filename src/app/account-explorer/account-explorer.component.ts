@@ -10,7 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Store } from '../store/tzkt.store';
-import { PageChangeEvent, TabConfig } from '../models';
+import { PageChangeEvent, TabConfig, CursorDirection } from '../models';
 import { PAGINATION, DEFAULT_TAB } from '../config/constants';
 import { AccountHeaderComponent } from './account-header/account-header.component';
 import { OperationsTabComponent } from './tabs/operations-tab/operations-tab.component';
@@ -81,6 +81,7 @@ export class AccountExplorerComponent {
   account = this.store.account;
   accountOperations = this.store.accountOperations;
   accountOperationsCount = this.store.accountOperationsCount;
+  operationsCursor = this.store.operationsCursor;
   entrypoints = this.store.entrypoints;
   storage = this.store.storage;
   contractInterface = this.store.contractInterface;
@@ -122,6 +123,17 @@ export class AccountExplorerComponent {
       relativeTo: this.route,
       queryParams: { page: event.page, pageSize: event.pageSize },
       queryParamsHandling: 'merge',
+    });
+  }
+
+  onOperationsNavigate(direction: CursorDirection): void {
+    const address = this.address();
+    if (!address) return;
+
+    this.store.loadAccountOperations({
+      address,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      direction,
     });
   }
 }

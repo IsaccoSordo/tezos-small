@@ -2,18 +2,19 @@ import {
   Component,
   input,
   output,
+  computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableComponent } from '../../../ui/table/table.component';
-import { AccountOperation, PageChangeEvent } from '../../../models';
+import { CursorPaginatorComponent } from '../../../ui/cursor-paginator/cursor-paginator.component';
 import {
-  PAGINATION,
-  TEZOS,
-  TIME,
-  HASH_DISPLAY,
-} from '../../../config/constants';
+  AccountOperation,
+  CursorState,
+  CursorDirection,
+} from '../../../models';
+import { TEZOS, TIME, HASH_DISPLAY } from '../../../config/constants';
 import { formatNumber } from '../../../utils/format.utils';
 
 @Component({
@@ -21,16 +22,20 @@ import { formatNumber } from '../../../utils/format.utils';
   templateUrl: './operations-tab.component.html',
   styleUrls: ['./operations-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, TableComponent],
+  imports: [CommonModule, RouterLink, TableComponent, CursorPaginatorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsTabComponent {
   operations = input<AccountOperation[]>([]);
-  totalRecords = input<number>(0);
-  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
-  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
+  cursorState = input<CursorState>({
+    cursors: [],
+    currentIndex: -1,
+    hasMore: true,
+  });
 
-  pageChange = output<PageChangeEvent>();
+  navigate = output<CursorDirection>();
+
+  hasData = computed(() => this.operations().length > 0);
 
   columns = [
     { field: 'type', header: 'Type' },
@@ -43,8 +48,8 @@ export class OperationsTabComponent {
     { field: 'status', header: 'Status' },
   ];
 
-  onPageChange(event: PageChangeEvent): void {
-    this.pageChange.emit(event);
+  onNavigate(direction: CursorDirection): void {
+    this.navigate.emit(direction);
   }
 
   formatAmount(amount: number | undefined): string {

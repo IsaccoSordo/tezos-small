@@ -1,4 +1,10 @@
-export type { Account, Block, Transaction, TZKTState } from './tzkt.model';
+export type {
+  Account,
+  Block,
+  Transaction,
+  TZKTState,
+  CursorState,
+} from './tzkt.model';
 
 export type {
   User,
@@ -7,7 +13,14 @@ export type {
   AuthState,
 } from './auth.model';
 
-export type { Column, TableData, PageChangeEvent, TabConfig } from './ui.model';
+export type {
+  Column,
+  TableData,
+  PageChangeEvent,
+  TabConfig,
+  CursorDirection,
+  CursorNavigateEvent,
+} from './ui.model';
 
 export type {
   AddressType,

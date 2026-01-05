@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { OperationsTabComponent } from './operations-tab.component';
-import { PageChangeEvent } from '../../../models';
+import { CursorDirection } from '../../../models';
 
 describe('OperationsTabComponent', () => {
   let component: OperationsTabComponent;
@@ -114,17 +114,35 @@ describe('OperationsTabComponent', () => {
     });
   });
 
-  describe('pageChange', () => {
-    it('should emit pageChange event', () => {
-      let emittedEvent: PageChangeEvent | undefined;
-      component.pageChange.subscribe((event) => {
-        emittedEvent = event;
+  describe('navigate', () => {
+    it('should emit navigate event with direction', () => {
+      let emittedDirection: CursorDirection | undefined;
+      component.navigate.subscribe((direction) => {
+        emittedDirection = direction;
       });
 
-      const event: PageChangeEvent = { page: 2, pageSize: 20 };
-      component.onPageChange(event);
+      component.onNavigate('next');
+      expect(emittedDirection).toBe('next');
 
-      expect(emittedEvent).toEqual({ page: 2, pageSize: 20 });
+      component.onNavigate('prev');
+      expect(emittedDirection).toBe('prev');
+
+      component.onNavigate('first');
+      expect(emittedDirection).toBe('first');
+    });
+  });
+
+  describe('hasData', () => {
+    it('should return false when operations is empty', () => {
+      fixture.componentRef.setInput('operations', []);
+      fixture.detectChanges();
+      expect(component.hasData()).toBe(false);
+    });
+
+    it('should return true when operations has items', () => {
+      fixture.componentRef.setInput('operations', [{ id: 1 }]);
+      fixture.detectChanges();
+      expect(component.hasData()).toBe(true);
     });
   });
 });
