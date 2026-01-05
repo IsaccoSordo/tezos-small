@@ -1,45 +1,40 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { of, throwError } from 'rxjs';
+import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
-import { SearchService } from '../../services/search.service';
-import { AccountSuggestion } from '../../models';
+import { Store } from '../../store/tzkt.store';
+import { SearchResult } from '../../models';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
   let router: Router;
-  let searchService: SearchService;
-
-  const mockSuggestions: AccountSuggestion[] = [
-    { alias: 'Plenty DEX', address: 'KT1PlentyAddress123456789012345678901' },
-    { alias: 'Quipuswap', address: 'KT1QuipuAddress1234567890123456789012' },
-  ];
+  let mockStore: {
+    searchSuggestions: ReturnType<typeof signal<SearchResult[]>>;
+    searchAccounts: ReturnType<typeof vi.fn>;
+    clearSearchSuggestions: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    vi.useFakeTimers();
+    mockStore = {
+      searchSuggestions: signal<SearchResult[]>([]),
+      searchAccounts: vi.fn(),
+      clearSearchSuggestions: vi.fn(),
+    };
 
     await TestBed.configureTestingModule({
       imports: [SearchComponent],
-      providers: [
-        provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideRouter([]), { provide: Store, useValue: mockStore }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    searchService = TestBed.inject(SearchService);
     fixture.detectChanges();
   });
 
   afterEach(() => {
     fixture.destroy();
-    vi.useRealTimers();
   });
 
   it('should create', () => {
@@ -48,62 +43,28 @@ describe('SearchComponent', () => {
 
   describe('onSearch', () => {
     it('should clear suggestions when query is too short', () => {
-      component.suggestions.set([
-        { type: 'account', label: 'test', value: 'test' },
-      ]);
-
       component.onSearch({ query: 'a', originalEvent: new Event('input') });
 
-      expect(component.suggestions()).toEqual([]);
+      expect(mockStore.clearSearchSuggestions).toHaveBeenCalled();
+      expect(mockStore.searchAccounts).not.toHaveBeenCalled();
     });
 
-    it('should trigger search for valid query', () => {
-      vi.spyOn(searchService, 'suggestAccounts').mockReturnValue(
-        of(mockSuggestions)
-      );
-
+    it('should trigger store search for valid query', () => {
       component.onSearch({
         query: 'plenty',
         originalEvent: new Event('input'),
       });
-      vi.advanceTimersByTime(350);
 
-      expect(searchService.suggestAccounts).toHaveBeenCalledWith('plenty');
+      expect(mockStore.searchAccounts).toHaveBeenCalledWith('plenty');
     });
 
-    it('should add block suggestion for numeric query', () => {
-      vi.spyOn(searchService, 'suggestAccounts').mockReturnValue(of([]));
+    it('should trim query before searching', () => {
+      component.onSearch({
+        query: '  plenty  ',
+        originalEvent: new Event('input'),
+      });
 
-      component.onSearch({ query: '12345', originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      const suggestions = component.suggestions();
-      expect(
-        suggestions.some((s) => s.type === 'block' && s.value === '12345')
-      ).toBe(true);
-    });
-
-    it('should add address suggestion for valid address query', () => {
-      const address = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
-
-      component.onSearch({ query: address, originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      const suggestions = component.suggestions();
-      expect(
-        suggestions.some((s) => s.type === 'account' && s.value === address)
-      ).toBe(true);
-    });
-
-    it('should handle API errors gracefully', () => {
-      vi.spyOn(searchService, 'suggestAccounts').mockReturnValue(
-        throwError(() => new Error('API Error'))
-      );
-
-      component.onSearch({ query: 'error', originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      expect(component.suggestions()).toEqual([]);
+      expect(mockStore.searchAccounts).toHaveBeenCalledWith('plenty');
     });
   });
 
@@ -135,13 +96,9 @@ describe('SearchComponent', () => {
     });
 
     it('should clear suggestions after selection', () => {
-      component.suggestions.set([
-        { type: 'account', label: 'test', value: 'test' },
-      ]);
-
       component.onSelect({ type: 'account', label: 'test', value: 'test' });
 
-      expect(component.suggestions()).toEqual([]);
+      expect(mockStore.clearSearchSuggestions).toHaveBeenCalled();
     });
   });
 
@@ -188,49 +145,14 @@ describe('SearchComponent', () => {
     });
   });
 
-  describe('address validation', () => {
-    it('should recognize tz1 addresses', () => {
-      const address = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
+  describe('suggestions signal', () => {
+    it('should read suggestions from store', () => {
+      const testSuggestions: SearchResult[] = [
+        { type: 'account', label: 'Test', value: 'tz1test' },
+      ];
+      mockStore.searchSuggestions.set(testSuggestions);
 
-      component.onSearch({ query: address, originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
-        true
-      );
-    });
-
-    it('should recognize tz2 addresses', () => {
-      const address = 'tz2BFTyPeYRzxd5aiBchbXN3WCZhx7BqbMBq';
-
-      component.onSearch({ query: address, originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
-        true
-      );
-    });
-
-    it('should recognize tz3 addresses', () => {
-      const address = 'tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9';
-
-      component.onSearch({ query: address, originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
-        true
-      );
-    });
-
-    it('should recognize KT1 addresses', () => {
-      const address = 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL';
-
-      component.onSearch({ query: address, originalEvent: new Event('input') });
-      vi.advanceTimersByTime(350);
-
-      expect(component.suggestions().some((s) => s.type === 'account')).toBe(
-        true
-      );
+      expect(component.suggestions()).toEqual(testSuggestions);
     });
   });
 });

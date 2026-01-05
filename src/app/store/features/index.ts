@@ -3,6 +3,7 @@ export { withBlocksData } from './blocks-data.feature';
 export { withTransactionsData } from './transactions-data.feature';
 export { withAccountData } from './account-data.feature';
 export { withContractData } from './contract-data.feature';
+export { withSearchData } from './search-data.feature';
 export { withRouterSync } from './router-sync.feature';
 export type { RouteType } from './url-utils';
 export {

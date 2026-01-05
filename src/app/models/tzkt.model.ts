@@ -23,6 +23,8 @@ export interface TZKTState {
   count: number;
   loadingCounter: number;
   transactions: Transaction[];
+  // Search state
+  searchSuggestions: import('./search.model').SearchResult[];
   // Account explorer state
   account:
     | import('./account.model').AccountInfo
