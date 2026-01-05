@@ -168,8 +168,9 @@ export class AuthService {
     provider: string
   ): AuthCredential | null {
     const oauthAccessToken = error.customData?._tokenResponse?.oauthAccessToken;
-    if (!oauthAccessToken) return null;
-
+    if (!oauthAccessToken) {
+      return null;
+    }
     if (provider === 'github') {
       return GithubAuthProvider.credential(oauthAccessToken);
     }

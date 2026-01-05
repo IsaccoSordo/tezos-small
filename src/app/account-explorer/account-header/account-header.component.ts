@@ -31,33 +31,34 @@ export class AccountHeaderComponent {
 
   contractCreator = computed(() => {
     const acc = this.account();
-    if (acc && this.isContract() && 'creator' in acc) {
-      return (acc as ContractInfo).creator;
+    if (!acc || !this.isContract() || !('creator' in acc)) {
+      return null;
     }
-    return null;
+    return (acc as ContractInfo).creator;
   });
 
   tzips = computed(() => {
     const acc = this.account();
-    if (acc && this.isContract() && 'tzips' in acc) {
-      return (acc as ContractInfo).tzips ?? [];
+    if (!acc || !this.isContract() || !('tzips' in acc)) {
+      return [];
     }
-    return [];
+    return (acc as ContractInfo).tzips ?? [];
   });
 
   contractKind = computed(() => {
     const acc = this.account();
-    if (acc && this.isContract() && 'kind' in acc) {
-      return (acc as ContractInfo).kind;
+    if (!acc || !this.isContract() || !('kind' in acc)) {
+      return null;
     }
-    return null;
+    return (acc as ContractInfo).kind;
   });
 
   copyAddress(): void {
     const acc = this.account();
-    if (acc) {
-      navigator.clipboard.writeText(acc.address);
+    if (!acc) {
+      return;
     }
+    navigator.clipboard.writeText(acc.address);
   }
 
   formatDate(dateString: string): string {
