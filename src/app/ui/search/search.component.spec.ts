@@ -12,14 +12,12 @@ describe('SearchComponent', () => {
   let mockStore: {
     searchSuggestions: ReturnType<typeof signal<SearchResult[]>>;
     searchAccounts: ReturnType<typeof vi.fn>;
-    clearSearchSuggestions: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
     mockStore = {
       searchSuggestions: signal<SearchResult[]>([]),
       searchAccounts: vi.fn(),
-      clearSearchSuggestions: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -42,11 +40,10 @@ describe('SearchComponent', () => {
   });
 
   describe('onSearch', () => {
-    it('should clear suggestions when query is too short', () => {
+    it('should trigger store search for any query', () => {
       component.onSearch({ query: 'a', originalEvent: new Event('input') });
 
-      expect(mockStore.clearSearchSuggestions).toHaveBeenCalled();
-      expect(mockStore.searchAccounts).not.toHaveBeenCalled();
+      expect(mockStore.searchAccounts).toHaveBeenCalledWith('a');
     });
 
     it('should trigger store search for valid query', () => {
@@ -82,23 +79,43 @@ describe('SearchComponent', () => {
       expect(component.searchQuery).toBe('');
     });
 
-    it('should navigate to account for account type', () => {
+    it('should navigate to account for user type', () => {
       const navigateSpy = vi.spyOn(router, 'navigate');
 
       component.onSelect({
-        type: 'account',
-        label: 'Test Account',
-        value: 'tz1abc123',
+        type: 'user',
+        label: 'Test User',
+        value: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
       });
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/account', 'tz1abc123']);
+      expect(navigateSpy).toHaveBeenCalledWith([
+        '/account',
+        'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+      ]);
       expect(component.searchQuery).toBe('');
     });
 
-    it('should clear suggestions after selection', () => {
-      component.onSelect({ type: 'account', label: 'test', value: 'test' });
+    it('should navigate to account for contract type', () => {
+      const navigateSpy = vi.spyOn(router, 'navigate');
 
-      expect(mockStore.clearSearchSuggestions).toHaveBeenCalled();
+      component.onSelect({
+        type: 'contract',
+        label: 'Test Contract',
+        value: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
+      });
+
+      expect(navigateSpy).toHaveBeenCalledWith([
+        '/account',
+        'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
+      ]);
+      expect(component.searchQuery).toBe('');
+    });
+
+    it('should clear search query after selection', () => {
+      component.searchQuery = 'test query';
+      component.onSelect({ type: 'user', label: 'test', value: 'test' });
+
+      expect(component.searchQuery).toBe('');
     });
   });
 
@@ -148,7 +165,7 @@ describe('SearchComponent', () => {
   describe('suggestions signal', () => {
     it('should read suggestions from store', () => {
       const testSuggestions: SearchResult[] = [
-        { type: 'account', label: 'Test', value: 'tz1test' },
+        { type: 'user', label: 'Test', value: 'tz1test' },
       ];
       mockStore.searchSuggestions.set(testSuggestions);
 

@@ -3,7 +3,7 @@ export interface AccountSuggestion {
   address: string;
 }
 
-export type SearchResultType = 'account' | 'block';
+export type SearchResultType = 'block' | 'contract' | 'user';
 
 export interface SearchResult {
   type: SearchResultType;

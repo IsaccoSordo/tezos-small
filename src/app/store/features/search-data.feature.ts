@@ -6,7 +6,7 @@ import {
   type,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, of, tap, filter, debounceTime } from 'rxjs';
+import { pipe, switchMap, of, tap, debounceTime } from 'rxjs';
 import { TZKTState, SearchResult } from '../../models';
 import { SearchService } from '../../services/search.service';
 import {
@@ -14,7 +14,9 @@ import {
   SEARCH_DEBOUNCE_MS,
   BLOCK_LEVEL_PATTERN,
   TEZOS_ADDRESS_PATTERN,
+  CONTRACT_ADDRESS_PATTERN,
 } from '../../config/search.config';
+import { SearchResultType } from '../../models';
 
 function isBlockLevel(query: string): boolean {
   return BLOCK_LEVEL_PATTERN.test(query);
@@ -22,6 +24,14 @@ function isBlockLevel(query: string): boolean {
 
 function isAddress(query: string): boolean {
   return TEZOS_ADDRESS_PATTERN.test(query);
+}
+
+function isContractAddress(address: string): boolean {
+  return CONTRACT_ADDRESS_PATTERN.test(address);
+}
+
+function getAddressType(address: string): SearchResultType {
+  return isContractAddress(address) ? 'contract' : 'user';
 }
 
 function buildLocalResults(query: string): SearchResult[] {
@@ -37,7 +47,7 @@ function buildLocalResults(query: string): SearchResult[] {
 
   if (isAddress(query)) {
     results.push({
-      type: 'account',
+      type: getAddressType(query),
       label: query,
       value: query,
     });
@@ -53,9 +63,13 @@ export function withSearchData() {
       searchAccounts: rxMethod<string>(
         pipe(
           debounceTime(SEARCH_DEBOUNCE_MS),
-          filter((query) => query.trim().length >= MIN_SEARCH_LENGTH),
           switchMap((query) => {
             const trimmedQuery = query.trim();
+
+            if (trimmedQuery.length < MIN_SEARCH_LENGTH) {
+              return of([]);
+            }
+
             const localResults = buildLocalResults(trimmedQuery);
 
             if (isAddress(trimmedQuery)) {
@@ -65,7 +79,7 @@ export function withSearchData() {
             return searchService.suggestAccounts(trimmedQuery).pipe(
               switchMap((accounts) => {
                 const accountResults: SearchResult[] = accounts.map((acc) => ({
-                  type: 'account' as const,
+                  type: getAddressType(acc.address),
                   label: acc.alias || acc.address,
                   value: acc.address,
                 }));
