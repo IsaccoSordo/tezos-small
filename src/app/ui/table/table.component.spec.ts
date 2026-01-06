@@ -35,7 +35,7 @@ describe('TableComponent', () => {
       expect(component.columns()).toEqual([]);
       expect(component.totalRecords()).toBe(0);
       expect(component.rows()).toBe(10);
-      expect(component.paginator()).toBe(false);
+      expect(component.paginatorMode()).toBe('standard');
       expect(component.scrollable()).toBe(true);
       expect(component.scrollHeight()).toBe('600px');
     });
@@ -57,7 +57,7 @@ describe('TableComponent', () => {
       fixture.componentRef.setInput('data', data);
       fixture.componentRef.setInput('totalRecords', 500);
       fixture.componentRef.setInput('rows', 25);
-      fixture.componentRef.setInput('paginator', true);
+      fixture.componentRef.setInput('paginatorMode', 'standard');
       fixture.componentRef.setInput('scrollable', false);
       fixture.detectChanges();
 
@@ -65,7 +65,7 @@ describe('TableComponent', () => {
       expect(component.data()).toEqual(data);
       expect(component.totalRecords()).toBe(500);
       expect(component.rows()).toBe(25);
-      expect(component.paginator()).toBe(true);
+      expect(component.paginatorMode()).toBe('standard');
       expect(component.scrollable()).toBe(false);
     });
   });

@@ -1,5 +1,11 @@
 <div class="operations-tab">
-  <app-table [data]="operations()" [columns]="columns">
+  <app-table
+    [data]="operations()"
+    [columns]="columns"
+    [paginatorMode]="'cursor'"
+    [cursorState]="cursorState()"
+    (cursorNavigate)="onNavigate($event)"
+  >
     <ng-template #body let-operation>
       <tr class="data-row">
         <td>
@@ -72,11 +78,4 @@
       </tr>
     </ng-template>
   </app-table>
-
-  <app-cursor-paginator
-    [currentIndex]="cursorState().currentIndex"
-    [hasMore]="cursorState().hasMore"
-    [hasData]="hasData()"
-    (navigationChange)="onNavigate($event)"
-  />
 </div>

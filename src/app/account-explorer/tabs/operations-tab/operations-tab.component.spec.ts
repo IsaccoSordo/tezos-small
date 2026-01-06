@@ -131,18 +131,4 @@ describe('OperationsTabComponent', () => {
       expect(emittedDirection).toBe('first');
     });
   });
-
-  describe('hasData', () => {
-    it('should return false when operations is empty', () => {
-      fixture.componentRef.setInput('operations', []);
-      fixture.detectChanges();
-      expect(component.hasData()).toBe(false);
-    });
-
-    it('should return true when operations has items', () => {
-      fixture.componentRef.setInput('operations', [{ id: 1 }]);
-      fixture.detectChanges();
-      expect(component.hasData()).toBe(true);
-    });
-  });
 });

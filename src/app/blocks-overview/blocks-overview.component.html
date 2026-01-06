@@ -10,7 +10,6 @@
     [totalRecords]="count() || 0"
     [rows]="pageSize()"
     [first]="currentPage() * pageSize()"
-    [paginator]="true"
     [scrollable]="true"
     (pageChange)="onPageChange($event)"
   >

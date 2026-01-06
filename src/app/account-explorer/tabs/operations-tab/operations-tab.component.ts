@@ -2,13 +2,11 @@ import {
   Component,
   input,
   output,
-  computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableComponent } from '../../../ui/table/table.component';
-import { CursorPaginatorComponent } from '../../../ui/cursor-paginator/cursor-paginator.component';
 import {
   AccountOperation,
   CursorState,
@@ -22,7 +20,7 @@ import { formatNumber } from '../../../utils/format.utils';
   templateUrl: './operations-tab.component.html',
   styleUrls: ['./operations-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, TableComponent, CursorPaginatorComponent],
+  imports: [CommonModule, RouterLink, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsTabComponent {
@@ -34,8 +32,6 @@ export class OperationsTabComponent {
   });
 
   navigate = output<CursorDirection>();
-
-  hasData = computed(() => this.operations().length > 0);
 
   columns = [
     { field: 'type', header: 'Type' },
