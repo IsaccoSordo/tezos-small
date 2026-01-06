@@ -119,7 +119,6 @@ src/app/
 ├── config/
 │   ├── api.config.ts         # TZKT API base URL
 │   ├── auth.config.ts        # Protected API patterns
-│   ├── cache.config.ts       # HTTP cache configuration
 │   ├── constants.ts          # App constants
 │   ├── httpContext.config.ts # HTTP context tokens
 │   └── search.config.ts      # Search patterns
@@ -138,7 +137,7 @@ src/app/
 │   ├── auth.model.ts         # User, AuthState
 │   ├── search.model.ts       # SearchResult, AccountSuggestion
 │   ├── tzkt.model.ts         # Block, Transaction, TZKTState
-│   ├── ui.model.ts           # Column, TableData
+│   ├── ui.model.ts           # Column, TableData, RouteType, PaginatorMode
 │   └── index.ts              # Barrel file
 ├── navbar/                   # Navigation with search
 ├── services/
@@ -157,8 +156,10 @@ src/app/
 │       ├── search-data.feature.ts
 │       ├── state-mutations.feature.ts
 │       ├── transactions-data.feature.ts
-│       └── url-utils.ts
+│       ├── url-utils.ts
+│       └── index.ts          # Barrel file
 ├── ui/
+│   ├── cursor-paginator/     # Cursor-based pagination
 │   ├── search/               # Global search component
 │   ├── spinner/              # Loading indicator
 │   └── table/                # Reusable data table
@@ -222,9 +223,10 @@ export const Store = signalStore(
 ### HTTP Interceptors
 
 - **Auth**: Attaches Bearer token to protected requests
-- **Cache**: Response caching via [@ngneat/cashew](https://github.com/ngneat/cashew)
 - **Error**: Toast notifications via PrimeNG MessageService
 - **Loading**: Counter-based loading state management
+
+Response caching is handled via [@ngneat/cashew](https://github.com/ngneat/cashew) through HTTP context tokens.
 
 ## API Reference
 

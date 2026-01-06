@@ -1,13 +1,11 @@
-import {
-  Component,
-  input,
-  output,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { TableComponent } from '../../../ui/table/table.component';
-import { ContractEvent, PageChangeEvent } from '../../../models';
+import { PageChangeEvent } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 import { PAGINATION } from '../../../config/constants';
 
 @Component({
@@ -19,12 +17,27 @@ import { PAGINATION } from '../../../config/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventsTabComponent {
-  events = input<ContractEvent[]>([]);
-  totalRecords = input<number>(0);
-  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
-  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  pageChange = output<PageChangeEvent>();
+  queryParams = toSignal(
+    this.route.queryParams.pipe(
+      map((params) => ({
+        pageSize: +(params['pageSize'] ?? PAGINATION.DEFAULT_PAGE_SIZE),
+        page: +(params['page'] ?? PAGINATION.DEFAULT_PAGE),
+      }))
+    ),
+    {
+      initialValue: {
+        pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+        page: PAGINATION.DEFAULT_PAGE,
+      },
+    }
+  );
+
+  events = this.store.contractEvents;
+  totalRecords = this.store.contractEventsCount;
 
   columns = [
     { field: 'tag', header: 'Event Tag' },
@@ -36,7 +49,11 @@ export class EventsTabComponent {
   expandedEvents = new Set<number>();
 
   onPageChange(event: PageChangeEvent): void {
-    this.pageChange.emit(event);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: event.page, pageSize: event.pageSize },
+      queryParamsHandling: 'merge',
+    });
   }
 
   formatTimestamp(timestamp: string): string {

@@ -2,11 +2,9 @@
   <app-table
     [data]="operations()"
     [columns]="columns"
-    [totalRecords]="totalRecords()"
-    [rows]="pageSize()"
-    [first]="currentPage() * pageSize()"
-    [paginator]="true"
-    (pageChange)="onPageChange($event)"
+    [paginatorMode]="'cursor'"
+    [cursorState]="cursorState()"
+    (cursorNavigate)="onNavigate($event)"
   >
     <ng-template #body let-operation>
       <tr class="data-row">

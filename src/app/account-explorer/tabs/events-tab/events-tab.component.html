@@ -44,15 +44,14 @@
       }
     </div>
 
-    @if (totalRecords() > pageSize()) {
+    @if (totalRecords() > queryParams().pageSize) {
       <div class="pagination-wrapper">
         <app-table
           [data]="[]"
           [columns]="[]"
           [totalRecords]="totalRecords()"
-          [rows]="pageSize()"
-          [first]="currentPage() * pageSize()"
-          [paginator]="true"
+          [rows]="queryParams().pageSize"
+          [first]="queryParams().page * queryParams().pageSize"
           (pageChange)="onPageChange($event)"
         />
       </div>

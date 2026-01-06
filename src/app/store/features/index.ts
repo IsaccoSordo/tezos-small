@@ -5,7 +5,6 @@ export { withAccountData } from './account-data.feature';
 export { withContractData } from './contract-data.feature';
 export { withSearchData } from './search-data.feature';
 export { withRouterSync } from './router-sync.feature';
-export type { RouteType } from './url-utils';
 export {
   getRouteType,
   getPaginationParams,

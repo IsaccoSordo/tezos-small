@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AccountSuggestion } from '../models';
 import { TZKT_API_BASE } from '../config/api.config';
-import { context, SKIP_LOADING } from '../config/httpContext.config';
+import { contextNoLoading } from '../config/httpContext.config';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ export class SearchService {
   suggestAccounts(query: string): Observable<AccountSuggestion[]> {
     return this.http.get<AccountSuggestion[]>(
       `${TZKT_API_BASE}/suggest/accounts/${encodeURIComponent(query)}`,
-      { context: context.set(SKIP_LOADING, true) }
+      { context: contextNoLoading }
     );
   }
 }

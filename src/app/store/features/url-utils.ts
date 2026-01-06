@@ -1,6 +1,5 @@
 import { TEZOS, PAGINATION, DEFAULT_TAB } from '../../config/constants';
-
-export type RouteType = 'overview' | 'details' | 'account' | 'other';
+import { RouteType } from '../../models';
 
 const parseUrl = (url: string) => {
   const urlObj = new URL(url, 'http://localhost');

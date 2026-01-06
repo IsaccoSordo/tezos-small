@@ -24,18 +24,20 @@ export class AccountService {
   getAccountOperations(
     address: string,
     limit: number,
-    offset: number
+    lastId?: number
   ): Observable<AccountOperation[]> {
+    const params: Record<string, string> = {
+      limit: limit.toString(),
+      'sort.desc': 'id',
+    };
+
+    if (lastId) {
+      params['lastId'] = lastId.toString();
+    }
+
     return this.http.get<AccountOperation[]>(
       `${TZKT_API_BASE}/accounts/${address}/operations`,
-      {
-        params: {
-          limit: limit.toString(),
-          offset: offset.toString(),
-          'sort.desc': 'id',
-        },
-        context,
-      }
+      { params, context }
     );
   }
 

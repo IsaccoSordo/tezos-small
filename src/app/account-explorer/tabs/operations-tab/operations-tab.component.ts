@@ -1,18 +1,16 @@
-import {
-  Component,
-  input,
-  output,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { TableComponent } from '../../../ui/table/table.component';
-import { AccountOperation, PageChangeEvent } from '../../../models';
+import { CursorDirection } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 import {
-  PAGINATION,
   TEZOS,
   TIME,
   HASH_DISPLAY,
+  PAGINATION,
 } from '../../../config/constants';
 import { formatNumber } from '../../../utils/format.utils';
 
@@ -25,12 +23,16 @@ import { formatNumber } from '../../../utils/format.utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsTabComponent {
-  operations = input<AccountOperation[]>([]);
-  totalRecords = input<number>(0);
-  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
-  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
 
-  pageChange = output<PageChangeEvent>();
+  private address = toSignal(
+    this.route.params.pipe(map((params) => params['address'] as string)),
+    { initialValue: '' }
+  );
+
+  operations = this.store.accountOperations;
+  cursorState = this.store.operationsCursor;
 
   columns = [
     { field: 'type', header: 'Type' },
@@ -43,8 +45,15 @@ export class OperationsTabComponent {
     { field: 'status', header: 'Status' },
   ];
 
-  onPageChange(event: PageChangeEvent): void {
-    this.pageChange.emit(event);
+  onNavigate(direction: CursorDirection): void {
+    const address = this.address();
+    if (!address) return;
+
+    this.store.loadAccountOperations({
+      address,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      direction,
+    });
   }
 
   formatAmount(amount: number | undefined): string {

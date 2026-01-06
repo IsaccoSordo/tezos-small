@@ -8,7 +8,13 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { PageChangeEvent } from '../../models';
+import {
+  PageChangeEvent,
+  CursorState,
+  CursorDirection,
+  PaginatorMode,
+} from '../../models';
+import { CursorPaginatorComponent } from '../cursor-paginator/cursor-paginator.component';
 import { PAGINATION } from '../../config/constants';
 
 @Component({
@@ -16,7 +22,7 @@ import { PAGINATION } from '../../config/constants';
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   standalone: true,
-  imports: [CommonModule, TableModule],
+  imports: [CommonModule, TableModule, CursorPaginatorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent<T = unknown> {
@@ -27,11 +33,18 @@ export class TableComponent<T = unknown> {
   totalRecords = input<number>(0);
   rows = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
   first = input<number>(0);
-  paginator = input<boolean>(false);
   scrollable = input<boolean>(true);
   scrollHeight = input<string>('600px');
 
+  paginatorMode = input<PaginatorMode>('standard');
+  cursorState = input<CursorState>({
+    cursors: [],
+    currentIndex: -1,
+    hasMore: true,
+  });
+
   pageChange = output<PageChangeEvent>();
+  cursorNavigate = output<CursorDirection>();
 
   onPageChange(event: { first?: number | null; rows?: number | null }) {
     const first = event.first ?? 0;
@@ -42,5 +55,9 @@ export class TableComponent<T = unknown> {
       page: page,
       pageSize: rows,
     });
+  }
+
+  onCursorNavigate(direction: CursorDirection): void {
+    this.cursorNavigate.emit(direction);
   }
 }

@@ -3,12 +3,11 @@
     [value]="data()"
     [scrollable]="scrollable()"
     [scrollHeight]="scrollHeight()"
-    [paginator]="paginator()"
+    [paginator]="paginatorMode() === 'standard'"
     [rows]="rows()"
-    [first]="first()"
     [totalRecords]="totalRecords()"
     [rowsPerPageOptions]="[10, 25, 50]"
-    [showCurrentPageReport]="paginator()"
+    [showCurrentPageReport]="paginatorMode() === 'standard'"
     [lazy]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     (onLazyLoad)="onPageChange($event)"
@@ -46,4 +45,13 @@
       </tr>
     </ng-template>
   </p-table>
+
+  @if (paginatorMode() === 'cursor') {
+    <app-cursor-paginator
+      [currentIndex]="cursorState().currentIndex"
+      [hasMore]="cursorState().hasMore"
+      [hasData]="data().length > 0"
+      (navigationChange)="onCursorNavigate($event)"
+    />
+  }
 </div>

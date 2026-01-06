@@ -1,6 +1,6 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContractView } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 @Component({
   selector: 'app-views-tab',
@@ -11,7 +11,9 @@ import { ContractView } from '../../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewsTabComponent {
-  views = input<ContractView[]>([]);
+  private store = inject(Store);
+
+  views = this.store.contractViews;
 
   expandedViews = new Set<string>();
 

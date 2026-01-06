@@ -14,7 +14,18 @@ export interface PageChangeEvent {
   pageSize: number;
 }
 
+export type CursorDirection = 'next' | 'prev' | 'first';
+
+export interface CursorNavigateEvent {
+  direction: CursorDirection;
+  limit: number;
+}
+
 export interface TabConfig {
   label: string;
   value: string;
 }
+
+export type RouteType = 'overview' | 'details' | 'account' | 'other';
+
+export type PaginatorMode = 'standard' | 'cursor';

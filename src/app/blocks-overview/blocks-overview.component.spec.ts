@@ -104,16 +104,16 @@ describe('BlocksOverviewComponent', () => {
     queryParamsSubject.next({ page: '1', pageSize: '20' });
     fixture.detectChanges();
 
-    expect(component.pageSize()).toBe(20);
-    expect(component.currentPage()).toBe(1);
+    expect(component.queryParams().pageSize).toBe(20);
+    expect(component.queryParams().page).toBe(1);
   });
 
   it('should use default pagination values when queryParams are empty', () => {
     queryParamsSubject.next({});
     fixture.detectChanges();
 
-    expect(component.pageSize()).toBe(10);
-    expect(component.currentPage()).toBe(0);
+    expect(component.queryParams().pageSize).toBe(10);
+    expect(component.queryParams().page).toBe(0);
   });
 
   it('should navigate to new URL on page change (0-indexed to 1-indexed URL)', () => {

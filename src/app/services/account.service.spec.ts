@@ -132,10 +132,10 @@ describe('AccountService', () => {
   });
 
   describe('getAccountOperations', () => {
-    it('should fetch account operations with pagination', () => {
+    it('should fetch account operations without lastId for first page', () => {
       let result: AccountOperation[] | undefined;
       service
-        .getAccountOperations('tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb', 10, 20)
+        .getAccountOperations('tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb', 10)
         .subscribe((ops) => {
           result = ops;
         });
@@ -145,8 +145,30 @@ describe('AccountService', () => {
           req.url ===
             `${TZKT_API_BASE}/accounts/tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb/operations` &&
           req.params.get('limit') === '10' &&
-          req.params.get('offset') === '20' &&
-          req.params.get('sort.desc') === 'id'
+          req.params.get('sort.desc') === 'id' &&
+          !req.params.has('lastId')
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush(mockOperations);
+
+      expect(result).toEqual(mockOperations);
+    });
+
+    it('should fetch account operations with lastId for cursor pagination', () => {
+      let result: AccountOperation[] | undefined;
+      service
+        .getAccountOperations('tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb', 10, 12345)
+        .subscribe((ops) => {
+          result = ops;
+        });
+
+      const req = httpMock.expectOne(
+        (req) =>
+          req.url ===
+            `${TZKT_API_BASE}/accounts/tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb/operations` &&
+          req.params.get('limit') === '10' &&
+          req.params.get('sort.desc') === 'id' &&
+          req.params.get('lastId') === '12345'
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockOperations);

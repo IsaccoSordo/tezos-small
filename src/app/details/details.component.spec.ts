@@ -31,6 +31,7 @@ describe('DetailsComponent', () => {
     transactions: signal<Transaction[]>([]),
     errors: signal<Error[]>([]),
     loadingCounter: signal(0),
+    operationsCursor: signal({ cursors: [], currentIndex: -1, hasMore: true }),
     loadBlocks: vi.fn(),
     pollBlocksCount: vi.fn(),
     loadTransactions: vi.fn(),

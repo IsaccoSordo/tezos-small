@@ -22,6 +22,7 @@ export const Store = signalStore(
     account: null,
     accountOperations: [],
     accountOperationsCount: 0,
+    operationsCursor: { cursors: [], currentIndex: -1, hasMore: true },
     entrypoints: [],
     storage: null,
     contractInterface: null,

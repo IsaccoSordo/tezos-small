@@ -1,11 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { TokensTabComponent } from './tokens-tab.component';
-import { TokenBalance, PageChangeEvent } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
+import { TokenBalance } from '../../../models';
 
 describe('TokensTabComponent', () => {
   let component: TokensTabComponent;
   let fixture: ComponentFixture<TokensTabComponent>;
+  let router: Router;
 
   const mockTokenWithMetadata: TokenBalance = {
     id: 1,
@@ -47,13 +52,29 @@ describe('TokensTabComponent', () => {
   };
 
   beforeEach(async () => {
+    const mockStore = {
+      tokenBalances: signal([]),
+      tokenBalancesCount: signal(0),
+    };
+
     await TestBed.configureTestingModule({
       imports: [TokensTabComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: Store, useValue: mockStore },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            params: of({}),
+            queryParams: of({}),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TokensTabComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -121,22 +142,21 @@ describe('TokensTabComponent', () => {
     it('should truncate address correctly', () => {
       const address = 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL';
       const result = component.truncateAddress(address);
-      // PREFIX_LENGTH=8, SUFFIX_LENGTH=6
       expect(result).toBe('KT1Xobej...MvcQuL');
     });
   });
 
-  describe('pageChange', () => {
-    it('should emit pageChange event', () => {
-      let emittedEvent: PageChangeEvent | undefined;
-      component.pageChange.subscribe((event) => {
-        emittedEvent = event;
+  describe('onPageChange', () => {
+    it('should navigate with page params', () => {
+      const navigateSpy = vi.spyOn(router, 'navigate');
+
+      component.onPageChange({ page: 2, pageSize: 25 });
+
+      expect(navigateSpy).toHaveBeenCalledWith([], {
+        relativeTo: expect.anything(),
+        queryParams: { page: 2, pageSize: 25 },
+        queryParamsHandling: 'merge',
       });
-
-      const event: PageChangeEvent = { page: 1, pageSize: 25 };
-      component.onPageChange(event);
-
-      expect(emittedEvent).toEqual({ page: 1, pageSize: 25 });
     });
   });
 });
