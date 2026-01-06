@@ -8,8 +8,8 @@
     [data]="blocks()"
     [columns]="columns"
     [totalRecords]="count() || 0"
-    [rows]="pageSize()"
-    [first]="currentPage() * pageSize()"
+    [rows]="queryParams().pageSize"
+    [first]="queryParams().page * queryParams().pageSize"
     [scrollable]="true"
     (pageChange)="onPageChange($event)"
   >

@@ -2,7 +2,7 @@
   <app-account-header [account]="account()" [isContract]="isContract()" />
 
   <div class="tabs-container">
-    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+    <p-tabs [value]="queryParams().tab" (valueChange)="onTabChange($event)">
       <p-tablist>
         @for (tab of tabs(); track tab.value) {
           <p-tab [value]="tab.value">{{ tab.label }}</p-tab>

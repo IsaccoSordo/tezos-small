@@ -50,12 +50,12 @@ export class AccountExplorerComponent {
   private route = inject(ActivatedRoute);
   store = inject(Store);
 
-  private routeParams = toSignal(
+  private address = toSignal(
     this.route.params.pipe(map((params) => params['address'] as string)),
     { initialValue: '' }
   );
 
-  private queryParams = toSignal(
+  queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
         tab: (params['tab'] as string) ?? DEFAULT_TAB,
@@ -64,9 +64,7 @@ export class AccountExplorerComponent {
     { initialValue: { tab: DEFAULT_TAB } }
   );
 
-  address = computed(() => this.routeParams());
   isContract = computed(() => isContractAddress(this.address()));
-  activeTab = computed(() => this.queryParams().tab);
 
   account = this.store.account;
 

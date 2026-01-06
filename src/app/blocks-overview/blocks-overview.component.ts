@@ -1,9 +1,4 @@
-import {
-  Component,
-  inject,
-  ChangeDetectionStrategy,
-  computed,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -29,23 +24,20 @@ export class BlocksOverviewComponent {
   blocks = this.store.blocks;
   count = this.store.count;
 
-  private queryParams = toSignal(
+  queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
         pageSize: +(params['pageSize'] ?? PAGINATION.DEFAULT_PAGE_SIZE),
-        urlPage: +(params['page'] ?? PAGINATION.DEFAULT_PAGE),
+        page: Math.max(0, +(params['page'] ?? PAGINATION.DEFAULT_PAGE)),
       }))
     ),
     {
       initialValue: {
         pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
-        urlPage: PAGINATION.DEFAULT_PAGE,
+        page: PAGINATION.DEFAULT_PAGE,
       },
     }
   );
-
-  pageSize = computed(() => this.queryParams().pageSize);
-  currentPage = computed(() => Math.max(0, this.queryParams().urlPage));
 
   columns = [
     { field: 'hash', header: 'Hash' },

@@ -3,8 +3,8 @@
     [data]="tokens()"
     [columns]="columns"
     [totalRecords]="totalRecords()"
-    [rows]="pageSize()"
-    [first]="currentPage() * pageSize()"
+    [rows]="queryParams().pageSize"
+    [first]="queryParams().page * queryParams().pageSize"
     (pageChange)="onPageChange($event)"
   >
     <ng-template #body let-token>

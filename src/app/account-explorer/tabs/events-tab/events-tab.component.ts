@@ -1,9 +1,4 @@
-import {
-  Component,
-  inject,
-  ChangeDetectionStrategy,
-  computed,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -26,7 +21,7 @@ export class EventsTabComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  private queryParams = toSignal(
+  queryParams = toSignal(
     this.route.queryParams.pipe(
       map((params) => ({
         pageSize: +(params['pageSize'] ?? PAGINATION.DEFAULT_PAGE_SIZE),
@@ -43,8 +38,6 @@ export class EventsTabComponent {
 
   events = this.store.contractEvents;
   totalRecords = this.store.contractEventsCount;
-  pageSize = computed(() => this.queryParams().pageSize);
-  currentPage = computed(() => this.queryParams().page);
 
   columns = [
     { field: 'tag', header: 'Event Tag' },
