@@ -1,16 +1,41 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { OperationsTabComponent } from './operations-tab.component';
-import { CursorDirection } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 describe('OperationsTabComponent', () => {
   let component: OperationsTabComponent;
   let fixture: ComponentFixture<OperationsTabComponent>;
+  let loadAccountOperationsSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
+    loadAccountOperationsSpy = vi.fn();
+    const mockStore = {
+      accountOperations: signal([]),
+      operationsCursor: signal({
+        cursors: [],
+        currentIndex: -1,
+        hasMore: true,
+      }),
+      loadAccountOperations: loadAccountOperationsSpy,
+    };
+
     await TestBed.configureTestingModule({
       imports: [OperationsTabComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: Store, useValue: mockStore },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            params: of({ address: 'tz1test123' }),
+            queryParams: of({}),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(OperationsTabComponent);
@@ -74,7 +99,6 @@ describe('OperationsTabComponent', () => {
     it('should truncate long hash', () => {
       const hash = 'ooabc123def456ghi789jkl012mno345pqr678stu901vwx234yz';
       const result = component.truncateHash(hash);
-      // PREFIX_LENGTH=8, SUFFIX_LENGTH=6
       expect(result).toBe('ooabc123...x234yz');
     });
 
@@ -114,21 +138,30 @@ describe('OperationsTabComponent', () => {
     });
   });
 
-  describe('navigate', () => {
-    it('should emit navigate event with direction', () => {
-      let emittedDirection: CursorDirection | undefined;
-      component.navigate.subscribe((direction) => {
-        emittedDirection = direction;
+  describe('onNavigate', () => {
+    it('should call store.loadAccountOperations with direction', () => {
+      component.onNavigate('next');
+      expect(loadAccountOperationsSpy).toHaveBeenCalledWith({
+        address: 'tz1test123',
+        limit: 10,
+        direction: 'next',
+      });
+    });
+
+    it('should call store with different directions', () => {
+      component.onNavigate('prev');
+      expect(loadAccountOperationsSpy).toHaveBeenCalledWith({
+        address: 'tz1test123',
+        limit: 10,
+        direction: 'prev',
       });
 
-      component.onNavigate('next');
-      expect(emittedDirection).toBe('next');
-
-      component.onNavigate('prev');
-      expect(emittedDirection).toBe('prev');
-
       component.onNavigate('first');
-      expect(emittedDirection).toBe('first');
+      expect(loadAccountOperationsSpy).toHaveBeenCalledWith({
+        address: 'tz1test123',
+        limit: 10,
+        direction: 'first',
+      });
     });
   });
 });

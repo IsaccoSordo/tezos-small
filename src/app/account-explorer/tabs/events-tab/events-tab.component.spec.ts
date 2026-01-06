@@ -1,20 +1,40 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { EventsTabComponent } from './events-tab.component';
-import { PageChangeEvent } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 describe('EventsTabComponent', () => {
   let component: EventsTabComponent;
   let fixture: ComponentFixture<EventsTabComponent>;
+  let router: Router;
 
   beforeEach(async () => {
+    const mockStore = {
+      contractEvents: signal([]),
+      contractEventsCount: signal(0),
+    };
+
     await TestBed.configureTestingModule({
       imports: [EventsTabComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: Store, useValue: mockStore },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            params: of({}),
+            queryParams: of({}),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EventsTabComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -110,17 +130,17 @@ describe('EventsTabComponent', () => {
     });
   });
 
-  describe('pageChange', () => {
-    it('should emit pageChange event', () => {
-      let emittedEvent: PageChangeEvent | undefined;
-      component.pageChange.subscribe((event) => {
-        emittedEvent = event;
+  describe('onPageChange', () => {
+    it('should navigate with page params', () => {
+      const navigateSpy = vi.spyOn(router, 'navigate');
+
+      component.onPageChange({ page: 3, pageSize: 15 });
+
+      expect(navigateSpy).toHaveBeenCalledWith([], {
+        relativeTo: expect.anything(),
+        queryParams: { page: 3, pageSize: 15 },
+        queryParamsHandling: 'merge',
       });
-
-      const event: PageChangeEvent = { page: 3, pageSize: 15 };
-      component.onPageChange(event);
-
-      expect(emittedEvent).toEqual({ page: 3, pageSize: 15 });
     });
   });
 });

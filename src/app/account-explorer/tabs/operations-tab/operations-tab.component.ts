@@ -1,18 +1,17 @@
-import {
-  Component,
-  input,
-  output,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { TableComponent } from '../../../ui/table/table.component';
+import { CursorDirection } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 import {
-  AccountOperation,
-  CursorState,
-  CursorDirection,
-} from '../../../models';
-import { TEZOS, TIME, HASH_DISPLAY } from '../../../config/constants';
+  TEZOS,
+  TIME,
+  HASH_DISPLAY,
+  PAGINATION,
+} from '../../../config/constants';
 import { formatNumber } from '../../../utils/format.utils';
 
 @Component({
@@ -24,14 +23,16 @@ import { formatNumber } from '../../../utils/format.utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsTabComponent {
-  operations = input<AccountOperation[]>([]);
-  cursorState = input<CursorState>({
-    cursors: [],
-    currentIndex: -1,
-    hasMore: true,
-  });
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
 
-  navigate = output<CursorDirection>();
+  private address = toSignal(
+    this.route.params.pipe(map((params) => params['address'] as string)),
+    { initialValue: '' }
+  );
+
+  operations = this.store.accountOperations;
+  cursorState = this.store.operationsCursor;
 
   columns = [
     { field: 'type', header: 'Type' },
@@ -45,7 +46,14 @@ export class OperationsTabComponent {
   ];
 
   onNavigate(direction: CursorDirection): void {
-    this.navigate.emit(direction);
+    const address = this.address();
+    if (!address) return;
+
+    this.store.loadAccountOperations({
+      address,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      direction,
+    });
   }
 
   formatAmount(amount: number | undefined): string {

@@ -1,6 +1,6 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContractEntrypoint } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 @Component({
   selector: 'app-entrypoints-tab',
@@ -11,7 +11,9 @@ import { ContractEntrypoint } from '../../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntrypointsTabComponent {
-  entrypoints = input<ContractEntrypoint[]>([]);
+  private store = inject(Store);
+
+  entrypoints = this.store.entrypoints;
 
   expandedEntrypoints = new Set<string>();
 

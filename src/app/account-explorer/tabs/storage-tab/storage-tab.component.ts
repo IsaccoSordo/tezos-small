@@ -1,6 +1,6 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContractStorage } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 @Component({
   selector: 'app-storage-tab',
@@ -11,7 +11,9 @@ import { ContractStorage } from '../../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StorageTabComponent {
-  storage = input<ContractStorage | null>(null);
+  private store = inject(Store);
+
+  storage = this.store.storage;
 
   formatStorage(): string {
     const s = this.storage();

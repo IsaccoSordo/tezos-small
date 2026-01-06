@@ -1,11 +1,11 @@
 import {
   Component,
-  input,
+  inject,
   ChangeDetectionStrategy,
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContractInterface } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 
 @Component({
   selector: 'app-code-tab',
@@ -16,7 +16,9 @@ import { ContractInterface } from '../../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeTabComponent {
-  contractInterface = input<ContractInterface | null>(null);
+  private store = inject(Store);
+
+  contractInterface = this.store.contractInterface;
 
   storageSchemaFormatted = computed(() => {
     const ci = this.contractInterface();

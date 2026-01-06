@@ -1,13 +1,16 @@
 import {
   Component,
-  input,
-  output,
+  inject,
   ChangeDetectionStrategy,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { TableComponent } from '../../../ui/table/table.component';
 import { TokenBalance, PageChangeEvent } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
 import { PAGINATION, HASH_DISPLAY } from '../../../config/constants';
 
 @Component({
@@ -19,12 +22,29 @@ import { PAGINATION, HASH_DISPLAY } from '../../../config/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TokensTabComponent {
-  tokens = input<TokenBalance[]>([]);
-  totalRecords = input<number>(0);
-  pageSize = input<number>(PAGINATION.DEFAULT_PAGE_SIZE);
-  currentPage = input<number>(PAGINATION.DEFAULT_PAGE);
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  pageChange = output<PageChangeEvent>();
+  private queryParams = toSignal(
+    this.route.queryParams.pipe(
+      map((params) => ({
+        pageSize: +(params['pageSize'] ?? PAGINATION.DEFAULT_PAGE_SIZE),
+        page: +(params['page'] ?? PAGINATION.DEFAULT_PAGE),
+      }))
+    ),
+    {
+      initialValue: {
+        pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+        page: PAGINATION.DEFAULT_PAGE,
+      },
+    }
+  );
+
+  tokens = this.store.tokenBalances;
+  totalRecords = this.store.tokenBalancesCount;
+  pageSize = computed(() => this.queryParams().pageSize);
+  currentPage = computed(() => this.queryParams().page);
 
   columns = [
     { field: 'token', header: 'Token' },
@@ -35,7 +55,11 @@ export class TokensTabComponent {
   ];
 
   onPageChange(event: PageChangeEvent): void {
-    this.pageChange.emit(event);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: event.page, pageSize: event.pageSize },
+      queryParamsHandling: 'merge',
+    });
   }
 
   getTokenName(token: TokenBalance): string {

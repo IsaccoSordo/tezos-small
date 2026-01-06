@@ -13,41 +13,25 @@
           <p-tabpanel [value]="tab.value">
             @switch (tab.value) {
               @case ('operations') {
-                <app-operations-tab
-                  [operations]="accountOperations()"
-                  [cursorState]="operationsCursor()"
-                  (navigate)="onOperationsNavigate($event)"
-                />
+                <app-operations-tab />
               }
               @case ('storage') {
-                <app-storage-tab [storage]="storage()" />
+                <app-storage-tab />
               }
               @case ('code') {
-                <app-code-tab [contractInterface]="contractInterface()" />
+                <app-code-tab />
               }
               @case ('entrypoints') {
-                <app-entrypoints-tab [entrypoints]="entrypoints()" />
+                <app-entrypoints-tab />
               }
               @case ('views') {
-                <app-views-tab [views]="contractViews()" />
+                <app-views-tab />
               }
               @case ('tokens') {
-                <app-tokens-tab
-                  [tokens]="tokenBalances()"
-                  [totalRecords]="tokenBalancesCount()"
-                  [pageSize]="pageSize()"
-                  [currentPage]="currentPage()"
-                  (pageChange)="onPageChange($event)"
-                />
+                <app-tokens-tab />
               }
               @case ('events') {
-                <app-events-tab
-                  [events]="contractEvents()"
-                  [totalRecords]="contractEventsCount()"
-                  [pageSize]="pageSize()"
-                  [currentPage]="currentPage()"
-                  (pageChange)="onPageChange($event)"
-                />
+                <app-events-tab />
               }
             }
           </p-tabpanel>
