@@ -20,6 +20,8 @@ export type {
   TabConfig,
   CursorDirection,
   CursorNavigateEvent,
+  RouteType,
+  PaginatorMode,
 } from './ui.model';
 
 export type {

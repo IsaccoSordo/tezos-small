@@ -25,3 +25,7 @@ export interface TabConfig {
   label: string;
   value: string;
 }
+
+export type RouteType = 'overview' | 'details' | 'account' | 'other';
+
+export type PaginatorMode = 'standard' | 'cursor';

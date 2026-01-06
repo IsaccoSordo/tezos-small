@@ -8,11 +8,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { PageChangeEvent, CursorState, CursorDirection } from '../../models';
+import {
+  PageChangeEvent,
+  CursorState,
+  CursorDirection,
+  PaginatorMode,
+} from '../../models';
 import { CursorPaginatorComponent } from '../cursor-paginator/cursor-paginator.component';
 import { PAGINATION } from '../../config/constants';
-
-export type PaginatorMode = 'standard' | 'cursor';
 
 @Component({
   selector: 'app-table',
