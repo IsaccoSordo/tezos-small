@@ -4,6 +4,7 @@ import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
 import { Store } from '../../store/tzkt.store';
 import { SearchResult } from '../../models';
+import { routes } from '../../app.routes';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
@@ -22,7 +23,7 @@ describe('SearchComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [SearchComponent],
-      providers: [provideRouter([]), { provide: Store, useValue: mockStore }],
+      providers: [provideRouter(routes), { provide: Store, useValue: mockStore }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchComponent);
