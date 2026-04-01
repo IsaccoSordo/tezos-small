@@ -23,7 +23,10 @@ describe('SearchComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [SearchComponent],
-      providers: [provideRouter(routes), { provide: Store, useValue: mockStore }],
+      providers: [
+        provideRouter(routes),
+        { provide: Store, useValue: mockStore },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchComponent);
