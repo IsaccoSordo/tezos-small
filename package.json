@@ -11,8 +11,8 @@
     "test:ci": "ng test --no-watch",
     "typecheck": "ngc -p tsconfig.app.json --noEmit && ngc -p tsconfig.spec.json --noEmit",
     "lint": "ng lint",
-    "format": "prettier --write \"src/**/*.{ts,html,scss,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\"",
+    "check": "biome check --write .",
+    "check:ci": "biome check .",
     "set-env": "npx ts-node --project scripts/tsconfig.json scripts/set-env.ts"
   },
   "private": true,
