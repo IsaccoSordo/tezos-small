@@ -12,12 +12,6 @@ export type {
 } from './account.model';
 
 export type {
-  AuthState,
-  OAuthCallbackResponse,
-  OAuthProvider,
-  User,
-} from './auth.model';
-export type {
   AccountSuggestion,
   SearchResult,
   SearchResultType,

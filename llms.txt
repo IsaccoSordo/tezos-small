@@ -1,18 +1,18 @@
 # Tezos Small
 
-> Angular 21 application for exploring Tezos blockchain via TZKT API.
+> Angular 22 application for exploring Tezos blockchain via TZKT API.
 
-This project is a zoneless, signal-based SPA using NgRx SignalStore and Firebase Auth. It prioritizes reactive patterns without manual subscriptions.
+This project is a zoneless, signal-based SPA using NgRx SignalStore. It prioritizes reactive patterns without manual subscriptions.
 
-**Stack:** Angular 21 (Zoneless), TypeScript 5.9, PrimeNG 21, NgRx Signals, @angular/fire, @ngneat/cashew.
-**Node:** v20.19+
+**Stack:** Angular 22 (Zoneless), TypeScript 6.0, PrimeNG 22, NgRx Signals, @ngneat/cashew.
+**Node:** v22.22.3+ / v24.15+ / v26+ (Angular 22's own engines range)
 **Live Demo:** [https://isaccosordo.github.io/tezos-small/](https://isaccosordo.github.io/tezos-small/)
 
 ## Core Map
 
 - [package.json](https://www.google.com/search?q=package.json): Exact versioning (no wildcards).
 - [src/main.ts](https://www.google.com/search?q=src/main.ts): Bootstrap with `bootstrapApplication`.
-- [src/app/app.config.ts](https://www.google.com/search?q=src/app/app.config.ts): Global providers (Firebase, PrimeNG Aura, Interceptors).
+- [src/app/app.config.ts](https://www.google.com/search?q=src/app/app.config.ts): Global providers (PrimeNG Aura, Interceptors).
 - [src/app/app.routes.ts](https://www.google.com/search?q=src/app/app.routes.ts): Lazy-loaded routes; data loading is URL-driven via Store hooks.
 
 ## Architecture & Patterns
@@ -22,11 +22,6 @@ This project is a zoneless, signal-based SPA using NgRx SignalStore and Firebase
 - **SignalStore:** Uses composable `signalStoreFeature` slices (`src/app/store/features/`).
 - **Reactive Loading:** `withRouterSync` feature subscribes to Router events and triggers `rxMethod` calls. Components only read signals.
 - **Interceptors:** Centralized loading (`loadingCounter`) and error handling (PrimeNG Toast).
-
-### Authentication
-
-- **Service:** `src/app/services/auth.service.ts` uses `toSignal()` for Firebase state.
-- **Linking:** `pendingLink` signal manages cross-provider email collisions.
 
 ## Coding Standards
 
@@ -41,6 +36,6 @@ This project is a zoneless, signal-based SPA using NgRx SignalStore and Firebase
 ## Project Constraints
 
 - **Zoneless:** Never use `NgZone` or `ChangeDetectorRef`.
-- **Imports:** Use relative paths for siblings; absolute (`src/app/...`) for deep nesting; barrel files (`../models`) for all interfaces.
+- **Imports:** Use relative paths (`tsconfig.json`'s `baseUrl` was removed — TypeScript 6.0 deprecates it ahead of removal in 7.0); barrel files (`../models`) for all interfaces.
 - **Clean Code:** Neutral documentation. No promotional adjectives (e.g., "sleek", "modern").
-- **Testing:** Mock `AuthService` and `Store` using signals. Use `vi.useFakeTimers()` for async tests.
+- **Testing:** Mock `Store` using signals. Use `vi.useFakeTimers()` for async tests.

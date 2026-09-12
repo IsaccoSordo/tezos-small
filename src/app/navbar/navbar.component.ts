@@ -1,18 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  type OnInit,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
-import { AvatarModule } from 'primeng/avatar';
-import { ButtonModule } from 'primeng/button';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MenubarModule } from 'primeng/menubar';
-import { TooltipModule } from 'primeng/tooltip';
-import { Subject, switchMap } from 'rxjs';
-import { AuthService } from '../services/auth.service';
 import { SearchComponent } from '../ui/search/search.component';
 
 @Component({
@@ -20,38 +8,7 @@ import { SearchComponent } from '../ui/search/search.component';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
   standalone: true,
-  imports: [
-    RouterLink,
-    MenubarModule,
-    ButtonModule,
-    AvatarModule,
-    TooltipModule,
-    SearchComponent,
-  ],
+  imports: [RouterLink, MenubarModule, SearchComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent implements OnInit {
-  authService = inject(AuthService);
-  private destroyRef = inject(DestroyRef);
-  private router = inject(Router);
-  private logoutTrigger$ = new Subject<void>();
-
-  ngOnInit(): void {
-    this.logoutTrigger$
-      .pipe(
-        switchMap(() => this.authService.logout()),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.router.navigate(['/']);
-      });
-  }
-
-  navigateToLogin(): void {
-    this.router.navigate(['/login']);
-  }
-
-  logout(): void {
-    this.logoutTrigger$.next();
-  }
-}
+export class NavbarComponent {}

@@ -9,10 +9,6 @@
  *   npx ts-node scripts/set-env.ts --prod   # Generates only production environment
  *
  * Required environment variables:
- *   FIREBASE_API_KEY
- *   FIREBASE_PROJECT_ID
- *   FIREBASE_APP_ID
- *   FIREBASE_SENDER_ID
  *   PRIMENG_UI_KEY
  */
 
@@ -26,19 +22,8 @@ if (existsSync(envPath)) {
   console.log('Loaded .env file');
 }
 
-interface FirebaseConfig {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-  measurementId?: string;
-}
-
 interface Environment {
   production: boolean;
-  firebase: FirebaseConfig;
   primengLicense: string;
 }
 
@@ -52,32 +37,9 @@ function generateEnvironmentContent(env: Environment): string {
 
 export const environment = {
   production: ${env.production},
-  firebase: {
-    apiKey: '${env.firebase.apiKey}',
-    authDomain: '${env.firebase.authDomain}',
-    projectId: '${env.firebase.projectId}',
-    storageBucket: '${env.firebase.storageBucket}',
-    messagingSenderId: '${env.firebase.messagingSenderId}',
-    appId: '${env.firebase.appId}',
-    measurementId: '${env.firebase.measurementId}',
-  },
   primengLicense: '${env.primengLicense}',
 };
 `;
-}
-
-function createFirebaseConfig(): FirebaseConfig {
-  const projectId = getEnvVar('FIREBASE_PROJECT_ID', 'YOUR_PROJECT_ID');
-
-  return {
-    apiKey: getEnvVar('FIREBASE_API_KEY', 'YOUR_API_KEY'),
-    authDomain: `${projectId}.firebaseapp.com`,
-    projectId: projectId,
-    storageBucket: `${projectId}.firebasestorage.com`,
-    messagingSenderId: getEnvVar('FIREBASE_SENDER_ID', 'YOUR_SENDER_ID'),
-    appId: getEnvVar('FIREBASE_APP_ID', 'YOUR_APP_ID'),
-    measurementId: getEnvVar('FIREBASE_MEASUREMENT_ID', 'YOUR_MEASUREMENT_ID'),
-  };
 }
 
 function main(): void {
@@ -90,13 +52,11 @@ function main(): void {
     mkdirSync(environmentsDir, { recursive: true });
   }
 
-  const firebaseConfig = createFirebaseConfig();
   const primengLicense = getEnvVar('PRIMENG_UI_KEY');
 
   if (!prodOnly) {
     const devEnv: Environment = {
       production: false,
-      firebase: firebaseConfig,
       primengLicense,
     };
 
@@ -107,29 +67,12 @@ function main(): void {
 
   const prodEnv: Environment = {
     production: true,
-    firebase: firebaseConfig,
     primengLicense,
   };
 
   const prodPath = join(environmentsDir, 'environment.prod.ts');
   writeFileSync(prodPath, generateEnvironmentContent(prodEnv));
   console.log(`Generated: ${prodPath}`);
-
-  const hasPlaceholders = Object.values(firebaseConfig).some(
-    (value) => value.includes('YOUR_') || value === '' || value === 'undefined'
-  );
-
-  if (hasPlaceholders) {
-    console.warn(
-      '\nWarning: Some environment variables are not set. Using placeholder values.'
-    );
-    console.warn('Required environment variables:');
-    console.warn('  - FIREBASE_API_KEY');
-    console.warn('  - FIREBASE_PROJECT_ID');
-    console.warn('  - FIREBASE_APP_ID');
-    console.warn('  - FIREBASE_SENDER_ID');
-    console.warn('  - FIREBASE_MEASUREMENT_ID');
-  }
 
   if (!primengLicense) {
     console.warn(
