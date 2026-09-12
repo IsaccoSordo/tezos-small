@@ -1,16 +1,16 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import {
-  ContractInfo,
-  ContractEntrypoint,
-  ContractStorage,
-  ContractInterface,
-  ContractView,
-  ContractEvent,
-} from '../models/account.model';
-import { context } from '../config/httpContext.config';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
 import { TZKT_API_BASE } from '../config/api.config';
+import { context } from '../config/httpContext.config';
+import type {
+  ContractEntrypoint,
+  ContractEvent,
+  ContractInfo,
+  ContractInterface,
+  ContractStorage,
+  ContractView,
+} from '../models/account.model';
 
 @Injectable({
   providedIn: 'root',

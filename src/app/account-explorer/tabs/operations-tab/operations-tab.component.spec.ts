@@ -1,10 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { OperationsTabComponent } from './operations-tab.component';
 import { Store } from '../../../store/tzkt.store';
+import { OperationsTabComponent } from './operations-tab.component';
 
 describe('OperationsTabComponent', () => {
   let component: OperationsTabComponent;

@@ -1,4 +1,4 @@
-<p-autoComplete
+<p-autocomplete
   [(ngModel)]="searchQuery"
   [suggestions]="suggestions()"
   (completeMethod)="onSearch($event)"
@@ -8,10 +8,10 @@
   placeholder="Search by level, hash or alias"
   [scrollHeight]="'300px'"
   [showEmptyMessage]="false"
-  [minLength]="2"
+  [minQueryLength]="2"
   appendTo="body"
 >
-  <ng-template let-result pTemplate="item">
+  <ng-template #item let-result>
     <div class="search-result-item">
       @switch (result.type) {
         @case ('block') {
@@ -32,4 +32,4 @@
       </div>
     </div>
   </ng-template>
-</p-autoComplete>
+</p-autocomplete>

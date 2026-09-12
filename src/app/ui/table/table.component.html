@@ -12,7 +12,7 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     (onLazyLoad)="onPageChange($event)"
   >
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         @for (column of columns(); track column.field) {
           <th>{{ column.header }}</th>
@@ -20,7 +20,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-rowData>
+    <ng-template #body let-rowData>
       @if (bodyTemplate()) {
         <ng-container
           *ngTemplateOutlet="bodyTemplate()!; context: { $implicit: rowData }"
@@ -34,7 +34,7 @@
       }
     </ng-template>
 
-    <ng-template pTemplate="emptymessage">
+    <ng-template #emptymessage>
       <tr>
         <td [attr.colspan]="columns().length" class="empty-message">
           <div class="no-data-container">

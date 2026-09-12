@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { DetailsComponent } from './details.component';
-import { Store } from '../store/tzkt.store';
-import { Transaction } from '../models';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import type { Transaction } from '../models';
+import { Store } from '../store/tzkt.store';
+import { DetailsComponent } from './details.component';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;

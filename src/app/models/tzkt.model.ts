@@ -1,15 +1,15 @@
-import { SearchResult } from './search.model';
-import {
+import type {
   AccountInfo,
-  ContractInfo,
   AccountOperation,
   ContractEntrypoint,
-  ContractStorage,
+  ContractEvent,
+  ContractInfo,
   ContractInterface,
+  ContractStorage,
   ContractView,
   TokenBalance,
-  ContractEvent,
 } from './account.model';
+import type { SearchResult } from './search.model';
 
 export interface Account {
   alias: string;

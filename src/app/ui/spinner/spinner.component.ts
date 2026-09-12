@@ -1,14 +1,14 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Store } from 'src/app/store/tzkt.store';
+import { Store } from '../../store/tzkt.store';
 
 @Component({
   selector: 'app-spinner',
   template: `
     @if (loadingCounter$()) {
       <div class="spinner-backdrop">
-        <p-progressSpinner
+        <p-progress-spinner
           [style]="{ width: '70px', height: '70px' }"
           strokeWidth="4"
           fill="transparent"

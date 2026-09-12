@@ -1,44 +1,35 @@
 export type {
-  Account,
-  Block,
-  Transaction,
-  TZKTState,
-  CursorState,
-} from './tzkt.model';
-
-export type {
-  User,
-  OAuthProvider,
-  OAuthCallbackResponse,
-  AuthState,
-} from './auth.model';
-
-export type {
-  Column,
-  TableData,
-  PageChangeEvent,
-  TabConfig,
-  CursorDirection,
-  CursorNavigateEvent,
-  RouteType,
-  PaginatorMode,
-} from './ui.model';
-
-export type {
-  AddressType,
   AccountInfo,
-  ContractInfo,
   AccountOperation,
+  AddressType,
   ContractEntrypoint,
+  ContractEvent,
+  ContractInfo,
+  ContractInterface,
+  ContractStorage,
   ContractView,
   TokenBalance,
-  ContractEvent,
-  ContractStorage,
-  ContractInterface,
 } from './account.model';
 
 export type {
   AccountSuggestion,
-  SearchResultType,
   SearchResult,
+  SearchResultType,
 } from './search.model';
+export type {
+  Account,
+  Block,
+  CursorState,
+  Transaction,
+  TZKTState,
+} from './tzkt.model';
+export type {
+  Column,
+  CursorDirection,
+  CursorNavigateEvent,
+  PageChangeEvent,
+  PaginatorMode,
+  RouteType,
+  TabConfig,
+  TableData,
+} from './ui.model';

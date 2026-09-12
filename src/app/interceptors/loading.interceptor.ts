@@ -1,8 +1,8 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import type { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { finalize } from 'rxjs';
-import { Store } from '../store/tzkt.store';
 import { SKIP_LOADING } from '../config/httpContext.config';
+import { Store } from '../store/tzkt.store';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const store = inject(Store);

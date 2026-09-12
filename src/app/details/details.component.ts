@@ -1,5 +1,5 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Store } from '../store/tzkt.store';
 import { TableComponent } from '../ui/table/table.component';

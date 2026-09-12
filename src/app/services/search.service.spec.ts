@@ -1,14 +1,18 @@
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withXhr,
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { SearchService } from './search.service';
-import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import { AccountSuggestion } from '../models';
 import { TZKT_API_BASE } from '../config/api.config';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
+import type { AccountSuggestion } from '../models';
+import { SearchService } from './search.service';
 
 describe('SearchService', () => {
   let service: SearchService;
@@ -24,6 +28,7 @@ describe('SearchService', () => {
       providers: [
         provideHttpCache(),
         provideHttpClient(
+          withXhr(),
           withInterceptors([withHttpCacheInterceptor(), loadingInterceptor])
         ),
         provideHttpClientTesting(),

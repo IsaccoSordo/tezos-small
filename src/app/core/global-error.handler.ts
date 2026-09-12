@@ -1,4 +1,4 @@
-import { ErrorHandler, Injectable, inject } from '@angular/core';
+import { type ErrorHandler, Injectable, inject } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
 @Injectable()

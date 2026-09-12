@@ -1,22 +1,26 @@
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withXhr,
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { ContractService } from './contract.service';
-import { Store } from '../store/tzkt.store';
-import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import {
-  ContractInfo,
-  ContractEntrypoint,
-  ContractStorage,
-  ContractInterface,
-  ContractView,
-  ContractEvent,
-} from '../models';
 import { TZKT_API_BASE } from '../config/api.config';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
+import type {
+  ContractEntrypoint,
+  ContractEvent,
+  ContractInfo,
+  ContractInterface,
+  ContractStorage,
+  ContractView,
+} from '../models';
+import { Store } from '../store/tzkt.store';
+import { ContractService } from './contract.service';
 
 describe('ContractService', () => {
   let service: ContractService;
@@ -92,6 +96,7 @@ describe('ContractService', () => {
       providers: [
         provideHttpCache(),
         provideHttpClient(
+          withXhr(),
           withInterceptors([withHttpCacheInterceptor(), loadingInterceptor])
         ),
         provideHttpClientTesting(),

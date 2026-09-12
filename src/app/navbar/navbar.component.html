@@ -1,6 +1,6 @@
 <div class="navbar-container">
   <p-menubar>
-    <ng-template pTemplate="start">
+    <ng-template #start>
       <a routerLink="" class="brand-link">
         <img
           src="assets/tezos-logo.svg"
@@ -12,33 +12,6 @@
       <div class="search-container">
         <app-search />
       </div>
-    </ng-template>
-    <ng-template pTemplate="end">
-      @if (authService.isAuthenticated()) {
-        <div class="user-section">
-          <img
-            [src]="authService.user()?.avatar"
-            [alt]="authService.user()?.name"
-            class="user-avatar"
-            referrerpolicy="no-referrer"
-          />
-          <span class="user-name">{{ authService.user()?.name }}</span>
-          <p-button
-            icon="pi pi-sign-out"
-            [text]="true"
-            severity="secondary"
-            (onClick)="logout()"
-            pTooltip="Sign out"
-          />
-        </div>
-      } @else {
-        <p-button
-          label="Sign In"
-          icon="pi pi-sign-in"
-          [text]="true"
-          (onClick)="navigateToLogin()"
-        />
-      }
     </ng-template>
   </p-menubar>
 </div>

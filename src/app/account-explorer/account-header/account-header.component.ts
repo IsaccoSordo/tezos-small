@@ -1,13 +1,13 @@
-import {
-  Component,
-  input,
-  ChangeDetectionStrategy,
-  computed,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AccountInfo, ContractInfo } from '../../models';
 import { TEZOS } from '../../config/constants';
+import type { AccountInfo, ContractInfo } from '../../models';
 import { formatNumber } from '../../utils/format.utils';
 
 @Component({
@@ -24,7 +24,7 @@ export class AccountHeaderComponent {
 
   balanceXTZ = computed(() => {
     const acc = this.account();
-    return !acc || !acc.balance
+    return !acc?.balance
       ? '0'
       : formatNumber(acc.balance / TEZOS.MUTEZ_PER_XTZ);
   });

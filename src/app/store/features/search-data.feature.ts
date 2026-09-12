@@ -1,22 +1,21 @@
 import { inject } from '@angular/core';
 import {
-  signalStoreFeature,
-  withMethods,
   patchState,
+  signalStoreFeature,
   type,
+  withMethods,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, of, tap, debounceTime } from 'rxjs';
-import { TZKTState, SearchResult } from '../../models';
-import { SearchService } from '../../services/search.service';
+import { debounceTime, of, pipe, switchMap, tap } from 'rxjs';
 import {
+  BLOCK_LEVEL_PATTERN,
+  CONTRACT_ADDRESS_PATTERN,
   MIN_SEARCH_LENGTH,
   SEARCH_DEBOUNCE_MS,
-  BLOCK_LEVEL_PATTERN,
   TEZOS_ADDRESS_PATTERN,
-  CONTRACT_ADDRESS_PATTERN,
 } from '../../config/search.config';
-import { SearchResultType } from '../../models';
+import type { SearchResult, SearchResultType, TZKTState } from '../../models';
+import { SearchService } from '../../services/search.service';
 
 function isBlockLevel(query: string): boolean {
   return BLOCK_LEVEL_PATTERN.test(query);

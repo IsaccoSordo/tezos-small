@@ -1,15 +1,16 @@
-import { TestBed } from '@angular/core/testing';
 import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
+  withXhr,
 } from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { loadingInterceptor } from './loading.interceptor';
+import { TestBed } from '@angular/core/testing';
 import { Store } from '../store/tzkt.store';
+import { loadingInterceptor } from './loading.interceptor';
 
 /**
  * Loading Interceptor Test Suite
@@ -30,7 +31,7 @@ describe('loadingInterceptor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([loadingInterceptor])),
+        provideHttpClient(withXhr(), withInterceptors([loadingInterceptor])),
         provideHttpClientTesting(),
       ],
     });

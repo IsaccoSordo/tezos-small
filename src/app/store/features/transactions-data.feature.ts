@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import {
-  signalStoreFeature,
-  withMethods,
   patchState,
+  signalStoreFeature,
   type,
+  withMethods,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
-import { TZKTState } from '../../models';
+import type { TZKTState } from '../../models';
 import { BlocksService } from '../../services/blocks.service';
 
 export function withTransactionsData() {

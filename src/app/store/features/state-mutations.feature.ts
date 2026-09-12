@@ -1,24 +1,24 @@
 import {
-  signalStoreFeature,
-  withMethods,
   patchState,
+  signalStoreFeature,
   type,
+  withMethods,
 } from '@ngrx/signals';
-import {
-  Block,
-  Transaction,
-  TZKTState,
+import { DEFAULT_TAB } from '../../config/constants';
+import type {
   AccountInfo,
-  ContractInfo,
   AccountOperation,
+  Block,
   ContractEntrypoint,
-  ContractStorage,
+  ContractEvent,
+  ContractInfo,
   ContractInterface,
+  ContractStorage,
   ContractView,
   TokenBalance,
-  ContractEvent,
+  Transaction,
+  TZKTState,
 } from '../../models';
-import { DEFAULT_TAB } from '../../config/constants';
 
 export function withStateMutations() {
   return signalStoreFeature(
