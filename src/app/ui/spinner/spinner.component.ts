@@ -8,7 +8,7 @@ import { Store } from '../../store/tzkt.store';
   template: `
     @if (loadingCounter$()) {
       <div class="spinner-backdrop">
-        <p-progressSpinner
+        <p-progress-spinner
           [style]="{ width: '70px', height: '70px' }"
           strokeWidth="4"
           fill="transparent"

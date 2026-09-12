@@ -13,6 +13,7 @@
  *   FIREBASE_PROJECT_ID
  *   FIREBASE_APP_ID
  *   FIREBASE_SENDER_ID
+ *   PRIMENG_UI_KEY
  */
 
 import { config } from 'dotenv';
@@ -38,6 +39,7 @@ interface FirebaseConfig {
 interface Environment {
   production: boolean;
   firebase: FirebaseConfig;
+  primengLicense: string;
 }
 
 function getEnvVar(name: string, fallback = ''): string {
@@ -59,6 +61,7 @@ export const environment = {
     appId: '${env.firebase.appId}',
     measurementId: '${env.firebase.measurementId}',
   },
+  primengLicense: '${env.primengLicense}',
 };
 `;
 }
@@ -88,11 +91,13 @@ function main(): void {
   }
 
   const firebaseConfig = createFirebaseConfig();
+  const primengLicense = getEnvVar('PRIMENG_UI_KEY');
 
   if (!prodOnly) {
     const devEnv: Environment = {
       production: false,
       firebase: firebaseConfig,
+      primengLicense,
     };
 
     const devPath = join(environmentsDir, 'environment.ts');
@@ -103,6 +108,7 @@ function main(): void {
   const prodEnv: Environment = {
     production: true,
     firebase: firebaseConfig,
+    primengLicense,
   };
 
   const prodPath = join(environmentsDir, 'environment.prod.ts');
@@ -123,6 +129,12 @@ function main(): void {
     console.warn('  - FIREBASE_APP_ID');
     console.warn('  - FIREBASE_SENDER_ID');
     console.warn('  - FIREBASE_MEASUREMENT_ID');
+  }
+
+  if (!primengLicense) {
+    console.warn(
+      '\nWarning: PRIMENG_UI_KEY is not set. PrimeNG will render its "Invalid PrimeUI License" banner.'
+    );
   }
 }
 

@@ -46,6 +46,7 @@ export const appConfig: ApplicationConfig = {
           cssLayer: false,
         },
       },
+      license: environment.primengLicense,
     }),
     MessageService,
     { provide: ErrorHandler, useClass: GlobalErrorHandler },

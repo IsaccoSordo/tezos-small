@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate environment files
+        run: npm run set-env
+
       - name: Run typecheck
         run: npm run typecheck
 
@@ -119,6 +122,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_SENDER_ID: ${{ secrets.FIREBASE_SENDER_ID }}
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          PRIMENG_UI_KEY: ${{ secrets.PRIMENG_UI_KEY }}
 
       - name: Copy index.html to 404.html for SPA routing
         run: cp dist/tezos-small/browser/index.html dist/tezos-small/browser/404.html
