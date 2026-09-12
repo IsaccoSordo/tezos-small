@@ -65,7 +65,7 @@ npm install
 ### Environment Setup
 
 1. Copy `.env.example` to `.env`
-2. Fill in your PrimeNG community license key:
+2. Fill in your PrimeNG license key:
 
 ```bash
 PRIMENG_UI_KEY=your_primeng_license_key
@@ -230,7 +230,7 @@ Base URL: `https://api.tzkt.io/v1`
 
 | Variable         | Description                    |
 | ---------------- | ------------------------------- |
-| `PRIMENG_UI_KEY` | PrimeNG community license key   |
+| `PRIMENG_UI_KEY` | PrimeNG license key   |
 
 ## Commands
 
