@@ -1,10 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { EventsTabComponent } from './events-tab.component';
 import { Store } from '../../../store/tzkt.store';
+import { EventsTabComponent } from './events-tab.component';
 
 describe('EventsTabComponent', () => {
   let component: EventsTabComponent;

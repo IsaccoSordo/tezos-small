@@ -1,18 +1,18 @@
 import {
-  Component,
-  inject,
   ChangeDetectionStrategy,
-  OnInit,
+  Component,
   DestroyRef,
+  inject,
+  type OnInit,
 } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
-import { AuthService } from '../services/auth.service';
+import { Subject, switchMap } from 'rxjs';
 import { OAUTH_PROVIDERS } from '../config/auth.config';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',

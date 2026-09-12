@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import type { AccountInfo, ContractInfo } from '../../models';
 import { AccountHeaderComponent } from './account-header.component';
-import { AccountInfo, ContractInfo } from '../../models';
 
 describe('AccountHeaderComponent', () => {
   let component: AccountHeaderComponent;

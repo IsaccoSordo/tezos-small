@@ -1,12 +1,12 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-import { TableComponent } from '../../../ui/table/table.component';
-import { PageChangeEvent } from '../../../models';
-import { Store } from '../../../store/tzkt.store';
 import { PAGINATION } from '../../../config/constants';
+import type { PageChangeEvent } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
+import { TableComponent } from '../../../ui/table/table.component';
 
 @Component({
   selector: 'app-events-tab',

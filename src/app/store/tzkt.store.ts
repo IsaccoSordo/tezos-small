@@ -1,15 +1,15 @@
 import { signalStore, withState } from '@ngrx/signals';
-import { TZKTState } from '../models';
-import {
-  withStateMutations,
-  withBlocksData,
-  withTransactionsData,
-  withAccountData,
-  withContractData,
-  withSearchData,
-  withRouterSync,
-} from './features';
 import { DEFAULT_TAB } from '../config/constants';
+import type { TZKTState } from '../models';
+import {
+  withAccountData,
+  withBlocksData,
+  withContractData,
+  withRouterSync,
+  withSearchData,
+  withStateMutations,
+  withTransactionsData,
+} from './features';
 
 export const Store = signalStore(
   { providedIn: 'root' },

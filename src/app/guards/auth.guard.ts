@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { type CanActivateFn, Router, type UrlTree } from '@angular/router';
+import type { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 

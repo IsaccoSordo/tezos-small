@@ -1,9 +1,9 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AccountSuggestion } from '../models';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
 import { TZKT_API_BASE } from '../config/api.config';
 import { contextNoLoading } from '../config/httpContext.config';
+import type { AccountSuggestion } from '../models';
 
 @Injectable({
   providedIn: 'root',

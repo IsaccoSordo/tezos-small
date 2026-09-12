@@ -1,13 +1,13 @@
+import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
-  computed,
-  ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { CursorDirection } from '../../models';
+import type { CursorDirection } from '../../models';
 
 @Component({
   selector: 'app-cursor-paginator',

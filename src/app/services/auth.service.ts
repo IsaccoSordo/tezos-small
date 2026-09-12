@@ -1,27 +1,27 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable, from, throwError } from 'rxjs';
-import {
-  map,
-  catchError,
-  switchMap,
-  filter,
-  take,
-  first,
-} from 'rxjs/operators';
 import {
   Auth,
-  user,
+  type AuthCredential,
+  type User as FirebaseUser,
+  GithubAuthProvider,
+  GoogleAuthProvider,
   idToken,
+  linkWithCredential,
   signInWithPopup,
   signOut,
-  linkWithCredential,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  User as FirebaseUser,
-  AuthCredential,
+  user,
 } from '@angular/fire/auth';
-import { User } from '../models';
+import { from, type Observable, throwError } from 'rxjs';
+import {
+  catchError,
+  filter,
+  first,
+  map,
+  switchMap,
+  take,
+} from 'rxjs/operators';
+import type { User } from '../models';
 
 export interface PendingLinkCredential {
   credential: AuthCredential;
@@ -43,9 +43,10 @@ export class AuthService {
 
   readonly token = toSignal(idToken(this.auth));
 
-  readonly user = computed(() =>
-    this.firebaseUser() ? this.mapFirebaseUser(this.firebaseUser()!) : null
-  );
+  readonly user = computed(() => {
+    const firebaseUser = this.firebaseUser();
+    return firebaseUser ? this.mapFirebaseUser(firebaseUser) : null;
+  });
 
   readonly isAuthenticated = computed(() => !!this.firebaseUser());
 

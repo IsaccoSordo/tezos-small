@@ -1,17 +1,17 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-import { TableComponent } from '../../../ui/table/table.component';
-import { CursorDirection } from '../../../models';
-import { Store } from '../../../store/tzkt.store';
 import {
-  TEZOS,
-  TIME,
   HASH_DISPLAY,
   PAGINATION,
+  TEZOS,
+  TIME,
 } from '../../../config/constants';
+import type { CursorDirection } from '../../../models';
+import { Store } from '../../../store/tzkt.store';
+import { TableComponent } from '../../../ui/table/table.component';
 import { formatNumber } from '../../../utils/format.utils';
 
 @Component({

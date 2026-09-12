@@ -1,5 +1,5 @@
-import { WritableSignal } from '@angular/core';
-import { Block, Transaction } from '../models';
+import type { WritableSignal } from '@angular/core';
+import type { Block, Transaction } from '../models';
 
 export interface TZKTState {
   blocks: WritableSignal<Block[]>;

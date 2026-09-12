@@ -1,16 +1,16 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
+  type AutoCompleteCompleteEvent,
   AutoCompleteModule,
-  AutoCompleteCompleteEvent,
 } from 'primeng/autocomplete';
-import { Store } from '../../store/tzkt.store';
-import { SearchResult } from '../../models';
 import {
   BLOCK_LEVEL_PATTERN,
   TEZOS_ADDRESS_PATTERN,
 } from '../../config/search.config';
+import type { SearchResult } from '../../models';
+import { Store } from '../../store/tzkt.store';
 
 @Component({
   selector: 'app-search',

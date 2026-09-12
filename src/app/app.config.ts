@@ -1,26 +1,26 @@
 import {
-  ApplicationConfig,
-  provideZonelessChangeDetection,
-  ErrorHandler,
-} from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
-import {
   provideHttpClient,
   withInterceptors,
   withXhr,
 } from '@angular/common/http';
-import { providePrimeNG } from 'primeng/config';
+import {
+  type ApplicationConfig,
+  ErrorHandler,
+  provideZonelessChangeDetection,
+} from '@angular/core';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
 import Aura from '@primeuix/themes/aura';
 import { MessageService } from 'primeng/api';
-import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { routes } from './app.routes';
-import { loadingInterceptor } from './interceptors/loading.interceptor';
-import { errorInterceptor } from './interceptors/error.interceptor';
-import { authInterceptor } from './interceptors/auth.interceptor';
-import { GlobalErrorHandler } from './core/global-error.handler';
+import { providePrimeNG } from 'primeng/config';
 import { environment } from '../environments/environment';
+import { routes } from './app.routes';
+import { GlobalErrorHandler } from './core/global-error.handler';
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { errorInterceptor } from './interceptors/error.interceptor';
+import { loadingInterceptor } from './interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

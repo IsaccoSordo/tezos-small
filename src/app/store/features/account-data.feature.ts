@@ -1,30 +1,30 @@
 import { inject } from '@angular/core';
 import {
-  signalStoreFeature,
-  withMethods,
   patchState,
+  signalStoreFeature,
   type,
+  withMethods,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
+  EMPTY,
+  from,
+  map,
+  mergeMap,
   pipe,
   switchMap,
-  from,
-  mergeMap,
-  toArray,
-  EMPTY,
-  map,
   tap,
+  toArray,
 } from 'rxjs';
-import {
-  TZKTState,
+import { DEFAULT_TAB, RATE_LIMIT } from '../../config/constants';
+import type {
   AccountInfo,
   ContractInfo,
   CursorDirection,
+  TZKTState,
 } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { ContractService } from '../../services/contract.service';
-import { RATE_LIMIT, DEFAULT_TAB } from '../../config/constants';
 import { isContractAddress } from './url-utils';
 
 function getOperationsCount(

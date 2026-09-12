@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import {
   provideHttpClient,
   withInterceptors,
@@ -8,12 +7,13 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { AccountService } from './account.service';
-import { Store } from '../store/tzkt.store';
-import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import { AccountInfo, AccountOperation, TokenBalance } from '../models';
 import { TZKT_API_BASE } from '../config/api.config';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
+import type { AccountInfo, AccountOperation, TokenBalance } from '../models';
+import { Store } from '../store/tzkt.store';
+import { AccountService } from './account.service';
 
 describe('AccountService', () => {
   let service: AccountService;

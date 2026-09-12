@@ -1,4 +1,4 @@
-import { OAuthProvider } from '../models';
+import type { OAuthProvider } from '../models';
 
 export const AUTH_STORAGE_KEYS = {
   TOKEN: 'auth_token',

@@ -1,27 +1,27 @@
 import { inject } from '@angular/core';
 import {
-  signalStoreFeature,
-  withMethods,
   patchState,
+  signalStoreFeature,
   type,
+  withMethods,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
-  pipe,
-  switchMap,
-  interval,
-  startWith,
-  from,
-  map,
-  toArray,
-  of,
   EMPTY,
+  from,
+  interval,
+  map,
   mergeMap,
+  of,
+  pipe,
+  startWith,
+  switchMap,
   tap,
+  toArray,
 } from 'rxjs';
-import { TZKTState } from '../../models';
+import { POLLING, RATE_LIMIT } from '../../config/constants';
+import type { TZKTState } from '../../models';
 import { BlocksService } from '../../services/blocks.service';
-import { RATE_LIMIT, POLLING } from '../../config/constants';
 import { getRouteType } from './url-utils';
 
 export function withBlocksData() {

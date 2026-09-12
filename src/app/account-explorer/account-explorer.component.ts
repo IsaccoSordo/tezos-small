@@ -1,26 +1,26 @@
-import {
-  Component,
-  inject,
-  ChangeDetectionStrategy,
-  computed,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { map } from 'rxjs';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
-import { Store } from '../store/tzkt.store';
-import { TabConfig } from '../models';
-import { PAGINATION, DEFAULT_TAB } from '../config/constants';
-import { AccountHeaderComponent } from './account-header/account-header.component';
-import { OperationsTabComponent } from './tabs/operations-tab/operations-tab.component';
-import { EntrypointsTabComponent } from './tabs/entrypoints-tab/entrypoints-tab.component';
-import { StorageTabComponent } from './tabs/storage-tab/storage-tab.component';
-import { CodeTabComponent } from './tabs/code-tab/code-tab.component';
-import { ViewsTabComponent } from './tabs/views-tab/views-tab.component';
-import { TokensTabComponent } from './tabs/tokens-tab/tokens-tab.component';
-import { EventsTabComponent } from './tabs/events-tab/events-tab.component';
+import { DEFAULT_TAB, PAGINATION } from '../config/constants';
+import type { TabConfig } from '../models';
 import { isContractAddress } from '../store/features';
+import { Store } from '../store/tzkt.store';
+import { AccountHeaderComponent } from './account-header/account-header.component';
+import { CodeTabComponent } from './tabs/code-tab/code-tab.component';
+import { EntrypointsTabComponent } from './tabs/entrypoints-tab/entrypoints-tab.component';
+import { EventsTabComponent } from './tabs/events-tab/events-tab.component';
+import { OperationsTabComponent } from './tabs/operations-tab/operations-tab.component';
+import { StorageTabComponent } from './tabs/storage-tab/storage-tab.component';
+import { TokensTabComponent } from './tabs/tokens-tab/tokens-tab.component';
+import { ViewsTabComponent } from './tabs/views-tab/views-tab.component';
 
 @Component({
   selector: 'app-account-explorer',

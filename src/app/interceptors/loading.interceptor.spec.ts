@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import {
   HttpClient,
   provideHttpClient,
@@ -9,8 +8,9 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { loadingInterceptor } from './loading.interceptor';
+import { TestBed } from '@angular/core/testing';
 import { Store } from '../store/tzkt.store';
+import { loadingInterceptor } from './loading.interceptor';
 
 /**
  * Loading Interceptor Test Suite

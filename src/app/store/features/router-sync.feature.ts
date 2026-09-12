@@ -1,23 +1,23 @@
 import { inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { signalStoreFeature, withHooks, type } from '@ngrx/signals';
+import { NavigationEnd, Router } from '@angular/router';
+import { signalStoreFeature, type, withHooks } from '@ngrx/signals';
 import {
+  distinctUntilChanged,
   filter,
   map,
-  distinctUntilChanged,
   merge,
-  take,
+  type Observable,
   of,
-  Observable,
+  take,
 } from 'rxjs';
-import { TZKTState, CursorDirection } from '../../models';
 import { PAGINATION } from '../../config/constants';
+import type { CursorDirection, TZKTState } from '../../models';
 import {
-  getRouteType,
-  getPaginationParams,
-  getDetailsLevel,
   getAccountAddress,
   getAccountTab,
+  getDetailsLevel,
+  getPaginationParams,
+  getRouteType,
   isContractAddress,
 } from './url-utils';
 
@@ -44,7 +44,7 @@ interface DataLoadingMethods {
     source: Observable<{ address: string; pageSize: number; page: number }>
   ) => void;
   clearAccountState: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  // biome-ignore lint/complexity/noBannedTypes: catch-all for store methods accessed by dynamic key
   [key: string]: Function;
 }
 

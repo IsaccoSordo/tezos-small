@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import {
   provideHttpClient,
   withInterceptors,
@@ -8,12 +7,13 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideHttpCache, withHttpCacheInterceptor } from '@ngneat/cashew';
-import { BlocksService } from './blocks.service';
-import { Store } from '../store/tzkt.store';
-import { loadingInterceptor } from '../interceptors/loading.interceptor';
-import { Block, Transaction } from '../models';
 import { TZKT_API_BASE } from '../config/api.config';
+import { loadingInterceptor } from '../interceptors/loading.interceptor';
+import type { Block, Transaction } from '../models';
+import { Store } from '../store/tzkt.store';
+import { BlocksService } from './blocks.service';
 
 /**
  * BlocksService Test Suite
@@ -149,9 +149,9 @@ describe('BlocksService', () => {
       req.flush(mockBlocks);
 
       expect(result).toBeDefined();
-      expect(result!.length).toBe(2);
-      expect(result![0].hash).toBe('abc123');
-      expect(result![1].hash).toBe('def456');
+      expect(result?.length).toBe(2);
+      expect(result?.[0].hash).toBe('abc123');
+      expect(result?.[1].hash).toBe('def456');
     });
 
     it('should use correct pagination parameters', () => {
@@ -249,8 +249,8 @@ describe('BlocksService', () => {
       req.flush(mockTransactions);
 
       expect(result).toBeDefined();
-      expect(result!.length).toBe(2);
-      expect(result![0].sender.address).toBe('addr1');
+      expect(result?.length).toBe(2);
+      expect(result?.[0].sender.address).toBe('addr1');
     });
 
     it('should handle errors gracefully', () => {

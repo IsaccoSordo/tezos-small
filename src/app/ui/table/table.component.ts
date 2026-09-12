@@ -1,21 +1,21 @@
+import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
+  contentChild,
   input,
   output,
-  contentChild,
-  ChangeDetectionStrategy,
-  TemplateRef,
+  type TemplateRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import {
-  PageChangeEvent,
-  CursorState,
+import { PAGINATION } from '../../config/constants';
+import type {
   CursorDirection,
+  CursorState,
+  PageChangeEvent,
   PaginatorMode,
 } from '../../models';
 import { CursorPaginatorComponent } from '../cursor-paginator/cursor-paginator.component';
-import { PAGINATION } from '../../config/constants';
 
 @Component({
   selector: 'app-table',

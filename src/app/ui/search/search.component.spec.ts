@@ -1,10 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { SearchComponent } from './search.component';
-import { Store } from '../../store/tzkt.store';
-import { SearchResult } from '../../models';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { routes } from '../../app.routes';
+import type { SearchResult } from '../../models';
+import { Store } from '../../store/tzkt.store';
+import { SearchComponent } from './search.component';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;

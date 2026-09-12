@@ -1,11 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BlocksOverviewComponent } from './blocks-overview.component';
-import { provideRouter, Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 import { signal } from '@angular/core';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import type { Block, PageChangeEvent } from '../models';
 import { Store } from '../store/tzkt.store';
-import { Block, PageChangeEvent } from '../models';
+import { BlocksOverviewComponent } from './blocks-overview.component';
 
 describe('BlocksOverviewComponent', () => {
   let component: BlocksOverviewComponent;

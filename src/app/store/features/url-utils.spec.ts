@@ -1,12 +1,12 @@
 import {
+  getAccountAddress,
+  getAccountTab,
+  getAddressType,
+  getDetailsLevel,
+  getPaginationParams,
   getRouteType,
   isContractAddress,
   isUserAddress,
-  getAddressType,
-  getAccountAddress,
-  getAccountTab,
-  getPaginationParams,
-  getDetailsLevel,
 } from './url-utils';
 
 describe('url-utils', () => {

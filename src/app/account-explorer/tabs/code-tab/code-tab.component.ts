@@ -1,10 +1,10 @@
-import {
-  Component,
-  inject,
-  ChangeDetectionStrategy,
-  computed,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { Store } from '../../../store/tzkt.store';
 
 @Component({

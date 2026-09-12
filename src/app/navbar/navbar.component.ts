@@ -1,17 +1,17 @@
 import {
-  Component,
   ChangeDetectionStrategy,
-  inject,
-  OnInit,
+  Component,
   DestroyRef,
+  inject,
+  type OnInit,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, switchMap } from 'rxjs';
-import { MenubarModule } from 'primeng/menubar';
-import { ButtonModule } from 'primeng/button';
+import { Router, RouterLink } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
+import { ButtonModule } from 'primeng/button';
+import { MenubarModule } from 'primeng/menubar';
 import { TooltipModule } from 'primeng/tooltip';
+import { Subject, switchMap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { SearchComponent } from '../ui/search/search.component';
 

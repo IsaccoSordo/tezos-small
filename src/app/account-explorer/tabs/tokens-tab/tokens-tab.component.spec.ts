@@ -1,11 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { TokensTabComponent } from './tokens-tab.component';
+import type { TokenBalance } from '../../../models';
 import { Store } from '../../../store/tzkt.store';
-import { TokenBalance } from '../../../models';
+import { TokensTabComponent } from './tokens-tab.component';
 
 describe('TokensTabComponent', () => {
   let component: TokensTabComponent;

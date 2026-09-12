@@ -1,7 +1,10 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import type {
+  HttpErrorResponse,
+  HttpInterceptorFn,
+} from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, EMPTY } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { catchError, EMPTY } from 'rxjs';
 
 const getBackendErrorMessage = (error: HttpErrorResponse): string =>
   error.error?.message ||

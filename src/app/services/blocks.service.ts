@@ -1,9 +1,9 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Block, Transaction } from '../models';
-import { context } from '../config/httpContext.config';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
 import { TZKT_API_BASE } from '../config/api.config';
+import { context } from '../config/httpContext.config';
+import type { Block, Transaction } from '../models';
 
 @Injectable({
   providedIn: 'root',

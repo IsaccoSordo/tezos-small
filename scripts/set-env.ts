@@ -16,9 +16,9 @@
  *   PRIMENG_UI_KEY
  */
 
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { config } from 'dotenv';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join } from 'path';
 
 const envPath = join(__dirname, '..', '.env');
 if (existsSync(envPath)) {

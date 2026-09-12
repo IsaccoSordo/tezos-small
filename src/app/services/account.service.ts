@@ -1,13 +1,13 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import {
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
+import { TZKT_API_BASE } from '../config/api.config';
+import { context } from '../config/httpContext.config';
+import type {
   AccountInfo,
   AccountOperation,
   TokenBalance,
 } from '../models/account.model';
-import { context } from '../config/httpContext.config';
-import { TZKT_API_BASE } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
