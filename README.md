@@ -256,6 +256,7 @@ Base URL: `https://api.tzkt.io/v1`
 | `FIREBASE_APP_ID`         | Firebase app ID              |
 | `FIREBASE_SENDER_ID`      | Firebase messaging sender ID |
 | `FIREBASE_MEASUREMENT_ID` | Firebase Analytics ID        |
+| `PRIMENG_UI_KEY`          | PrimeNG community license key |
 
 ## Commands
 
@@ -265,8 +266,10 @@ Base URL: `https://api.tzkt.io/v1`
 | `npm run build:prod` | Build for production                      |
 | `npm test`           | Run tests in watch mode                   |
 | `npm run test:ci`    | Run tests once                            |
-| `npm run lint`       | Run ESLint                                |
-| `npm run format`     | Format with Prettier                      |
+| `npm run typecheck`  | Type-check the app and spec tsconfigs     |
+| `npm run lint`       | Run ESLint (Angular templates)            |
+| `npm run check`      | Format and lint with Biome, fixing issues |
+| `npm run check:ci`   | Check formatting and lint with Biome      |
 
 ## License
 
