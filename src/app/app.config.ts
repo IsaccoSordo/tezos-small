@@ -4,7 +4,11 @@ import {
   ErrorHandler,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withXhr,
+} from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { MessageService } from 'primeng/api';
@@ -26,6 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideHttpCache(),
     provideHttpClient(
+      withXhr(),
       withInterceptors([
         authInterceptor,
         withHttpCacheInterceptor(),

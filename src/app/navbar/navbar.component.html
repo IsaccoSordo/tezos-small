@@ -17,8 +17,8 @@
       @if (authService.isAuthenticated()) {
         <div class="user-section">
           <img
-            [src]="authService.user()?.avatar"
-            [alt]="authService.user()?.name"
+            [src]="$safeNavigationMigration(authService.user()?.avatar)"
+            [alt]="$safeNavigationMigration(authService.user()?.name)"
             class="user-avatar"
             referrerpolicy="no-referrer"
           />

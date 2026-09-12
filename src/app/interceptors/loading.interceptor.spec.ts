@@ -3,6 +3,7 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
+  withXhr,
 } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -30,7 +31,7 @@ describe('loadingInterceptor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([loadingInterceptor])),
+        provideHttpClient(withXhr(), withInterceptors([loadingInterceptor])),
         provideHttpClientTesting(),
       ],
     });

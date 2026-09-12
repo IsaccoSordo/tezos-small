@@ -1,5 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withXhr,
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -24,6 +28,7 @@ describe('SearchService', () => {
       providers: [
         provideHttpCache(),
         provideHttpClient(
+          withXhr(),
           withInterceptors([withHttpCacheInterceptor(), loadingInterceptor])
         ),
         provideHttpClientTesting(),
